@@ -10,12 +10,13 @@ This library aims to make it simple to work with just the date part.
 
 ### Install
 
-`composer require madison-solutions/just-date`
-
+```
+composer require madison-solutions/just-date
+```
 
 ### Basic Use
 
-```
+```php
 use MadisonSolutions\JustDate\JustDate;
 
 $date = new JustDate(2019, 4, 21);
@@ -43,7 +44,7 @@ $date->isBefore($date2);
 
 ### Time is ignored
 
-```
+```php
 use MadisonSolutions\JustDate\JustDate;
 
 $t1 = new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney'));
@@ -63,7 +64,7 @@ $d1->isSameAs($d2);
 
 ### Today's date
 
-```
+```php
 use MadisonSolutions\JustDate\JustDate;
 
 // The current date, in the local timezone
@@ -75,7 +76,7 @@ $today_in_denver = Date::today(new DateTimeZone('America/Denver'));
 
 ### Traversing the calendar
 
-```
+```php
 use MadisonSolutions\JustDate\JustDate;
 
 $d1 = new JustDate(2019, 04, 21);
@@ -88,7 +89,7 @@ $d2 = $d1->nextDay();
 
 Note JustDate objects are **immutable** - `nextDay()` and all other similar methods return new instances of JustDate!
 
-```
+```php
 (string) $d1->prevDay();
 // 2019-04-20
 (string) $d1->addDays(3);
@@ -118,7 +119,7 @@ JustDate::spanDays($d1, $d1->endOfMonth()->nextDay())
 
 ### Date Ranges
 
-```
+```php
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\JustDate;
 
