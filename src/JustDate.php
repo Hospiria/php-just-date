@@ -5,8 +5,10 @@ namespace MadisonSolutions\JustDate;
 use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
+use JsonSerializable;
+use Serializable;
 
-class JustDate
+class JustDate implements Serializable, JsonSerializable
 {
     /**
      * Create a new JustDate object from a DateTime object
@@ -50,12 +52,24 @@ class JustDate
      */
     public static function fromYmd(string $ymd) : JustDate
     {
+        return new JustDate(...JustDate::parseYmd($ymd));
+    }
+
+    /**
+     * Get year month and day integers from a string in Y-m-d format, if valid
+     *
+     * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
+     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
+     * @return array Array containing integers [year, month, day]
+     */
+    public static function parseYmd(string $ymd)
+    {
         if (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', trim($ymd), $matches)) {
             $year = (int) $matches[1];
             $month = (int) $matches[2];
             $day = (int) $matches[3];
             if (checkdate($month, $day, $year)) {
-                return new JustDate($year, $month, $day);
+                return [$year, $month, $day];
             }
         }
         throw new InvalidArgumentException("Invalid Y-m-d date '{$ymd}'");
@@ -73,6 +87,42 @@ class JustDate
     public static function spanDays(JustDate $from, JustDate $to) : int
     {
         return (int) round(($to->timestamp - $from->timestamp) / (60 * 60 * 24));
+    }
+
+    /**
+     * Return the earliest of a set of dates
+     *
+     * @param MadisonSolutions\JustDate\JustDate $first
+     * @param MadisonSolutions\JustDate\JustDate ...$others
+     * @return MadisonSolutions\JustDate\JustDate The earliest date from $first and $others
+     */
+    public static function earliest(JustDate $first, JustDate ...$others) : JustDate
+    {
+        $earliest = $first;
+        foreach ($others as $date) {
+            if ($date->isBefore($earliest)) {
+                $earliest = $date;
+            }
+        }
+        return $earliest;
+    }
+
+    /**
+     * Return the latest of a set of dates
+     *
+     * @param MadisonSolutions\JustDate\JustDate $first
+     * @param MadisonSolutions\JustDate\JustDate ...$others
+     * @return MadisonSolutions\JustDate\JustDate The latest date from $first and $others
+     */
+    public static function latest(JustDate $first, JustDate ...$others) : JustDate
+    {
+        $latest = $first;
+        foreach ($others as $date) {
+            if ($date->isAfter($latest)) {
+                $latest = $date;
+            }
+        }
+        return $latest;
     }
 
     /**
@@ -164,7 +214,7 @@ class JustDate
      * Add the specified number of days to this date, and return a new JustDate object for the result
      *
      * @param int $days The number of days to add (use negative values to get earlier dates)
-     * @return JustDate The new JustDate object
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
      */
     public function addDays(int $days) : JustDate
     {
@@ -174,7 +224,7 @@ class JustDate
     /**
      * Get the next day after this one
      *
-     * @return JustDate The new JustDate object
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
      */
     public function nextDay() : JustDate
     {
@@ -184,7 +234,7 @@ class JustDate
     /**
      * Get the day prior to this one
      *
-     * @return JustDate The new JustDate object
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
      */
     public function prevDay() : JustDate
     {
@@ -194,7 +244,7 @@ class JustDate
     /**
      * Get the date which is the start of this date's month
      *
-     * @return JustDate The new JustDate object
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
      */
     public function startOfMonth() : JustDate
     {
@@ -204,7 +254,7 @@ class JustDate
     /**
      * Get the date which is the end of this date's month
      *
-     * @return JustDate The new JustDate object
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
      */
     public function endOfMonth() : JustDate
     {
@@ -264,5 +314,29 @@ class JustDate
     public function isAfterOrSameAs(JustDate $other)
     {
         return $this->timestamp >= $other->timestamp;
+    }
+
+    /**
+     * Serialization of a JustDate will consist of the Y-m-d string
+     */
+    public function serialize()
+    {
+        return (string) $this;
+    }
+
+    /**
+     * Unserialize by parsing the Y-m-d string
+     */
+    public function unserialize($data)
+    {
+        $this->__construct(...JustDate::parseYmd($data));
+    }
+
+    /**
+     * Json serialize to the Y-m-d string
+     */
+    public function jsonSerialize()
+    {
+        return (string) $this;
     }
 }
