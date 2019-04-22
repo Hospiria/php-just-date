@@ -1,5 +1,5 @@
 {
-    "name": "madison-solutions/php-just-date",
+    "name": "madison-solutions/just-date",
     "description": "PHP library for dealing with dates without any time information",
     "keywords": ["date"],
     "license" : "MIT",
