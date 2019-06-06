@@ -53,6 +53,11 @@ class TimeTest extends TestCase
         $t1 = JustTime::fromDateTime($p1);
         $this->assertJustTime('16:23:12', $t1);
         $this->assertSame(gmmktime(16, 23, 12, 1, 1, 1970), $t1->since_midnight);
+
+        // Different date, different timezone, but the time part is the same
+        $t2 = JustTime::fromDateTime(new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney')));
+        $t3 = JustTime::fromDateTime(new DateTime('2018-10-06 16:23:12', new DateTimeZone('Europe/London')));
+        $this->assertTrue($t2->isSameAs($t3));
     }
 
     public function testCreateNow()

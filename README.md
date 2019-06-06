@@ -1,18 +1,20 @@
 # php-just-date
 
-PHP library for dealing with dates without any time information
+PHP library for dealing with dates without any time information, and times without any date information
 
-There are several excellent PHP libraries for working with DateTime objects. But sometimes you need to deal with only the date part of a DateTime object.
+There are several excellent PHP libraries for working with DateTime objects. But sometimes you need to deal with only the date part, or only the time part of a DateTime object.
 
 For example, a hotel booking system might care only about a guest's check-in date - and the exact time of arrival is unimportant. In those situations, all of the functionality relevant to the time of day just gets in the way, making things like comparisons and equality checks awkward. Added complications like timezones and daylight saving time further muddy the waters.
 
-This library aims to make it simple to work with just the date part.
+This library aims to make it simple to work with just the date part, or just the time part.
 
-### Install
+## Install
 
 ```
 composer require madison-solutions/just-date
 ```
+
+## Dates
 
 ### Basic Use
 
@@ -68,10 +70,10 @@ $d1->isSameAs($d2);
 use MadisonSolutions\JustDate\JustDate;
 
 // The current date, in the local timezone
-$today = Date::today();
+$today = JustDate::today();
 
 // What date is is right now in Denver?
-$today_in_denver = Date::today(new DateTimeZone('America/Denver'));
+$today_in_denver = JustDate::today(new DateTimeZone('America/Denver'));
 ```
 
 ### Traversing the calendar
@@ -117,7 +119,7 @@ JustDate::spanDays($d1, $d1->endOfMonth()->nextDay())
 // 10
 ```
 
-### Date Ranges
+## Date Ranges
 
 ```php
 use MadisonSolutions\JustDate\DateRange;
@@ -163,5 +165,91 @@ try {
 } catch (\InvalidArgumentException $e) {
     // Won't let you create a range with end before start
 }
+
+```
+
+## Times
+
+```php
+use MadisonSolutions\JustDate\JustTime;
+
+$time = new JustTime(17, 45, 30);
+
+(string) $time;
+// 17:45:30
+
+$time->format('g:ia');
+// 5:45pm
+
+$time->hours;
+// 17
+$time->minutes;
+// 45
+$time->seconds;
+// 30
+$time->since_midnight;
+// 63930
+
+$time2 = JustDate::fromHis('17:55:00');
+$time->isBefore($time2);
+// true
+
+```
+
+### Date info is ignored
+
+The date part is removed, as well as the timezone.
+If date parameters are used in a format string, the date will be 1 Jan 1970 (unix epoch).
+
+```php
+use MadisonSolutions\JustDate\JustTime;
+
+$t1 = new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney'));
+$t1->format('r');
+// Sun, 21 Apr 2019 16:23:12 +1000
+
+$time1 - JustTime::fromDateTime($t1);
+$time1->format('r');
+// Thu, 01 Jan 1970 16:23:12 +0000
+
+// Different date, different timezone, but the time part is the same
+$t2 = new DateTime('2018-10-06 16:23:12', new DateTimeZone('Europe/London'));
+$time2 = JustTime::fromDateTime($t2);
+$time1->isSameAs($time2);
+// true
+```
+
+### The time now
+
+```php
+use MadisonSolutions\JustDate\JustTime;
+
+// The current time, in the local timezone
+$now = JustTime::now();
+
+// What time is is right now in Denver?
+$time_now_in_denver = JustTime::now(new DateTimeZone('America/Denver'));
+```
+
+### Traversing the clock
+
+Note JustTime objects are **immutable** - `addTime()` returns new instances of JustTime!
+
+```php
+use MadisonSolutions\JustDate\JustTime;
+
+$t1 = new JustTime(12, 0, 0);
+
+$t2 = $t1->addTime(2, 30, 10);
+(string) $t2;
+// '14:30:10'
+
+$t3 = $t1->addTime(14, 0, 0);
+(string) $t3;
+// '02:00:00'
+
+$t4 = $t1->addTime(0, 0, -1);
+(string) $t4;
+// '11:59:59'
 
 ```
