@@ -42,6 +42,18 @@ class TimeTest extends TestCase
 
         $t = new JustTime(-1, -1, -1);
         $this->assertJustTime('22:58:59', $t);
+
+        $t = JustTime::fromSecondsSinceMidnight(1);
+        $this->assertJustTime('00:00:01', $t);
+
+        $t = JustTime::fromSecondsSinceMidnight((15 * 60 * 60) + (23 * 60) + (47));
+        $this->assertJustTime('15:23:47', $t);
+
+        $t = JustTime::fromSecondsSinceMidnight((25 * 60 * 60) + (23 * 60) + (47));
+        $this->assertJustTime('01:23:47', $t);
+
+        $t = JustTime::fromSecondsSinceMidnight(-10);
+        $this->assertJustTime('23:59:50', $t);
     }
 
     public function testCreatefromDateTime()

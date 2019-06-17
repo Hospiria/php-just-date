@@ -118,6 +118,7 @@ class JustTime implements Serializable, JsonSerializable
      * Eg quotientAndRemainder(-10, 60) returns quotient -1 and remainder 50
      * This makes it suitable for 'clock' calculations (-10 minutes is equivalent to 50 minutes from the previous hour)
      *
+     * @deprecated 1.2.0 No longer used by internal code and will be removed in v1.2.0
      * @param int $a the dividend
      * @param int $b the divisor
      * @return array Returns an array [0 => (int) quotient, 1 => (int) remainder]
@@ -131,6 +132,44 @@ class JustTime implements Serializable, JsonSerializable
         } else {
             return [intdiv($a, $b), $a % $b];
         }
+    }
+
+    /**
+     * Get the hours, minutes and seconds given the total number of seconds since midnight
+     *
+     * Note the hours will wrap around midnight if the total number of seconds is more than a day.
+     * The hours returned will always be in the interval 0-23.
+     * The return value will be an array of integers [0 => hours, 1 => minutes, 2 => seconds]
+     *
+     * @param int $seconds_since_midnight The total number of seconds since midnight
+     * @return array The number of hours, minutes and seconds
+     */
+    public static function split(int $seconds_since_midnight)
+    {
+        // Utility fn for finding the remainder when $a is divided by $b
+        // As a side-effect, the quotient is assigned to the 3rd parameter
+        $remainder = function (int $a, int $b, &$q) {
+            $q = intval($a < 0 ? -ceil(-$a / $b) : floor($a / $b));
+            return $a - ($b * $q);
+        };
+        $secs = $remainder($seconds_since_midnight, 60, $mins);
+        $mins = $remainder($mins, 60, $hours);
+        $hours = $remainder($hours, 24, $days);
+        return [$hours, $mins, $secs];
+    }
+
+    /**
+     * Create a new JustTime instance from the total number of seconds since midnight
+     *
+     * Note the hours will wrap around midnight if the total number of seconds is more than a day.
+     *
+     * @param int $seconds_since_midnight The total number of seconds since midnight
+     * @return JustTime The new JustTime instance
+     */
+    public static function fromSecondsSinceMidnight(int $seconds_since_midnight)
+    {
+        list($hours, $mins, $secs) = JustTime::split($seconds_since_midnight);
+        return new JustTime($hours, $mins, $secs);
     }
 
     /**
@@ -148,14 +187,8 @@ class JustTime implements Serializable, JsonSerializable
      */
     public function __construct(int $hours = 0, int $minutes = 0, int $seconds = 0)
     {
-        list($q, $r) = self::quotientAndRemainder($seconds, 60);
-        $this->seconds = $r;
-        $minutes += $q;
-        list($q, $r) = self::quotientAndRemainder($minutes, 60);
-        $this->minutes = $r;
-        $hours += $q;
-        list($q, $r) = self::quotientAndRemainder($hours, 24);
-        $this->hours = $r;
+        $secondsSinceMidnight = ($seconds) + ($minutes * 60) + ($hours * 60 * 60);
+        list($this->hours, $this->minutes, $this->seconds) = JustTime::split($secondsSinceMidnight);
     }
 
     /**
