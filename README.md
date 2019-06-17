@@ -194,6 +194,9 @@ $time2 = JustDate::fromHis('17:55:00');
 $time->isBefore($time2);
 // true
 
+$time3 = JustTime::fromSecondsSinceMidnight(125);
+// 00:02:05
+
 ```
 
 ### Date info is ignored
@@ -252,4 +255,20 @@ $t4 = $t1->addTime(0, 0, -1);
 (string) $t4;
 // '11:59:59'
 
+```
+
+### Rounding to a certain interval
+
+```PHP
+use MadisonSolutions\JustDate\JustTime;
+
+$t1 = new JustTime(12, 47, 10);
+
+// round to nearest minute
+$t2 = $t1->round(60);
+// 12:47:00
+
+// round to nearest quarter of an hour
+$t3 = $t1->round(15 * 60);
+// 12:45:00
 ```
