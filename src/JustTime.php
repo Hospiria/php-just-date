@@ -324,6 +324,21 @@ class JustTime implements Serializable, JsonSerializable
     }
 
     /**
+     * Round a time to a given interval
+     *
+     * For example to round 09:47 to the nearest 15 minutes:
+     * $time = (new JustTime(9, 47))->round(15 * 60); // 09:45
+     *
+     * @param int $interval_seconds The length of the interval to round to, in seconds
+     * @return JustTime A new JustTime instance with the rounded time
+     */
+    public function round(int $interval_seconds)
+    {
+        $rounded = round($this->since_midnight / $interval_seconds) * $interval_seconds;
+        return self::fromSecondsSinceMidnight((int) $rounded);
+    }
+
+    /**
      * Serialization of a JustTime will consist of the H:i:s string
      */
     public function serialize()

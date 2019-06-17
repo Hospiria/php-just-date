@@ -207,6 +207,20 @@ class TimeTest extends TestCase
         $this->assertJustTime('14:08:08', JustTime::latest($t3, $t2, $t1));
     }
 
+    public function testRounding()
+    {
+        $t = new JustTime(15, 47, 12);
+
+        $this->assertJustTime('15:47:12', $t->round(1));
+        $this->assertJustTime('15:47:10', $t->round(10));
+        $this->assertJustTime('15:47:00', $t->round(60));
+        $this->assertJustTime('15:45:00', $t->round(5 * 60));
+        $this->assertJustTime('15:45:00', $t->round(15 * 60));
+        $this->assertJustTime('16:00:00', $t->round(60 * 60));
+        $this->assertJustTime('18:00:00', $t->round(6 * 60 * 60));
+        $this->assertJustTime('00:00:00', $t->round(24 * 60 * 60));
+    }
+
     public function testSerialization()
     {
         $t1 = new JustTime(14, 8, 7);
