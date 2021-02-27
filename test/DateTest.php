@@ -69,6 +69,12 @@ class DateTest extends TestCase
         $d3 = JustDate::today(new DateTimeZone('Pacific/Kiritimati'));
         $d4 = JustDate::today(new DateTimeZone('Pacific/Niue'));
         $this->assertNotEquals((string) $d3, (string) $d4);
+
+        $d5 = JustDate::yesterday();
+        $this->assertJustDate(date('Y-m-d', strtotime('yesterday')), $d5);
+
+        $d6 = JustDate::tomorrow();
+        $this->assertJustDate(date('Y-m-d', strtotime('tomorrow')), $d6);
     }
 
     public function testCreateFromTimestamp()
@@ -138,6 +144,31 @@ class DateTest extends TestCase
         $this->assertJustDate('2019-04-20', $d1->addDays(-1));
         $this->assertJustDate('2019-04-20', $d1->prevDay());
         $this->assertJustDate('2018-06-25', $d1->addDays(-300));
+
+        $this->assertJustDate('2019-04-28', $d1->addWeeks(1));
+        $this->assertJustDate('2019-05-05', $d1->addWeeks(2));
+        $this->assertJustDate('2019-04-14', $d1->addWeeks(-1));
+
+        $this->assertJustDate('2019-05-21', $d1->addMonths(1));
+        $this->assertJustDate('2019-06-21', $d1->addMonths(2));
+        $this->assertJustDate('2019-03-21', $d1->addMonths(-1));
+
+        $this->assertJustDate('2020-04-21', $d1->addYears(1));
+        $this->assertJustDate('2021-04-21', $d1->addYears(2));
+        $this->assertJustDate('2018-04-21', $d1->addYears(-1));
+
+        $this->assertJustDate('2020-05-22', $d1->add(1, 1, 1));
+        $this->assertJustDate('2019-04-21', $d1->add(0, 0, 0));
+        $this->assertJustDate('2018-03-20', $d1->add(-1, -1, -1));
+
+        // Check some edge cases
+        // Adding one month to Jan 30 is ambiguous because there is no Feb 30
+        // Expect it to overflow to March 1/2 (depending on if it's a leap year)
+        $this->assertJustDate('2020-03-01', (new JustDate(2020, 01, 30))->addMonths(1));
+        $this->assertJustDate('2021-03-02', (new JustDate(2021, 01, 30))->addMonths(1));
+        $this->assertJustDate('2021-03-30', (new JustDate(2021, 01, 30))->addMonths(2));
+        $this->assertJustDate('2021-03-02', (new JustDate(2021, 03, 30))->addMonths(-1));
+        // Note this means sometimes $d->addMonths(a)->addMonths(b) is not equal to $d->addMonths(a + b) !
     }
 
     public function testFormat()

@@ -33,6 +33,28 @@ class JustDate implements Serializable, JsonSerializable
     }
 
     /**
+     * Get the date that it was yesterday
+     *
+     * @param ?DateTimeZone $timezone Optional timezone - if specified the date will one day before whatever the date is right now in the specified timezone
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     */
+    public static function yesterday(?DateTimeZone $timezone = null) : JustDate
+    {
+        return JustDate::today()->addDays(-1);
+    }
+
+    /**
+     * Get the date that it will be tomorrow
+     *
+     * @param ?DateTimeZone $timezone Optional timezone - if specified the date will one day after whatever the date is right now in the specified timezone
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     */
+    public static function tomorrow(?DateTimeZone $timezone = null) : JustDate
+    {
+        return JustDate::today()->addDays(1);
+    }
+
+    /**
      * Get the date at the specified timestamp
      *
      * @param ?DateTimeZone $timezone Optional timezone - if specified the date will be whatever the date is in the specified timezone at the specified timestamp
@@ -211,6 +233,19 @@ class JustDate implements Serializable, JsonSerializable
     }
 
     /**
+     * Add the specified number of years, months and days to this date, and return a new JustDate object for the result
+     *
+     * @param int $years The number of years to add (use negative values to get earlier dates)
+     * @param int $months The number of months to add (use negative values to get earlier dates)
+     * @param int $days The number of days to add (use negative values to get earlier dates)
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     */
+    public function add(int $years, int $months, int $days)
+    {
+        return new JustDate($this->year + $years, $this->month + $months, $this->day + $days);
+    }
+
+    /**
      * Add the specified number of days to this date, and return a new JustDate object for the result
      *
      * @param int $days The number of days to add (use negative values to get earlier dates)
@@ -218,7 +253,40 @@ class JustDate implements Serializable, JsonSerializable
      */
     public function addDays(int $days) : JustDate
     {
-        return new JustDate($this->year, $this->month, $this->day + $days);
+        return $this->add(0, 0, $days);
+    }
+
+    /**
+     * Add the specified number of weeks to this date, and return a new JustDate object for the result
+     *
+     * @param int $weeks The number of weeks to add (use negative values to get earlier dates)
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     */
+    public function addWeeks(int $weeks) : JustDate
+    {
+        return $this->add(0, 0, $weeks * 7);
+    }
+
+    /**
+     * Add the specified number of months to this date, and return a new JustDate object for the result
+     *
+     * @param int $months The number of months to add (use negative values to get earlier dates)
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     */
+    public function addMonths(int $months) : JustDate
+    {
+        return $this->add(0, $months, 0);
+    }
+
+    /**
+     * Add the specified number of years to this date, and return a new JustDate object for the result
+     *
+     * @param int $years The number of years to add (use negative values to get earlier dates)
+     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     */
+    public function addYears(int $years) : JustDate
+    {
+        return $this->add($years, 0, 0);
     }
 
     /**
