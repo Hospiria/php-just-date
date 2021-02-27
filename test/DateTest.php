@@ -265,11 +265,15 @@ class DateTest extends TestCase
         $this->assertJustDate('2019-04-21', $r1->start);
         $this->assertJustDate('2019-04-25', $r1->end);
         $this->assertSame(4, $r1->span);
+        $this->assertSame(4, $r1->num_nights);
+        $this->assertSame(5, $r1->num_days);
 
         $r2 = DateRange::fromYmd('2019-04-21', '2019-04-21');
         $this->assertJustDate('2019-04-21', $r2->start);
         $this->assertJustDate('2019-04-21', $r2->end);
         $this->assertSame(0, $r2->span);
+        $this->assertSame(0, $r2->num_nights);
+        $this->assertSame(1, $r2->num_days);
     }
 
     public function testRangeIncludes()

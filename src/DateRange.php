@@ -71,7 +71,9 @@ class DateRange implements JsonSerializable
      *
      * start - The start of the range
      * end - The end of the range
-     * span - The number of days between start and end (if start and end are same day, span is 0)
+     * span - The number of nights between start and end (if start and end are same day, span is 0)
+     * num_nights - Alias for span
+     * num_days - The number of days in the range, including start end end (if start and end are same day, num_days is 1)
      */
     public function __get($name)
     {
@@ -81,7 +83,10 @@ class DateRange implements JsonSerializable
             case 'end':
                 return $this->end;
             case 'span':
+            case 'num_nights':
                 return JustDate::spanDays($this->start, $this->end);
+            case 'num_days':
+                return JustDate::spanDays($this->start, $this->end) + 1;
         }
         return null;
     }
