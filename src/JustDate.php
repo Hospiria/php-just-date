@@ -317,6 +317,98 @@ class JustDate implements Serializable, JsonSerializable
     }
 
     /**
+     * Is the date a Sunday
+     *
+     * @return bool True if the date is a Sunday, false otherwise
+     */
+    public function isSunday()
+    {
+        return $this->day_of_week == 0;
+    }
+
+    /**
+     * Is the date a Monday
+     *
+     * @return bool True if the date is a Monday, false otherwise
+     */
+    public function isMonday()
+    {
+        return $this->day_of_week == 1;
+    }
+
+    /**
+     * Is the date a Tuesday
+     *
+     * @return bool True if the date is a Tuesday, false otherwise
+     */
+    public function isTuesday()
+    {
+        return $this->day_of_week == 2;
+    }
+
+    /**
+     * Is the date a Wednesday
+     *
+     * @return bool True if the date is a Wednesday, false otherwise
+     */
+    public function isWednesday()
+    {
+        return $this->day_of_week == 3;
+    }
+
+    /**
+     * Is the date a Thursday
+     *
+     * @return bool True if the date is a Thursday, false otherwise
+     */
+    public function isThursday()
+    {
+        return $this->day_of_week == 4;
+    }
+
+    /**
+     * Is the date a Friday
+     *
+     * @return bool True if the date is a Friday, false otherwise
+     */
+    public function isFriday()
+    {
+        return $this->day_of_week == 5;
+    }
+
+    /**
+     * Is the date a Saturday
+     *
+     * @return bool True if the date is a Saturday, false otherwise
+     */
+    public function isSaturday()
+    {
+        return $this->day_of_week == 6;
+    }
+
+    /**
+     * Is the date a Weekday (Monday to Friday)
+     *
+     * @return bool True if the date is a Weekday, false otherwise
+     */
+    public function isWeekday()
+    {
+        $dow = $this->day_of_week;
+        return $dow > 0 && $dow < 6;
+    }
+
+    /**
+     * Is the date a Weekend (Saturday or Sunday)
+     *
+     * @return bool True if the date is a Saturday or Sunday, false otherwise
+     */
+    public function isWeekend()
+    {
+        $dow = $this->day_of_week;
+        return $dow == 0 || $dow == 6;
+    }
+
+    /**
      * Serialization of a JustDate will consist of the Y-m-d string
      */
     public function serialize()

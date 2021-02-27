@@ -204,6 +204,38 @@ class DateTest extends TestCase
         $this->assertJustDate('2019-04-23', JustDate::latest($d3, $d2, $d1));
     }
 
+    public function testDaysOfTheWeek()
+    {
+        $d0 = new JustDate(2021, 03, 01); // Monday 1st March
+        $days = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+        ];
+        for ($i = 0; $i < 7; $i++) {
+            $d = $d0->addDays($i);
+            for ($j = 0; $j < 7; $j++) {
+                $method = 'is' . $days[$j];
+                if ($i == $j) {
+                    $this->assertTrue($d->$method());
+                } else {
+                    $this->assertFalse($d->$method());
+                }
+            }
+            if ($days[$i] == 'Saturday' || $days[$i] == 'Sunday') {
+                $this->assertTrue($d->isWeekend());
+                $this->assertFalse($d->isWeekday());
+            } else {
+                $this->assertFalse($d->isWeekend());
+                $this->assertTrue($d->isWeekday());
+            }
+        }
+    }
+
     public function testCreateRange()
     {
         $d1 = new JustDate(2019, 04, 21);
