@@ -288,6 +288,14 @@ class DateTest extends TestCase
         // Start same as end is allowed though
         $r = new DateRange($d1, $d1);
         $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+
+        // You can use eitherWayRound() to supply the end date first
+        $r = DateRange::eitherWayRound($d1, $d2);
+        $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
+        $r = DateRange::eitherWayRound($d2, $d1);
+        $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
+        $r = DateRange::eitherWayRound($d1, $d1);
+        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
     }
 
     public function testRangeGetters()
@@ -394,6 +402,49 @@ class DateTest extends TestCase
         $this->assertDateRange("2019-04-25 to 2019-04-25", DateRange::intersection($r1, $r2));
         $this->assertTrue($r1->contains($r2));
         $this->assertFalse($r2->contains($r1));
+    }
+
+    public function testIteratingSubRanges()
+    {
+        // Split the range into subranges by month
+        $r1 = DateRange::fromYmd('2021-02-28', '2021-04-02');
+        $getMonth = function (JustDate $date) {
+            return $date->month;
+        };
+        $subranges = [];
+        foreach ($r1->iterateSubRanges($getMonth) as $subrange) {
+            $subranges[] = $subrange;
+        }
+        $this->assertSame(3, count($subranges));
+        $this->assertDateRange("2021-02-28 to 2021-02-28", $subranges[0]['range']);
+        $this->assertSame(2, $subranges[0]['value']);
+        $this->assertDateRange("2021-03-01 to 2021-03-31", $subranges[1]['range']);
+        $this->assertSame(3, $subranges[1]['value']);
+        $this->assertDateRange("2021-04-01 to 2021-04-02", $subranges[2]['range']);
+        $this->assertSame(4, $subranges[2]['value']);
+
+        // Same but backwards
+        $subranges = [];
+        foreach ($r1->iterateSubRanges($getMonth, ['backwards' => true]) as $subrange) {
+            $subranges[] = $subrange;
+        }
+        $this->assertSame(3, count($subranges));
+        $this->assertDateRange("2021-04-01 to 2021-04-02", $subranges[0]['range']);
+        $this->assertSame(4, $subranges[0]['value']);
+        $this->assertDateRange("2021-03-01 to 2021-03-31", $subranges[1]['range']);
+        $this->assertSame(3, $subranges[1]['value']);
+        $this->assertDateRange("2021-02-28 to 2021-02-28", $subranges[2]['range']);
+        $this->assertSame(2, $subranges[2]['value']);
+
+        // Single date range
+        $r2 = DateRange::fromYmd('2021-02-28', '2021-02-28');
+        $subranges = [];
+        foreach ($r2->iterateSubRanges($getMonth) as $subrange) {
+            $subranges[] = $subrange;
+        }
+        $this->assertSame(1, count($subranges));
+        $this->assertDateRange("2021-02-28 to 2021-02-28", $subranges[0]['range']);
+        $this->assertSame(2, $subranges[0]['value']);
     }
 
     public function testSerialization()

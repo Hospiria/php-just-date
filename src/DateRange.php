@@ -67,6 +67,21 @@ class DateRange implements JsonSerializable
     }
 
     /**
+     * Create a new DateRange objects from start and end dates specified in any order
+     *
+     * The start date will be whichever of the 2 dates is earliest and the end date
+     * whichever of the 2 dates is latest.
+     *
+     * @param MadisonSolutions\JustDate\JustDate $a Start or end of range
+     * @param MadisonSolutions\JustDate\JustDate $b Other side of range
+     * @return MadisonSolutions\JustDate\DateRange The DateRange object
+     */
+    public static function eitherWayRound(JustDate $a, JustDate $b)
+    {
+        return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
+    }
+
+    /**
      * Getters
      *
      * start - The start of the range
@@ -161,5 +176,56 @@ class DateRange implements JsonSerializable
     public function contains(DateRange $range) : bool
     {
         return $this->start->isBeforeOrSameAs($range->start) && $this->end->isAfterOrSameAs($range->end);
+    }
+
+    /**
+     * Get a generator which splits the range into subranges
+     *
+     * The supplied callback function will be applied to each date in the range,
+     * and consecutive dates for which the callback returns equal values will be
+     * grouped together into a subrange.
+     *
+     * This function returns a generator which will yield each of these contiguous
+     * subranges in turn, together with the callback value. The yield values will
+     * be in the format of an array with 'value' and 'range' keys.
+     *
+     * @param callable $value_fn Callback used to determine how to delimit the subranges
+     *                 Each subrange will contain dates for which the callback returns
+     *                 the same value.
+     * @param array $opts Array of options. Currently one option is supported, boolean
+     *              'backwards' (default false).  If true the subranges will be returned
+     *              in reverse order.
+     */
+    public function iterateSubRanges(callable $value_fn, array $opts = [])
+    {
+        $backwards = (bool) ($opts['backwards'] ?? false);
+        $step = $backwards ? -1 : 1;
+        $end = $backwards ? $this->start : $this->end;
+
+        $sub_range_start = $backwards ? $this->end : $this->start;;
+        $sub_range_end = $sub_range_start;
+        $sub_range_value = $value_fn($sub_range_start);
+
+        while (! $sub_range_end->isSameAs($end)) {
+            $next_date = $sub_range_end->addDays($step);
+            $next_value = $value_fn($next_date);
+            if ($next_value != $sub_range_value) {
+                // Value has changed
+                yield [
+                    'range' => DateRange::eitherWayRound($sub_range_start, $sub_range_end),
+                    'value' => $sub_range_value,
+                ];
+                // Start a new current range
+                $sub_range_start = $next_date;
+                $sub_range_value = $next_value;
+            }
+            $sub_range_end = $next_date;
+        }
+
+        // Finish the current range
+        yield [
+            'range' => DateRange::eitherWayRound($sub_range_start, $sub_range_end),
+            'value' => $sub_range_value,
+        ];
     }
 }
