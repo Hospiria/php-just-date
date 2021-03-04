@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection DuplicatedCode */
 
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\JustDate;
@@ -12,7 +12,7 @@ class DateTest extends TestCase
         $e = null;
         try {
             $callback();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
         }
         $this->assertInstanceOf($exceptionClass, $e);
     }
@@ -35,9 +35,10 @@ class DateTest extends TestCase
         $this->assertJustDate('2019-04-21', $d);
     }
 
-    public function testCreatefromDateTime()
+    public function testCreateFromDateTime()
     {
         // Create a PHP DateTime object with the given date, time and timezone
+        /** @noinspection PhpUnhandledExceptionInspection */
         $p1 = new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney'));
 
         // The resulting JustDate object should have the matching date with no time or timezone info
@@ -47,6 +48,7 @@ class DateTest extends TestCase
 
         // A DateTime with the same date and time in a different timezone will naturally have a different timestamp
         // Since it refers to a different instance in time
+        /** @noinspection PhpUnhandledExceptionInspection */
         $p2 = new DateTime('2019-04-21 16:23:12', new DateTimeZone('Asia/Calcutta'));
         $this->assertNotEquals($p1->getTimestamp(), $p2->getTimestamp());
 
@@ -79,7 +81,7 @@ class DateTest extends TestCase
 
     public function testCreateFromTimestamp()
     {
-        // Create the timesamp for 2019-04-21 16:23 in UTC
+        // Create the timestamp for 2019-04-21 16:23 in UTC
         $ts = gmmktime(16, 23, 12, 4, 21, 2019);
 
         // Create a JustDate from the timestamp
@@ -173,6 +175,7 @@ class DateTest extends TestCase
 
     public function testFormat()
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         $p1 = new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney'));
         $d1 = JustDate::fromDateTime($p1);
 
@@ -238,26 +241,25 @@ class DateTest extends TestCase
     public function testDaysOfTheWeek()
     {
         $d0 = new JustDate(2021, 03, 01); // Monday 1st March
-        $days = [
-            'Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday',
-            'Sunday',
-        ];
         for ($i = 0; $i < 7; $i++) {
             $d = $d0->addDays($i);
+            $is_days = [
+                $d->isMonday(),
+                $d->isTuesday(),
+                $d->isWednesday(),
+                $d->isThursday(),
+                $d->isFriday(),
+                $d->isSaturday(),
+                $d->isSunday(),
+            ];
             for ($j = 0; $j < 7; $j++) {
-                $method = 'is' . $days[$j];
                 if ($i == $j) {
-                    $this->assertTrue($d->$method());
+                    $this->assertTrue($is_days[$j]);
                 } else {
-                    $this->assertFalse($d->$method());
+                    $this->assertFalse($is_days[$j]);
                 }
             }
-            if ($days[$i] == 'Saturday' || $days[$i] == 'Sunday') {
+            if ($d->isSaturday() || $d->isSunday()) {
                 $this->assertTrue($d->isWeekend());
                 $this->assertFalse($d->isWeekday());
             } else {
@@ -279,10 +281,10 @@ class DateTest extends TestCase
 
         // Won't let you make a range with end before start
         $this->assertThrows(InvalidArgumentException::class, function () {
-            $r = new DateRange(new JustDate(2019, 04, 21), new JustDate(2019, 04, 19));
+            new DateRange(new JustDate(2019, 04, 21), new JustDate(2019, 04, 19));
         });
         $this->assertThrows(InvalidArgumentException::class, function () {
-            $r = DateRange::fromYmd('2019-04-21', '2019-04-19');
+            DateRange::fromYmd('2019-04-21', '2019-04-19');
         });
 
         // Start same as end is allowed though
@@ -353,6 +355,7 @@ class DateTest extends TestCase
         $this->assertSame('21', $test_str);
 
         $test_var = false;
+        /** @noinspection PhpUnusedLocalVariableInspection */
         foreach ($r2->eachExceptEnd() as $date) {
             $test_var = true;
         }

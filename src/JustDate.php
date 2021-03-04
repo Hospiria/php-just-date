@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpRedundantOptionalArgumentInspection */
 
 namespace MadisonSolutions\JustDate;
 
@@ -8,15 +8,25 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Serializable;
 
+/**
+ * Class JustDate
+ *
+ * @package MadisonSolutions\JustDate
+ * @property int $year
+ * @property int $month
+ * @property int $day
+ * @property int $day_of_week
+ * @property int $timestamp
+ */
 class JustDate implements Serializable, JsonSerializable
 {
     /**
      * Create a new JustDate object from a DateTime object
      *
      * @param DateTime $date The DateTime object (remains unchanged)
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     * @return JustDate The new JustDate instance
      */
-    public static function fromDateTime(DateTime $date) : JustDate
+    public static function fromDateTime(DateTime $date): JustDate
     {
         return new JustDate((int) $date->format('Y'), (int) $date->format('m'), (int) $date->format('d'));
     }
@@ -25,44 +35,54 @@ class JustDate implements Serializable, JsonSerializable
      * Get the date that it is today
      *
      * @param ?DateTimeZone $timezone Optional timezone - if specified the date will be whatever the date is right now in the specified timezone
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     * @return JustDate The new JustDate instance
      */
-    public static function today(?DateTimeZone $timezone = null) : JustDate
+    public static function today(?DateTimeZone $timezone = null): JustDate
     {
-        return JustDate::fromDateTime(new DateTime('now', $timezone));
+        $dt = new DateTime();
+        if ($timezone) {
+            $dt->setTimezone($timezone);
+        }
+        return JustDate::fromDateTime($dt);
     }
 
     /**
      * Get the date that it was yesterday
      *
      * @param ?DateTimeZone $timezone Optional timezone - if specified the date will one day before whatever the date is right now in the specified timezone
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     * @return JustDate The new JustDate instance
      */
-    public static function yesterday(?DateTimeZone $timezone = null) : JustDate
+    public static function yesterday(?DateTimeZone $timezone = null): JustDate
     {
-        return JustDate::today()->addDays(-1);
+        return JustDate::today($timezone)->addDays(-1);
     }
 
     /**
      * Get the date that it will be tomorrow
      *
      * @param ?DateTimeZone $timezone Optional timezone - if specified the date will one day after whatever the date is right now in the specified timezone
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     * @return JustDate The new JustDate instance
      */
-    public static function tomorrow(?DateTimeZone $timezone = null) : JustDate
+    public static function tomorrow(?DateTimeZone $timezone = null): JustDate
     {
-        return JustDate::today()->addDays(1);
+        return JustDate::today($timezone)->addDays(1);
     }
 
     /**
      * Get the date at the specified timestamp
      *
+     * @param int $timestamp The timestamp
      * @param ?DateTimeZone $timezone Optional timezone - if specified the date will be whatever the date is in the specified timezone at the specified timestamp
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     * @return JustDate The new JustDate instance
      */
-    public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null) : JustDate
+    public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null): JustDate
     {
-        return JustDate::fromDateTime((new DateTime(null, $timezone))->setTimestamp($timestamp));
+        $dt = new DateTime();
+        $dt->setTimestamp($timestamp);
+        if ($timezone) {
+            $dt->setTimezone($timezone);
+        }
+        return JustDate::fromDateTime($dt);
     }
 
     /**
@@ -70,7 +90,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate instance
+     * @return JustDate The new JustDate instance
      */
     public static function fromYmd(string $ymd) : JustDate
     {
@@ -84,7 +104,7 @@ class JustDate implements Serializable, JsonSerializable
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
      * @return array Array containing integers [year, month, day]
      */
-    public static function parseYmd(string $ymd)
+    public static function parseYmd(string $ymd): array
     {
         if (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', trim($ymd), $matches)) {
             $year = (int) $matches[1];
@@ -102,11 +122,11 @@ class JustDate implements Serializable, JsonSerializable
      *
      * Note if the supplied $to date is before the $from date, the result will be negative
      *
-     * @param MadisonSolutions\JustDate\JustDate $from The start date
-     * @param MadisonSolutions\JustDate\JustDate $to The end date
+     * @param JustDate $from The start date
+     * @param JustDate $to The end date
      * @return int The number of days from $from to $to
      */
-    public static function spanDays(JustDate $from, JustDate $to) : int
+    public static function spanDays(JustDate $from, JustDate $to): int
     {
         return (int) round(($to->timestamp - $from->timestamp) / (60 * 60 * 24));
     }
@@ -114,11 +134,11 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Return the earliest of a set of dates
      *
-     * @param MadisonSolutions\JustDate\JustDate $first
-     * @param MadisonSolutions\JustDate\JustDate ...$others
-     * @return MadisonSolutions\JustDate\JustDate The earliest date from $first and $others
+     * @param JustDate $first
+     * @param JustDate ...$others
+     * @return JustDate The earliest date from $first and $others
      */
-    public static function earliest(JustDate $first, JustDate ...$others) : JustDate
+    public static function earliest(JustDate $first, JustDate ...$others): JustDate
     {
         $earliest = $first;
         foreach ($others as $date) {
@@ -132,11 +152,11 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Return the latest of a set of dates
      *
-     * @param MadisonSolutions\JustDate\JustDate $first
-     * @param MadisonSolutions\JustDate\JustDate ...$others
-     * @return MadisonSolutions\JustDate\JustDate The latest date from $first and $others
+     * @param JustDate $first
+     * @param JustDate ...$others
+     * @return JustDate The latest date from $first and $others
      */
-    public static function latest(JustDate $first, JustDate ...$others) : JustDate
+    public static function latest(JustDate $first, JustDate ...$others): JustDate
     {
         $latest = $first;
         foreach ($others as $date) {
@@ -170,7 +190,10 @@ class JustDate implements Serializable, JsonSerializable
         if (is_null($utc)) {
             $utc = new DateTimeZone('UTC');
         }
-        $this->date = (new DateTime(null, $utc))->setDate($year, $month, $day)->setTime(0, 0, 0, 0);
+        $this->date = new DateTime();
+        $this->date->setTimezone($utc)
+            ->setDate($year, $month, $day)
+            ->setTime(0, 0, 0, 0);
     }
 
     /**
@@ -181,6 +204,10 @@ class JustDate implements Serializable, JsonSerializable
      * day - the day of the month as an integer
      * day_of_week - the day of the week (0 = Sunday ... 6 = Saturday)
      * timestamp - unix timestamp corresponding to 00:00:00 on this date in UTC
+     *
+     * @param $name
+     * @return mixed
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function __get($name)
     {
@@ -196,9 +223,10 @@ class JustDate implements Serializable, JsonSerializable
             case 'timestamp':
                 return (int) $this->date->getTimestamp();
         }
+        return null;
     }
 
-    public function __isset($name)
+    public function __isset($name): bool
     {
         switch ($name) {
             case 'year':
@@ -214,7 +242,7 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Standard string representation is Y-m-d format
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->date->format('Y-m-d');
     }
@@ -227,7 +255,7 @@ class JustDate implements Serializable, JsonSerializable
      * @param string $format The format, as per PHP's date() function
      * @return string The formatted string
      */
-    public function format(string $format = 'Y-m-d') : string
+    public function format(string $format = 'Y-m-d'): string
     {
         return $this->date->format($format);
     }
@@ -238,9 +266,9 @@ class JustDate implements Serializable, JsonSerializable
      * @param int $years The number of years to add (use negative values to get earlier dates)
      * @param int $months The number of months to add (use negative values to get earlier dates)
      * @param int $days The number of days to add (use negative values to get earlier dates)
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function add(int $years, int $months, int $days)
+    public function add(int $years, int $months, int $days): JustDate
     {
         return new JustDate($this->year + $years, $this->month + $months, $this->day + $days);
     }
@@ -249,9 +277,9 @@ class JustDate implements Serializable, JsonSerializable
      * Add the specified number of days to this date, and return a new JustDate object for the result
      *
      * @param int $days The number of days to add (use negative values to get earlier dates)
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function addDays(int $days) : JustDate
+    public function addDays(int $days): JustDate
     {
         return $this->add(0, 0, $days);
     }
@@ -260,9 +288,9 @@ class JustDate implements Serializable, JsonSerializable
      * Add the specified number of weeks to this date, and return a new JustDate object for the result
      *
      * @param int $weeks The number of weeks to add (use negative values to get earlier dates)
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function addWeeks(int $weeks) : JustDate
+    public function addWeeks(int $weeks): JustDate
     {
         return $this->add(0, 0, $weeks * 7);
     }
@@ -271,9 +299,9 @@ class JustDate implements Serializable, JsonSerializable
      * Add the specified number of months to this date, and return a new JustDate object for the result
      *
      * @param int $months The number of months to add (use negative values to get earlier dates)
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function addMonths(int $months) : JustDate
+    public function addMonths(int $months): JustDate
     {
         return $this->add(0, $months, 0);
     }
@@ -282,9 +310,9 @@ class JustDate implements Serializable, JsonSerializable
      * Add the specified number of years to this date, and return a new JustDate object for the result
      *
      * @param int $years The number of years to add (use negative values to get earlier dates)
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function addYears(int $years) : JustDate
+    public function addYears(int $years): JustDate
     {
         return $this->add($years, 0, 0);
     }
@@ -292,9 +320,9 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Get the next day after this one
      *
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function nextDay() : JustDate
+    public function nextDay(): JustDate
     {
         return $this->addDays(1);
     }
@@ -302,9 +330,9 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Get the day prior to this one
      *
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function prevDay() : JustDate
+    public function prevDay(): JustDate
     {
         return $this->addDays(-1);
     }
@@ -312,9 +340,9 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Get the date which is the start of this date's month
      *
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function startOfMonth() : JustDate
+    public function startOfMonth(): JustDate
     {
         return new JustDate($this->year, $this->month, 1);
     }
@@ -322,9 +350,9 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Get the date which is the end of this date's month
      *
-     * @return MadisonSolutions\JustDate\JustDate The new JustDate object
+     * @return JustDate The new JustDate object
      */
-    public function endOfMonth() : JustDate
+    public function endOfMonth(): JustDate
     {
         return new JustDate($this->year, $this->month + 1, 0);
     }
@@ -332,10 +360,10 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Test whether a JustDate object refers to the same date as this one
      *
-     * @param MadisonSolutions\JustDate\JustDate $other
+     * @param JustDate $other
      * @return bool True if $other is the same date
      */
-    public function isSameAs(JustDate $other)
+    public function isSameAs(JustDate $other): bool
     {
         return $this->timestamp == $other->timestamp;
     }
@@ -343,10 +371,10 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date before this one
      *
-     * @param MadisonSolutions\JustDate\JustDate $other
+     * @param JustDate $other
      * @return bool True if $other is before this date
      */
-    public function isBefore(JustDate $other)
+    public function isBefore(JustDate $other): bool
     {
         return $this->timestamp < $other->timestamp;
     }
@@ -354,10 +382,10 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date before or equal to this one
      *
-     * @param MadisonSolutions\JustDate\JustDate $other
+     * @param JustDate $other
      * @return bool True if $other is before or the same as this date
      */
-    public function isBeforeOrSameAs(JustDate $other)
+    public function isBeforeOrSameAs(JustDate $other): bool
     {
         return $this->timestamp <= $other->timestamp;
     }
@@ -365,10 +393,10 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date after this one
      *
-     * @param MadisonSolutions\JustDate\JustDate $other
+     * @param JustDate $other
      * @return bool True if $other is after this date
      */
-    public function isAfter(JustDate $other)
+    public function isAfter(JustDate $other): bool
     {
         return $this->timestamp > $other->timestamp;
     }
@@ -376,10 +404,10 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date after or equal to this one
      *
-     * @param MadisonSolutions\JustDate\JustDate $other
+     * @param JustDate $other
      * @return bool True if $other is after or the same as this date
      */
-    public function isAfterOrSameAs(JustDate $other)
+    public function isAfterOrSameAs(JustDate $other): bool
     {
         return $this->timestamp >= $other->timestamp;
     }
@@ -389,7 +417,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Sunday, false otherwise
      */
-    public function isSunday()
+    public function isSunday(): bool
     {
         return $this->day_of_week == 0;
     }
@@ -399,7 +427,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Monday, false otherwise
      */
-    public function isMonday()
+    public function isMonday(): bool
     {
         return $this->day_of_week == 1;
     }
@@ -409,7 +437,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Tuesday, false otherwise
      */
-    public function isTuesday()
+    public function isTuesday(): bool
     {
         return $this->day_of_week == 2;
     }
@@ -419,7 +447,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Wednesday, false otherwise
      */
-    public function isWednesday()
+    public function isWednesday(): bool
     {
         return $this->day_of_week == 3;
     }
@@ -429,7 +457,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Thursday, false otherwise
      */
-    public function isThursday()
+    public function isThursday(): bool
     {
         return $this->day_of_week == 4;
     }
@@ -439,7 +467,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Friday, false otherwise
      */
-    public function isFriday()
+    public function isFriday(): bool
     {
         return $this->day_of_week == 5;
     }
@@ -449,7 +477,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Saturday, false otherwise
      */
-    public function isSaturday()
+    public function isSaturday(): bool
     {
         return $this->day_of_week == 6;
     }
@@ -459,7 +487,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Weekday, false otherwise
      */
-    public function isWeekday()
+    public function isWeekday(): bool
     {
         $dow = $this->day_of_week;
         return $dow > 0 && $dow < 6;
@@ -470,7 +498,7 @@ class JustDate implements Serializable, JsonSerializable
      *
      * @return bool True if the date is a Saturday or Sunday, false otherwise
      */
-    public function isWeekend()
+    public function isWeekend(): bool
     {
         $dow = $this->day_of_week;
         return $dow == 0 || $dow == 6;
@@ -479,23 +507,25 @@ class JustDate implements Serializable, JsonSerializable
     /**
      * Serialization of a JustDate will consist of the Y-m-d string
      */
-    public function serialize()
+    public function serialize(): string
     {
         return (string) $this;
     }
 
     /**
      * Unserialize by parsing the Y-m-d string
+     *
+     * @param $serialized
      */
-    public function unserialize($data)
+    public function unserialize($serialized)
     {
-        $this->__construct(...JustDate::parseYmd($data));
+        $this->__construct(...JustDate::parseYmd($serialized));
     }
 
     /**
      * Json serialize to the Y-m-d string
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return (string) $this;
     }

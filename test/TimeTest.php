@@ -1,4 +1,8 @@
 <?php
+/**
+ * @noinspection DuplicatedCode
+ * @noinspection PhpRedundantOptionalArgumentInspection
+ */
 
 use MadisonSolutions\JustDate\JustTime;
 use PHPUnit\Framework\TestCase;
@@ -11,7 +15,7 @@ class TimeTest extends TestCase
         $e = null;
         try {
             $callback();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
         }
         $this->assertInstanceOf($exceptionClass, $e);
     }
@@ -56,9 +60,10 @@ class TimeTest extends TestCase
         $this->assertJustTime('23:59:50', $t);
     }
 
-    public function testCreatefromDateTime()
+    public function testCreateFromDateTime()
     {
         // Create a PHP DateTime object with the given date, time and timezone
+        /** @noinspection PhpUnhandledExceptionInspection */
         $p1 = new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney'));
 
         // The resulting JustTime object should have the matching time and no date info
@@ -67,7 +72,9 @@ class TimeTest extends TestCase
         $this->assertSame(gmmktime(16, 23, 12, 1, 1, 1970), $t1->since_midnight);
 
         // Different date, different timezone, but the time part is the same
+        /** @noinspection PhpUnhandledExceptionInspection */
         $t2 = JustTime::fromDateTime(new DateTime('2019-04-21 16:23:12', new DateTimeZone('Australia/Sydney')));
+        /** @noinspection PhpUnhandledExceptionInspection */
         $t3 = JustTime::fromDateTime(new DateTime('2018-10-06 16:23:12', new DateTimeZone('Europe/London')));
         $this->assertTrue($t2->isSameAs($t3));
     }
@@ -85,13 +92,13 @@ class TimeTest extends TestCase
         // Get the time now in Kathmandu and check it's correct
         $kmdZone = new DateTimeZone('Asia/Kathmandu');
         $t3 = JustTime::now($kmdZone);
-        $kmdNow = new DateTime('now', $kmdZone);
+        $kmdNow = (new DateTime())->setTimezone($kmdZone);
         $this->assertJustTime($kmdNow->format('H:i:s'), $t3);
     }
 
     public function testCreateFromTimestamp()
     {
-        // Create the timesamp for 2019-04-21 16:23 in UTC
+        // Create the timestamp for 2019-04-21 16:23 in UTC
         $ts = gmmktime(16, 23, 12, 4, 21, 2019);
 
         // Create a JustTime from the timestamp
@@ -106,7 +113,7 @@ class TimeTest extends TestCase
         // Same timestamp but with Sydney timezone explicitly set
         $sydZone = new DateTimeZone('Australia/Sydney');
         $t3 = JustTime::fromTimestamp($ts, $sydZone);
-        $sydTime = (new DateTime(null, $sydZone))->setTimestamp($ts);
+        $sydTime = (new DateTime())->setTimezone($sydZone)->setTimestamp($ts);
         $this->assertJustTime($sydTime->format('H:i:s'), $t3);
     }
 

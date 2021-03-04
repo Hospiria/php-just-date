@@ -4,17 +4,27 @@ namespace MadisonSolutions\JustDate;
 
 use DateTime;
 use DateTimeZone;
+use DivisionByZeroError;
 use InvalidArgumentException;
 use JsonSerializable;
 use Serializable;
 
+/**
+ * Class JustTime
+ *
+ * @package MadisonSolutions\JustDate
+ * @property int hours
+ * @property int minutes
+ * @property int seconds
+ * @property int since_midnight
+ */
 class JustTime implements Serializable, JsonSerializable
 {
     /**
      * Create a new JustTime object from a DateTime object
      *
      * @param DateTime $date The DateTime object (remains unchanged)
-     * @return MadisonSolutions\JustDate\JustTime The new JustTime instance
+     * @return JustTime The new JustTime instance
      */
     public static function fromDateTime(DateTime $date) : JustTime
     {
@@ -25,30 +35,39 @@ class JustTime implements Serializable, JsonSerializable
      * Get the current time
      *
      * @param ?DateTimeZone $timezone Optional timezone - if specified the time will be whatever the time is right now in the specified timezone
-     * @return MadisonSolutions\JustDate\JustTime The new JustTime instance
+     * @return JustTime The new JustTime instance
      */
     public static function now(?DateTimeZone $timezone = null) : JustTime
     {
-        return JustTime::fromDateTime(new DateTime('now', $timezone));
+        $dt = new DateTime();
+        if ($timezone) {
+            $dt->setTimezone($timezone);
+        }
+        return JustTime::fromDateTime($dt);
     }
 
     /**
      * Get the time at the specified timestamp
      *
+     * @param int $timestamp
      * @param ?DateTimeZone $timezone Optional timezone - if specified the time will be whatever the time is in the specified timezone at the specified timestamp
-     * @return MadisonSolutions\JustDate\JustTime The new JustTime instance
+     * @return JustTime The new JustTime instance
      */
     public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null) : JustTime
     {
-        return JustTime::fromDateTime((new DateTime(null, $timezone))->setTimestamp($timestamp));
+        $dt = new DateTime();
+        if ($timezone) {
+            $dt->setTimezone($timezone);
+        }
+        $dt->setTimestamp($timestamp);
+        return JustTime::fromDateTime($dt);
     }
 
     /**
      * Create a new JustTime object from a string in H:i:s format
      *
      * @param string $his The date in H:i:s format, eg '14:35:02' (note seconds can be omitted eg '14:35')
-     * @throws InvalidArgumentException If the string does not contain a valid time in H:i:s format
-     * @return MadisonSolutions\JustDate\JustTime The new JustTime instance
+     * @return JustTime The new JustTime instance
      */
     public static function fromHis(string $his) : JustTime
     {
@@ -62,7 +81,7 @@ class JustTime implements Serializable, JsonSerializable
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
      * @return array Array containing integers [year, month, day]
      */
-    public static function parseHis(string $his)
+    public static function parseHis(string $his): array
     {
         if (preg_match('/^(\d\d?):(\d\d?)(:(\d\d?))?$/', trim($his), $matches)) {
             $hours = (int) $matches[1];
@@ -78,9 +97,9 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Return the earliest of a set of times
      *
-     * @param MadisonSolutions\JustDate\JustTime $first
-     * @param MadisonSolutions\JustDate\JustTime ...$others
-     * @return MadisonSolutions\JustDate\JustTime The earliest time from $first and $others
+     * @param JustTime $first
+     * @param JustTime ...$others
+     * @return JustTime The earliest time from $first and $others
      */
     public static function earliest(JustTime $first, JustTime ...$others) : JustTime
     {
@@ -96,9 +115,9 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Return the latest of a set of times
      *
-     * @param MadisonSolutions\JustDate\JustTime $first
-     * @param MadisonSolutions\JustDate\JustTime ...$others
-     * @return MadisonSolutions\JustDate\JustTime The latest time from $first and $others
+     * @param JustTime $first
+     * @param JustTime ...$others
+     * @return JustTime The latest time from $first and $others
      */
     public static function latest(JustTime $first, JustTime ...$others) : JustTime
     {
@@ -114,7 +133,7 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Return the quotient and remainder when dividing integer $a by integer $b
      *
-     * This differs from the PHP intdiv function by always returning a non-negative remainder
+     * This differs from the PHP intdiv() function by always returning a non-negative remainder
      * Eg quotientAndRemainder(-10, 60) returns quotient -1 and remainder 50
      * This makes it suitable for 'clock' calculations (-10 minutes is equivalent to 50 minutes from the previous hour)
      *
@@ -123,8 +142,9 @@ class JustTime implements Serializable, JsonSerializable
      * @param int $b the divisor
      * @return array Returns an array [0 => (int) quotient, 1 => (int) remainder]
      * @throws DivisionByZeroError If $b is zero
+     * @noinspection PhpUnused
      */
-    public static function quotientAndRemainder(int $a, int $b)
+    public static function quotientAndRemainder(int $a, int $b): array
     {
         if ($a < 0) {
             $c = ceil(-$a / $b);
@@ -144,7 +164,7 @@ class JustTime implements Serializable, JsonSerializable
      * @param int $seconds_since_midnight The total number of seconds since midnight
      * @return array The number of hours, minutes and seconds
      */
-    public static function split(int $seconds_since_midnight)
+    public static function split(int $seconds_since_midnight): array
     {
         // Utility fn for finding the remainder when $a is divided by $b
         // As a side-effect, the quotient is assigned to the 3rd parameter
@@ -166,11 +186,26 @@ class JustTime implements Serializable, JsonSerializable
      * @param int $seconds_since_midnight The total number of seconds since midnight
      * @return JustTime The new JustTime instance
      */
-    public static function fromSecondsSinceMidnight(int $seconds_since_midnight)
+    public static function fromSecondsSinceMidnight(int $seconds_since_midnight): JustTime
     {
         list($hours, $mins, $secs) = JustTime::split($seconds_since_midnight);
         return new JustTime($hours, $mins, $secs);
     }
+
+    /**
+     * @var int
+     */
+    protected $hours;
+
+    /**
+     * @var int
+     */
+    protected $minutes;
+
+    /**
+     * @var int
+     */
+    protected $seconds;
 
     /**
      * Create a new JustTime instance
@@ -198,6 +233,9 @@ class JustTime implements Serializable, JsonSerializable
      * minutes - the minutes as an integer (0 - 59)
      * seconds - the seconds as an integer (0 - 59)
      * since_midnight - the number of seconds from midnight to this time
+     *
+     * @param $name
+     * @return mixed
      */
     public function __get($name)
     {
@@ -211,9 +249,10 @@ class JustTime implements Serializable, JsonSerializable
             case 'since_midnight':
                 return ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
         }
+        return null;
     }
 
-    public function __isset($name)
+    public function __isset($name): bool
     {
         switch ($name) {
             case 'hours':
@@ -228,9 +267,9 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Standard string representation is H:i:s format
      */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->format('H:i:s');
+        return $this->format();
     }
 
     /**
@@ -247,7 +286,7 @@ class JustTime implements Serializable, JsonSerializable
         if (is_null($utc)) {
             $utc = new DateTimeZone('UTC');
         }
-        return (new DateTime(null, $utc))->setTimestamp($this->since_midnight)->format($format);
+        return (new DateTime())->setTimezone($utc)->setTimestamp($this->since_midnight)->format($format);
     }
 
     /**
@@ -261,7 +300,7 @@ class JustTime implements Serializable, JsonSerializable
      * @param int $minutes The number of minutes to add
      * @param int $seconds The number of seconds to add
      *
-     * @return MadisonSolutions\JustDate\JustTime The new JustTime object
+     * @return JustTime The new JustTime object
      */
     public function addTime(int $hours = 0, int $minutes = 0, int $seconds = 0) : JustTime
     {
@@ -271,10 +310,10 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Test whether a JustTime object refers to the same time as this one
      *
-     * @param MadisonSolutions\JustDate\JustTime $other
+     * @param JustTime $other
      * @return bool True if $other is the same time
      */
-    public function isSameAs(JustTime $other)
+    public function isSameAs(JustTime $other): bool
     {
         return $this->since_midnight == $other->since_midnight;
     }
@@ -282,10 +321,10 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Test whether a JustTime object refers to a time before this one
      *
-     * @param MadisonSolutions\JustDate\JustTime $other
+     * @param JustTime $other
      * @return bool True if $other is before this time
      */
-    public function isBefore(JustTime $other)
+    public function isBefore(JustTime $other): bool
     {
         return $this->since_midnight < $other->since_midnight;
     }
@@ -293,10 +332,10 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Test whether a JustTime object refers to a time before or equal to this one
      *
-     * @param MadisonSolutions\JustDate\JustTime $other
+     * @param JustTime $other
      * @return bool True if $other is before or the same as this date
      */
-    public function isBeforeOrSameAs(JustTime $other)
+    public function isBeforeOrSameAs(JustTime $other): bool
     {
         return $this->since_midnight <= $other->since_midnight;
     }
@@ -304,10 +343,10 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Test whether a JustTime object refers to a time after this one
      *
-     * @param MadisonSolutions\JustDate\JustTime $other
+     * @param JustTime $other
      * @return bool True if $other is after this date
      */
-    public function isAfter(JustTime $other)
+    public function isAfter(JustTime $other): bool
     {
         return $this->since_midnight > $other->since_midnight;
     }
@@ -315,10 +354,10 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Test whether a JustTime object refers to a time after or equal to this one
      *
-     * @param MadisonSolutions\JustDate\JustTime $other
+     * @param JustTime $other
      * @return bool True if $other is after or the same as this time
      */
-    public function isAfterOrSameAs(JustTime $other)
+    public function isAfterOrSameAs(JustTime $other): bool
     {
         return $this->since_midnight >= $other->since_midnight;
     }
@@ -332,7 +371,7 @@ class JustTime implements Serializable, JsonSerializable
      * @param int $interval_seconds The length of the interval to round to, in seconds
      * @return JustTime A new JustTime instance with the rounded time
      */
-    public function round(int $interval_seconds)
+    public function round(int $interval_seconds): JustTime
     {
         $rounded = round($this->since_midnight / $interval_seconds) * $interval_seconds;
         return self::fromSecondsSinceMidnight((int) $rounded);
@@ -341,23 +380,25 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * Serialization of a JustTime will consist of the H:i:s string
      */
-    public function serialize()
+    public function serialize(): string
     {
         return (string) $this;
     }
 
     /**
      * Unserialize by parsing the H:i:s string
+     *
+     * @param $serialized
      */
-    public function unserialize($data)
+    public function unserialize($serialized)
     {
-        $this->__construct(...JustTime::parseHis($data));
+        $this->__construct(...JustTime::parseHis($serialized));
     }
 
     /**
      * Json serialize to the H:i:s string
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return (string) $this;
     }

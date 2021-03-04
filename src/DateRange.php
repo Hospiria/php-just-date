@@ -2,18 +2,29 @@
 
 namespace MadisonSolutions\JustDate;
 
+use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
 
+/**
+ * Class DateRange
+ *
+ * @package MadisonSolutions\JustDate
+ * @property JustDate $start
+ * @property JustDate $end
+ * @property int $span
+ * @property int $num_nights
+ * @property int $num_days
+ */
 class DateRange implements JsonSerializable
 {
     /**
-     * @var MadisonSolutions\JustDate\JustDate
+     * @var JustDate
      */
     protected $start;
 
     /**
-     * @var MadisonSolutions\JustDate\JustDate
+     * @var JustDate
      */
     protected $end;
 
@@ -23,9 +34,9 @@ class DateRange implements JsonSerializable
      * @param string $start Start of range, in Y-m-d format
      * @param string $end End of range, in Y-m-d format
      * @throws InvalidArgumentException If start or end are invalid Y-m-d strings, or if end is before start
-     * @return MadisonSolutions\JustDate\DateRange The DateRange object
+     * @return DateRange The DateRange object
      */
-    public static function fromYmd(string $start, string $end) : DateRange
+    public static function fromYmd(string $start, string $end): DateRange
     {
         return new DateRange(JustDate::fromYmd($start), JustDate::fromYmd($end));
     }
@@ -35,11 +46,11 @@ class DateRange implements JsonSerializable
      *
      * If $r1 and $r2 have no intersection and are totally separate, then this function returns null
      *
-     * @param MadisonSolutions\JustDate\DateRange $r1 The first range
-     * @param MadisonSolutions\JustDate\DateRange $r2 The second range
-     * @return ?MadisonSolutions\JustDate\DateRange The intersection DateRange object or null
+     * @param DateRange $r1 The first range
+     * @param DateRange $r2 The second range
+     * @return ?DateRange The intersection DateRange object or null
      */
-    public static function intersection(DateRange $r1, DateRange $r2) : ?DateRange
+    public static function intersection(DateRange $r1, DateRange $r2): ?DateRange
     {
         $start = JustDate::latest($r1->start, $r2->start);
         $end = JustDate::earliest($r1->end, $r2->end);
@@ -53,14 +64,14 @@ class DateRange implements JsonSerializable
     /**
      * Create a new DateRange object from start and end dates
      *
-     * @param MadisonSolutions\JustDate\JustDate $start Start of range
-     * @param MadisonSolutions\JustDate\JustDate $end End of range
+     * @param JustDate $start Start of range
+     * @param JustDate $end End of range
      * @throws InvalidArgumentException If end is before start
      */
     public function __construct(JustDate $start, JustDate $end)
     {
         if ($start->isAfter($end)) {
-            throw new \InvalidArgumentException("Start date cannot be after end date");
+            throw new InvalidArgumentException("Start date cannot be after end date");
         }
         $this->start = clone $start;
         $this->end = clone $end;
@@ -72,11 +83,11 @@ class DateRange implements JsonSerializable
      * The start date will be whichever of the 2 dates is earliest and the end date
      * whichever of the 2 dates is latest.
      *
-     * @param MadisonSolutions\JustDate\JustDate $a Start or end of range
-     * @param MadisonSolutions\JustDate\JustDate $b Other side of range
-     * @return MadisonSolutions\JustDate\DateRange The DateRange object
+     * @param JustDate $a Start or end of range
+     * @param JustDate $b Other side of range
+     * @return DateRange The DateRange object
      */
-    public static function eitherWayRound(JustDate $a, JustDate $b)
+    public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
     {
         return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
     }
@@ -89,6 +100,9 @@ class DateRange implements JsonSerializable
      * span - The number of nights between start and end (if start and end are same day, span is 0)
      * num_nights - Alias for span
      * num_days - The number of days in the range, including start end end (if start and end are same day, num_days is 1)
+     *
+     * @param $name
+     * @return int|JustDate|null
      */
     public function __get($name)
     {
@@ -106,7 +120,7 @@ class DateRange implements JsonSerializable
         return null;
     }
 
-    public function __isset($name)
+    public function __isset($name): bool
     {
         switch ($name) {
             case 'start':
@@ -120,7 +134,7 @@ class DateRange implements JsonSerializable
     /**
      * Standard string representation is eg '2019-04-21 to 2019-04-25'
      */
-    public function __toString()
+    public function __toString(): string
     {
         return "{$this->start} to {$this->end}";
     }
@@ -128,7 +142,7 @@ class DateRange implements JsonSerializable
     /**
      * Json representation is object with 'start' and 'end' properties
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'start' => (string) $this->start,
@@ -138,8 +152,10 @@ class DateRange implements JsonSerializable
 
     /**
      * Get a generator which yields each date in the range (inclusive of end points) as a JustDate object
+     *
+     * @return Generator
      */
-    public function each()
+    public function each(): Generator
     {
         for ($day = $this->start; $day->isBeforeOrSameAs($this->end); $day = $day->nextDay()) {
             yield $day;
@@ -148,8 +164,10 @@ class DateRange implements JsonSerializable
 
     /**
      * Get a generator which yields each date in the range (including start but not end) as a JustDate object
+     *
+     * @return Generator
      */
-    public function eachExceptEnd()
+    public function eachExceptEnd(): Generator
     {
         for ($day = $this->start; $day->isBefore($this->end); $day = $day->nextDay()) {
             yield $day;
@@ -159,10 +177,10 @@ class DateRange implements JsonSerializable
     /**
      * Test whether a particular date lies within this range
      *
-     * @param MadisonSolutions\JustDate\JustDate $date The date to test
+     * @param JustDate $date The date to test
      * @return bool True if the date is within this range (including endpoints), false otherwise
      */
-    public function includes(JustDate $date) : bool
+    public function includes(JustDate $date): bool
     {
         return $date->isAfterOrSameAs($this->start) && $date->isBeforeOrSameAs($this->end);
     }
@@ -170,10 +188,10 @@ class DateRange implements JsonSerializable
     /**
      * Test whether a particular date range is completely contained within this range
      *
-     * @param MadisonSolutions\JustDate\DateRange $range The range to test
+     * @param DateRange $range The range to test
      * @return bool True if $range is completely contained within this range, false otherwise
      */
-    public function contains(DateRange $range) : bool
+    public function contains(DateRange $range): bool
     {
         return $this->start->isBeforeOrSameAs($range->start) && $this->end->isAfterOrSameAs($range->end);
     }
@@ -195,14 +213,15 @@ class DateRange implements JsonSerializable
      * @param array $opts Array of options. Currently one option is supported, boolean
      *              'backwards' (default false).  If true the subranges will be returned
      *              in reverse order.
+     * @return Generator
      */
-    public function iterateSubRanges(callable $value_fn, array $opts = [])
+    public function iterateSubRanges(callable $value_fn, array $opts = []): Generator
     {
         $backwards = (bool) ($opts['backwards'] ?? false);
         $step = $backwards ? -1 : 1;
         $end = $backwards ? $this->start : $this->end;
 
-        $sub_range_start = $backwards ? $this->end : $this->start;;
+        $sub_range_start = $backwards ? $this->end : $this->start;
         $sub_range_end = $sub_range_start;
         $sub_range_value = $value_fn($sub_range_start);
 
