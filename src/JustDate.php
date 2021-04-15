@@ -11,6 +11,8 @@ use Serializable;
 /**
  * Class JustDate
  *
+ * Class representing a single date with no time information
+ *
  * @package MadisonSolutions\JustDate
  * @property int $year
  * @property int $month
@@ -18,7 +20,7 @@ use Serializable;
  * @property int $day_of_week
  * @property int $timestamp
  */
-class JustDate implements Serializable, JsonSerializable
+class JustDate implements DateRangeList, Serializable, JsonSerializable
 {
     /**
      * Create a new JustDate object from a DateTime object
@@ -528,5 +530,10 @@ class JustDate implements Serializable, JsonSerializable
     public function jsonSerialize(): string
     {
         return (string) $this;
+    }
+
+    public function getRanges(): array
+    {
+        return [new DateRange($this, $this)];
     }
 }

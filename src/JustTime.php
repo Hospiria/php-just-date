@@ -12,6 +12,8 @@ use Serializable;
 /**
  * Class JustTime
  *
+ * Class representing a time of day, with no date or timezone information
+ *
  * @package MadisonSolutions\JustDate
  * @property int hours
  * @property int minutes

@@ -9,6 +9,10 @@ use JsonSerializable;
 /**
  * Class DateRange
  *
+ * Class representing a range of dates
+ * Ranges that contain a single date are allowed (IE the start and end date are the same)
+ * Ranges that contain no dates are impossible
+ *
  * @package MadisonSolutions\JustDate
  * @property JustDate $start
  * @property JustDate $end
@@ -16,7 +20,7 @@ use JsonSerializable;
  * @property int $num_nights
  * @property int $num_days
  */
-class DateRange implements JsonSerializable
+class DateRange implements DateRangeList, JsonSerializable
 {
     /**
      * @var JustDate
@@ -246,5 +250,10 @@ class DateRange implements JsonSerializable
             'range' => DateRange::eitherWayRound($sub_range_start, $sub_range_end),
             'value' => $sub_range_value,
         ];
+    }
+
+    public function getRanges(): array
+    {
+        return [$this];
     }
 }
