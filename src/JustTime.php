@@ -144,7 +144,6 @@ class JustTime implements Serializable, JsonSerializable
      * @param int $b the divisor
      * @return array Returns an array [0 => (int) quotient, 1 => (int) remainder]
      * @throws DivisionByZeroError If $b is zero
-     * @noinspection PhpUnused
      */
     public static function quotientAndRemainder(int $a, int $b): array
     {

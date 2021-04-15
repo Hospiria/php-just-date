@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.1.3] - 2021-04-15
+### Added
+- Added checks for specific days of the week (`JustDate::isSunday()` etc)
+- Add `num_days` and `num_nights` properties to DateRange.
+- Add some convenience methods `JustDate::yesterday()`, `JustDate::tommorrow()`, `JustDate::addWeeks()`, 
+  `JustDate::addMonths()`, `JustDate::addYears()`, `DateRange::eitherWayRound()`.
+- Add functions for splitting a range into subranges using a user defined callback function
+  (`DateRange::iterateSubRanges()`).
+- Add 2 new concrete classes DateSet and MutableDateSet which can be used to store and manipulate arbitrary sets of
+  dates without any duplications or overlaps.
+DateSet and MutableDateSet both inherit from BaseDateSet, and have the normal set-related functions, eg `union()`,
+  `intersection()`, `subtract()`, `contains()`.  Both can be constructed from JustDate and DateRange objects.  Main
+  difference between them (obviously) is that DateSet is immutable, but MutableDateSet can be mutated. 
+
+### Changed
+ - Lots of code cleanup
+
 ## [1.1.2] - 2019-06-17
 ### Added
 - Added JustTime::fromSecondsSinceMidnight() function
