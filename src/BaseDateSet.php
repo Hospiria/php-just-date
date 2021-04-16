@@ -2,7 +2,11 @@
 
 namespace MadisonSolutions\JustDate;
 
+use Cassandra\Date;
 use Generator;
+use InvalidArgumentException;
+use JsonSerializable;
+use Serializable;
 
 /**
  * Class BaseDateSet
@@ -11,7 +15,7 @@ use Generator;
  *
  * @package MadisonSolutions\JustDate
  */
-abstract class BaseDateSet implements DateRangeList
+abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializable
 {
     /**
      * @var DateRange[]
@@ -179,7 +183,7 @@ abstract class BaseDateSet implements DateRangeList
      * @param JustDate $date
      * @return bool
      */
-    public function includes(JustDate $date) : bool
+    public function includes(JustDate $date): bool
     {
         foreach ($this->ranges as $range) {
             if ($range->end->isAfterOrSameAs($date)) {
@@ -191,6 +195,36 @@ abstract class BaseDateSet implements DateRangeList
             }
         }
         return false;
+    }
+
+    /**
+     * Determine whether this set is empty
+     *
+     * @return bool True if this set is empty (IE contains no dates), false otherwise
+     */
+    public function isEmpty(): bool
+    {
+        return count($this->ranges) == 0;
+    }
+
+    /**
+     * Fetch the single date range that spans this set
+     *
+     * Fetch the single date range that covers all the dates in this set
+     * IE the returned range will start with the earliest date in this set, and finish with the latest
+     * Returns null in case this set is empty
+     *
+     * @return ?DateRange The spanning DateRange, or null if this set is empty
+     */
+    public function getSpanningRange(): ?DateRange
+    {
+        $num = count($this->ranges);
+        if ($num == 0) {
+            return null;
+        }
+        $start = $this->ranges[0]->start;
+        $end = $this->ranges[$num - 1]->end;
+        return new DateRange($start, $end);
     }
 
     /**
@@ -218,6 +252,54 @@ abstract class BaseDateSet implements DateRangeList
     }
 
     /**
+     * Get a generator which yields whether or not each date in the window range belongs to this set
+     *
+     * Specifically, the generator will yield an array for each each date in the window range in order
+     * The first element of the array will be the JustDate object for that date
+     * The second, a boolean, true if the date belongs to this set, and false otherwise.
+     *
+     * @param DateRange $window
+     * @return Generator
+     */
+    public function window(DateRange $window): Generator
+    {
+        // The idea here is that we'll step over the dates in the window, and keep $curr pointing to
+        // either the range that the date is in, or the next range that's coming up.
+        // If $curr is false, it will mean that there are no more ranges in the set.
+        // $started_curr will be a boolean for tracking whether we've got to $curr or if it's still in the future
+
+        // Start by looking at the first range
+        reset($this->ranges);
+        $curr = current($this->ranges);
+
+        // Skip over any ranges that are completely before the start of the window
+        $window_start = $window->start;
+        while ($curr && $window_start->isAfter($curr->end)) {
+            $curr = next($this->ranges);
+        }
+
+        // See whether at the start of the window, we're already in $curr or not
+        $started_curr = ($curr && $window_start->isAfterOrSameAs($curr->start));
+
+        foreach ($window->each() as $date) {
+            if ($curr) {
+                if (!$started_curr && $date->isSameAs($curr->start)) {
+                    // We've now entered $curr
+                    $started_curr = true;
+                }
+                yield [$date, $started_curr];
+                if ($started_curr && $date->isSameAs($curr->end)) {
+                    // This was the last day of $curr, so we need to move to the next range
+                    $started_curr = false;
+                    $curr = next($this->ranges);
+                }
+            } else {
+                yield [$date, false];
+            }
+        }
+    }
+
+    /**
      * Get the string representation of this set
      *
      * @return string
@@ -237,5 +319,49 @@ abstract class BaseDateSet implements DateRangeList
     public function getRanges(): array
     {
         return $this->ranges;
+    }
+
+    /**
+     * Json representation is array of ranges
+     */
+    public function jsonSerialize(): array
+    {
+        return array_map(function ($range) {
+            return $range->jsonSerialize();
+        }, $this->ranges);
+    }
+
+    /**
+     * Use the standard string representation for serialization
+     */
+    public function serialize(): string
+    {
+        return (string) $this;
+    }
+
+    /**
+     * Unserialize by parsing the standard string representation
+     *
+     * @param $serialized
+     */
+    public function unserialize($serialized)
+    {
+        $parts = explode(',', $serialized);
+        $args = array_map(function ($part) {
+            $part = trim($part);
+            if (empty($part)) {
+                return null;
+            }
+            $sub_parts = explode(' to ', $part);
+            switch (count($sub_parts)) {
+                case 1:
+                    return JustDate::fromYmd(trim($part));
+                case 2:
+                    return DateRange::fromYmd(trim($sub_parts[0]), trim($sub_parts[1]));
+                default:
+                    throw new InvalidArgumentException("Invalid date range string '{$part}'");
+            }
+        }, $parts);
+        $this->__construct(...array_filter($args));
     }
 }

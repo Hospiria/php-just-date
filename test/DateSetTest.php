@@ -267,4 +267,86 @@ class DateSetTest extends TestCase
             $this->assertFalse($set->includes(JustDate::fromYmd($ymd)));
         }
     }
+
+    public function testIsEmpty()
+    {
+        $set = new DateSet();
+        $this->assertTrue($set->isEmpty());
+
+        $set = new DateSet(JustDate::fromYmd('2021-04-10'));
+        $this->assertFalse($set->isEmpty());
+
+        $set = new DateSet(DateRange::fromYmd('2021-04-04', '2021-04-10'));
+        $this->assertFalse($set->isEmpty());
+
+        $set = $set->subtract(DateRange::fromYmd('2021-04-04', '2021-04-10'));
+        $this->assertTrue($set->isEmpty());
+    }
+
+    public function testSpanningRange()
+    {
+        $set = new DateSet();
+        $this->assertNull($set->getSpanningRange());
+
+        $set = new DateSet(JustDate::fromYmd('2021-04-10'));
+        $this->assertEquals('2021-04-10 to 2021-04-10', (string) $set->getSpanningRange());
+
+        $set = new DateSet(JustDate::fromYmd('2021-04-10'), JustDate::fromYmd('2021-05-10'));
+        $this->assertEquals('2021-04-10 to 2021-05-10', (string) $set->getSpanningRange());
+    }
+
+    public function testWindowGenerator()
+    {
+        $tests = [
+            [
+                // Empty set, all dates in window false
+                new DateSet(),
+                DateRange::fromYmd('2021-04-01', '2021-04-05'),
+                ['2021-04-01' => false, '2021-04-02' => false, '2021-04-03' => false, '2021-04-04' => false, '2021-04-05' => false],
+            ],
+            [
+                // Set contains a single date in the window
+                new DateSet(JustDate::fromYmd('2021-04-03')),
+                DateRange::fromYmd('2021-04-01', '2021-04-05'),
+                ['2021-04-01' => false, '2021-04-02' => false, '2021-04-03' => true, '2021-04-04' => false, '2021-04-05' => false],
+            ],
+            [
+                // Set contains some dates before the window
+                new DateSet(DateRange::fromYmd('2021-03-01', '2021-03-10')),
+                DateRange::fromYmd('2021-04-01', '2021-04-05'),
+                ['2021-04-01' => false, '2021-04-02' => false, '2021-04-03' => false, '2021-04-04' => false, '2021-04-05' => false],
+            ],
+            [
+                // Set contains some dates after the window
+                new DateSet(DateRange::fromYmd('2021-06-01', '2021-06-10')),
+                DateRange::fromYmd('2021-04-01', '2021-04-05'),
+                ['2021-04-01' => false, '2021-04-02' => false, '2021-04-03' => false, '2021-04-04' => false, '2021-04-05' => false],
+            ],
+            [
+                // Set contains some dates in, and outside the window
+                new DateSet(
+                    JustDate::fromYmd('2021-03-01'),
+                    DateRange::fromYmd('2021-03-20', '2021-04-02'),
+                    JustDate::fromYmd('2021-04-04'),
+                    DateRange::fromYmd('2021-04-06', '2021-06-10')
+                ),
+                DateRange::fromYmd('2021-04-01', '2021-04-06'),
+                ['2021-04-01' => true, '2021-04-02' => true, '2021-04-03' => false, '2021-04-04' => true, '2021-04-05' => false, '2021-04-06' => true],
+            ],
+            [
+                // Set covers the window completely
+                new DateSet(DateRange::fromYmd('2021-04-01', '2021-04-30')),
+                DateRange::fromYmd('2021-04-01', '2021-04-05'),
+                ['2021-04-01' => true, '2021-04-02' => true, '2021-04-03' => true, '2021-04-04' => true, '2021-04-05' => true],
+            ],
+        ];
+
+        foreach ($tests as [$set, $window, $expected]) {
+            $actual = [];
+            foreach ($set->window($window) as [$date, $in_set]) {
+                $actual[(string)$date] = $in_set;
+            }
+            $this->assertEquals($expected, $actual);
+        }
+    }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.4] - 2021-04-16
+### Added
+ - Added `isEmpty()`, `getSpanningRange()` and `window()` methods to DateSet and MutableDateSet
+ - Added serialization support to DateSet and MutableDateSet
+
 ## [1.1.3] - 2021-04-15
 ### Added
 - Added checks for specific days of the week (`JustDate::isSunday()` etc)
