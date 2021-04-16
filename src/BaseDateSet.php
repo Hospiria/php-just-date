@@ -2,7 +2,6 @@
 
 namespace MadisonSolutions\JustDate;
 
-use Cassandra\Date;
 use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
