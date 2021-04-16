@@ -342,6 +342,10 @@ class DateSetTest extends TestCase
         ];
 
         foreach ($tests as [$set, $window, $expected]) {
+            /**
+             * @var DateSet $set
+             * @var DateRange $window
+             */
             $actual = [];
             foreach ($set->window($window) as [$date, $in_set]) {
                 $actual[(string)$date] = $in_set;

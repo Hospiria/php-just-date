@@ -1,5 +1,6 @@
 <?php /** @noinspection DuplicatedCode */
 
+use MadisonSolutions\JustDate\BaseDateSet;
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\DateSet;
@@ -54,6 +55,50 @@ class BaseDateSetTest extends TestCase
             $this->assertEquals($expected_string, (string) $restored);
             $json = json_encode($set);
             $this->assertEquals(json_encode($expected_json_obj), $json);
+        }
+    }
+
+    public function testGenerators()
+    {
+        $tests = [
+            [
+                [],
+                [],
+                [],
+            ],
+            [
+                [JustDate::fromYmd('2021-04-15')],
+                ['2021-04-15'],
+                ['2021-04-15 to 2021-04-15'],
+            ],
+            [
+                [DateRange::fromYmd('2021-04-15', '2021-04-17')],
+                ['2021-04-15', '2021-04-16', '2021-04-17'],
+                ['2021-04-15 to 2021-04-17'],
+            ],
+            [
+                [DateRange::fromYmd('2021-02-01', '2021-02-03'), JustDate::fromYmd('2021-02-08'), DateRange::fromYmd('2021-02-10', '2021-02-11')],
+                ['2021-02-01', '2021-02-02', '2021-02-03', '2021-02-08', '2021-02-10', '2021-02-11'],
+                ['2021-02-01 to 2021-02-03', '2021-02-08 to 2021-02-08', '2021-02-10 to 2021-02-11'],
+            ],
+        ];
+
+        foreach ($tests as [$args, $expected_dates, $expected_ranges]) {
+            foreach ([new DateSet(...$args), new MutableDateSet(...$args)] as $set) {
+                /**
+                 * @var BaseDateSet $set
+                 */
+                $dates = [];
+                foreach ($set->eachDate() as $date) {
+                    $dates[] = (string)$date;
+                }
+                $this->assertEquals($expected_dates, $dates);
+                $ranges = [];
+                foreach ($set->eachRange() as $range) {
+                    $ranges[] = (string)$range;
+                }
+                $this->assertEquals($expected_ranges, $ranges);
+            }
         }
     }
 }

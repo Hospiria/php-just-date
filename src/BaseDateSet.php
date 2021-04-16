@@ -65,7 +65,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * @param DateRange $cut Range to be subtracted from each of the ranges
      * @return array Resulting normalized list of ranges after subtracting $cut
      */
-    protected static function subtractRangeFromSortedRanges(array $ranges, DateRange $cut)
+    protected static function subtractRangeFromSortedRanges(array $ranges, DateRange $cut): array
     {
         $num = count($ranges);
         if ($num == 0) {
@@ -124,7 +124,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * @param BaseDateSet $b
      * @return DateRange[] Normalised list of ranges in the intersection of $a and $b
      */
-    protected static function getIntersectingRanges(BaseDateSet $a, BaseDateSet $b)
+    protected static function getIntersectingRanges(BaseDateSet $a, BaseDateSet $b): array
     {
         $intersection = [];
         foreach ($a->ranges as $range_a) {
@@ -145,7 +145,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * @param DateRange[] $in
      * @return DateRange[]
      */
-    protected static function normalizeRanges(array $in)
+    protected static function normalizeRanges(array $in): array
     {
         $num = count($in);
         if ($num == 0) {
@@ -248,11 +248,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         foreach ($this->ranges as $range) {
             yield from $range->each();
         }
-    }
-
-    public function derp()
-    {
-        reset($this->ranges);
     }
 
     /**
