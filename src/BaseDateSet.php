@@ -251,6 +251,11 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         }
     }
 
+    public function derp()
+    {
+        reset($this->ranges);
+    }
+
     /**
      * Get a generator which yields whether or not each date in the window range belongs to this set
      *
@@ -268,14 +273,18 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         // If $curr is false, it will mean that there are no more ranges in the set.
         // $started_curr will be a boolean for tracking whether we've got to $curr or if it's still in the future
 
+        // Work on a copy of the ranges array
+        // This is so that nothing else can modify the internal array pointer between iterations
+        $ranges = $this->ranges;
+
         // Start by looking at the first range
-        reset($this->ranges);
-        $curr = current($this->ranges);
+        reset($ranges);
+        $curr = current($ranges);
 
         // Skip over any ranges that are completely before the start of the window
         $window_start = $window->start;
         while ($curr && $window_start->isAfter($curr->end)) {
-            $curr = next($this->ranges);
+            $curr = next($ranges);
         }
 
         // See whether at the start of the window, we're already in $curr or not
@@ -291,7 +300,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
                 if ($started_curr && $date->isSameAs($curr->end)) {
                     // This was the last day of $curr, so we need to move to the next range
                     $started_curr = false;
-                    $curr = next($this->ranges);
+                    $curr = next($ranges);
                 }
             } else {
                 yield [$date, false];
