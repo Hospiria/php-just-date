@@ -38,9 +38,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         if ($num == 0) {
             return $ranges;
         }
-        usort($dates, function ($a, $b) {
-            return $a->timestamp - $b->timestamp;
-        });
+        usort($dates, fn($a, $b) => $a->epoch_day - $b->epoch_day);
         $curr_start = $curr_end = $dates[0];
         for ($i = 1; $i < $num; $i++) {
             if ($dates[$i]->isAfter($curr_end->nextDay())) {
@@ -152,9 +150,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
             return [];
         }
 
-        usort($in, function ($a, $b) {
-            return $a->start->timestamp - $b->start->timestamp;
-        });
+        usort($in, fn($a, $b) => $a->start->epoch_day - $b->start->epoch_day);
 
         $out = [];
         $curr = $in[0];

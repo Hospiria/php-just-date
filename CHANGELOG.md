@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.0.0]
+
+### Breaking Changes
+ - Minimum PHP version required is now 7.4
+ - JustDate constructor is now a protected method, so you can't directly call `new JustDate()`.
+   The old constructor functionality is now available via `JustDate::make($year, $month, $day)`.
+ - `JustDate::spanDays()` renamed to `JustDate::numNights()`.
+ - Removed `DateRange::span` (use `DateRange::num_nights` instead).
+ - Serialization of JustDate now done via the epoch day (integer) instead of Y-m-d string.
+   This means if you have a saved string serialization of a JustDate that was serialized in v1 you will not be able to deserialize it in v2.
+
+### Added
+ - Added `epoch_day` property to JustDate and static `JustDate::fromEpochDay()` function.
+ - Added `subDays()`, `subWeeks()`, `subMonths()` and `subYears()` functions to JustDate as alternatives to using a negative quantity in
+the old `addDays()`, `addWeeks()`, `addMonths()` and `addYears()` methods.
+ - Added `toDateTime()` method to JustDate.  
+
+
+
+
+
 ## [1.1.4] - 2021-04-16
 ### Added
  - Added `isEmpty()`, `getSpanningRange()` and `window()` methods to DateSet and MutableDateSet

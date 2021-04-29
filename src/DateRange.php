@@ -22,15 +22,8 @@ use JsonSerializable;
  */
 class DateRange implements DateRangeList, JsonSerializable
 {
-    /**
-     * @var JustDate
-     */
-    protected $start;
-
-    /**
-     * @var JustDate
-     */
-    protected $end;
+    protected JustDate $start;
+    protected JustDate $end;
 
     /**
      * Create a new DateRange object from start and end date as Y-m-d formatted strings
@@ -101,9 +94,8 @@ class DateRange implements DateRangeList, JsonSerializable
      *
      * start - The start of the range
      * end - The end of the range
-     * span - The number of nights between start and end (if start and end are same day, span is 0)
-     * num_nights - Alias for span
-     * num_days - The number of days in the range, including start end end (if start and end are same day, num_days is 1)
+     * num_nights - The number of nights between the start and end of the range (if start and end are same day, num_nights is 0)
+     * num_days - The number of days in the range, including start and end (if start and end are same day, num_days is 1)
      *
      * @param $name
      * @return int|JustDate|null
@@ -115,11 +107,10 @@ class DateRange implements DateRangeList, JsonSerializable
                 return $this->start;
             case 'end':
                 return $this->end;
-            case 'span':
             case 'num_nights':
-                return JustDate::spanDays($this->start, $this->end);
+                return JustDate::numNights($this->start, $this->end);
             case 'num_days':
-                return JustDate::spanDays($this->start, $this->end) + 1;
+                return JustDate::numNights($this->start, $this->end) + 1;
         }
         return null;
     }
@@ -133,6 +124,17 @@ class DateRange implements DateRangeList, JsonSerializable
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Does this range consist of just a single day?
+     * IE start date and end date are the same
+     *
+     * @return bool
+     */
+    public function isSingleDay(): bool
+    {
+        return $this->start->isSameAs($this->end);
     }
 
     /**
