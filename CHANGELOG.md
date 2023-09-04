@@ -16,8 +16,8 @@
  - Added `subDays()`, `subWeeks()`, `subMonths()` and `subYears()` functions to JustDate as alternatives to using a negative quantity in
 the old `addDays()`, `addWeeks()`, `addMonths()` and `addYears()` methods.
  - Added `toDateTime()` method to JustDate.  
-
-
+ - Added `addDaysPassingTest()` and `addWorkingDays()` methods to JustDate.
+ - Added `DateSet` and `MutableDate` classes.
 
 
 

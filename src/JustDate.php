@@ -508,6 +508,54 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
+     * Add the given number of dates which pass the test function
+     * Typical use is to add a number of 'working days' to a date, where the test function identifies the 'working' dates
+     * Note if $num_to_add is zero (or negative) the behaviour is to advance to the first date that does pass the test and return it
+     *
+     * @param int $num_to_add The number of days to add.
+     * @param callable(JustDate): bool $test_fn Function for testing whether or not this date counts for reducing $num_to_add
+     * @return JustDate
+     */
+    public function addDaysPassingTest(int $num_to_add, callable $test_fn): JustDate
+    {
+        $curr = $this;
+        if (! $test_fn($curr)) {
+            $curr = $curr->nextDay();
+        }
+        while ($num_to_add > 0) {
+            $curr = $curr->nextDay();
+            if ($test_fn($curr)) {
+                $num_to_add--;
+            }
+        }
+        return $curr;
+    }
+
+    /**
+     * Add the given number of working days to the date, where a working day is assumed to be Mon to Fri
+     *
+     * Note if $num_to_add is zero (or negative) the first working date equal or later than $this is returned
+     * If a different definition of 'working day' is required, use JustDate::addDaysPassingTest() with a custom test function
+     *
+     * @param int $num_to_add The number of 'working' days to add.
+     * @param ?BaseDateSet $holidays Optionally provide a set of holiday dates that will not be counted as working days
+     * @return JustDate
+     */
+    public function addWorkingDays(int $num_to_add, ?BaseDateSet $holidays = null): JustDate
+    {
+        if (($holidays instanceof BaseDateSet) && ! $holidays->isEmpty()) {
+            $test_fn = function (JustDate $date) use ($holidays) {
+                return !($date->isWeekend() || $holidays->includes($date));
+            };
+        } else {
+            $test_fn = function (JustDate $date) {
+                return ! $date->isWeekend();
+            };
+        }
+        return $this->addDaysPassingTest($num_to_add, $test_fn);
+    }
+
+    /**
      * Test whether a JustDate object refers to the same date as this one
      *
      * @param JustDate $other

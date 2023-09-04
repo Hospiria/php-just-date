@@ -1,6 +1,7 @@
 <?php /** @noinspection DuplicatedCode */
 
 use MadisonSolutions\JustDate\DateRange;
+use MadisonSolutions\JustDate\DateSet;
 use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\JustTime;
 use PHPUnit\Framework\TestCase;
@@ -519,14 +520,14 @@ class DateTest extends TestCase
 
     public function testSerialization()
     {
-        $d1 = JustDate::make(2019, 04, 21);
+        $d1 = JustDate::make(2019, 4, 21);
         $s = serialize($d1);
         $this->assertTrue(is_string($s));
         $_d1 = unserialize($s);
         $this->assertJustDate('2019-04-21', $_d1);
         $this->assertNotSame($d1, $_d1);
 
-        $d2 = JustDate::make(2019, 04, 25);
+        $d2 = JustDate::make(2019, 4, 25);
         $r = new DateRange($d1, $d2);
         $s = serialize($r);
         $this->assertTrue(is_string($s));
@@ -536,5 +537,22 @@ class DateTest extends TestCase
 
         $this->assertSame('"2019-04-21"', json_encode($d1));
         $this->assertSame('{"start":"2019-04-21","end":"2019-04-25"}', json_encode($r));
+    }
+
+    public function testAddWorkingDays()
+    {
+        $d1 = JustDate::make(2023, 9, 4); // Monday
+        $this->assertJustDate('2023-09-04', $d1->addWorkingDays(0));
+        $this->assertJustDate('2023-09-05', $d1->addWorkingDays(1)); // Tue)
+        $this->assertJustDate('2023-09-08', $d1->addWorkingDays(4)); // Fri)
+        $this->assertJustDate('2023-09-11', $d1->addWorkingDays(5)); // Next Mon)
+        $this->assertJustDate('2023-09-04', $d1->addWorkingDays(-1));
+
+        $holidays = new DateSet(JustDate::make(2023, 9, 4), JustDate::make(2023, 9, 7)); // Mon and Thur
+        $this->assertJustDate('2023-09-05', $d1->addWorkingDays(0, $holidays)); // Tue
+        $this->assertJustDate('2023-09-06', $d1->addWorkingDays(1, $holidays)); // Wed)
+        $this->assertJustDate('2023-09-12', $d1->addWorkingDays(4, $holidays)); // Next Tue)
+        $this->assertJustDate('2023-09-13', $d1->addWorkingDays(5, $holidays)); // Next Wed)
+        $this->assertJustDate('2023-09-05', $d1->addWorkingDays(-1, $holidays)); // Tue
     }
 }
