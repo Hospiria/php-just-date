@@ -544,11 +544,11 @@ class JustDate implements DateRangeList, JsonSerializable
     public function addWorkingDays(int $num_to_add, ?BaseDateSet $holidays = null): JustDate
     {
         if (($holidays instanceof BaseDateSet) && ! $holidays->isEmpty()) {
-            $test_fn = function (JustDate $date) use ($holidays) {
+            $test_fn = function (JustDate $date) use ($holidays): bool {
                 return !($date->isWeekend() || $holidays->includes($date));
             };
         } else {
-            $test_fn = function (JustDate $date) {
+            $test_fn = function (JustDate $date): bool {
                 return ! $date->isWeekend();
             };
         }

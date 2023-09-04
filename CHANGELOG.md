@@ -4,7 +4,7 @@
 
 ### Breaking Changes
  - Minimum PHP version required is now 8.1
- - JustDate constructor is now a protected method, so you can't directly call `new JustDate()`.
+ - JustDate constructor is now a protected method, so you can't directly call `new JustDate()` - use `JustDate::make($year, $month, $day)` instead
    The old constructor functionality is now available via `JustDate::make($year, $month, $day)`.
  - `JustDate::spanDays()` renamed to `JustDate::numNights()`.
  - Removed `DateRange::span` (use `DateRange::num_nights` instead).

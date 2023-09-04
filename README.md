@@ -21,7 +21,7 @@ composer require madison-solutions/just-date
 ```php
 use MadisonSolutions\JustDate\JustDate;
 
-$date = new JustDate(2019, 4, 21);
+$date = JustDate::make(2019, 4, 21);
 
 (string) $date;
 // 2019-04-21
@@ -81,7 +81,7 @@ $today_in_denver = JustDate::today(new DateTimeZone('America/Denver'));
 ```php
 use MadisonSolutions\JustDate\JustDate;
 
-$d1 = new JustDate(2019, 04, 21);
+$d1 = JustDate::make(2019, 04, 21);
 
 $d2 = $d1->nextDay();
 (string) $d2;
@@ -103,7 +103,7 @@ Note JustDate objects are **immutable** - `nextDay()` and all other similar meth
 // 2019-04-30
 
 // What day was it on this day 2 years ago?
-(new JustDate($d1->year - 2, $d1->month, $d1->day))->format('l');
+JustDate::make($d1->year - 2, $d1->month, $d1->day)->format('l');
 // Friday
 
 // Find the previous Wednesday
@@ -119,13 +119,29 @@ JustDate::spanDays($d1, $d1->endOfMonth()->nextDay())
 // 10
 ```
 
+## Working days
+
+```php
+// Add a certain number of 'working' days
+$holidays = new DateSet(...[
+    JustDate::make(2023, 12, 25), // Christmas
+    JustDate::make(2023, 12, 26), // Boxing Day
+    JustDate::make(2024, 1, 1), // New Year's Day
+]);
+$order_date = JustDate::make(2023, 12, 28);
+// Delivery in 3 working days
+// 29th Dec is Friday (a working day), 30 & 31 are weekend, 1st is holiday, 2nd and 3rd are next 2 working days
+$delivery_date = $order_date->addWorkingDays(3, $holidays);
+// Wed 3rd Jan 2024
+```
+
 ## Date Ranges
 
 ```php
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\JustDate;
 
-$start = new JustDate(2019, 04, 21);
+$start = JustDate::make(2019, 04, 21);
 $end = $d1->addDays(4);
 
 $range = new DateRange($start, $end);
@@ -139,7 +155,7 @@ $range = new DateRange($start, $end);
 $range->span;
 // 4
 
-$range->includes(new JustDate(2019, 04, 22));
+$range->includes(JustDate::make(2019, 04, 22));
 // true
 
 $range2 = DateRange::fromYmd('2019-04-18', '2019-04-23');
