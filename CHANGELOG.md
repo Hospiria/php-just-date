@@ -3,7 +3,7 @@
 ## [2.0.0]
 
 ### Breaking Changes
- - Minimum PHP version required is now 7.4
+ - Minimum PHP version required is now 8.1
  - JustDate constructor is now a protected method, so you can't directly call `new JustDate()`.
    The old constructor functionality is now available via `JustDate::make($year, $month, $day)`.
  - `JustDate::spanDays()` renamed to `JustDate::numNights()`.
@@ -30,7 +30,7 @@ the old `addDays()`, `addWeeks()`, `addMonths()` and `addYears()` methods.
 ### Added
 - Added checks for specific days of the week (`JustDate::isSunday()` etc)
 - Add `num_days` and `num_nights` properties to DateRange.
-- Add some convenience methods `JustDate::yesterday()`, `JustDate::tommorrow()`, `JustDate::addWeeks()`, 
+- Add some convenience methods `JustDate::yesterday()`, `JustDate::tommorrow()`, `JustDate::addWeeks()`,
   `JustDate::addMonths()`, `JustDate::addYears()`, `DateRange::eitherWayRound()`.
 - Add functions for splitting a range into subranges using a user defined callback function
   (`DateRange::iterateSubRanges()`).
@@ -38,7 +38,7 @@ the old `addDays()`, `addWeeks()`, `addMonths()` and `addYears()` methods.
   dates without any duplications or overlaps.
 DateSet and MutableDateSet both inherit from BaseDateSet, and have the normal set-related functions, eg `union()`,
   `intersection()`, `subtract()`, `contains()`.  Both can be constructed from JustDate and DateRange objects.  Main
-  difference between them (obviously) is that DateSet is immutable, but MutableDateSet can be mutated. 
+  difference between them (obviously) is that DateSet is immutable, but MutableDateSet can be mutated.
 
 ### Changed
  - Lots of code cleanup

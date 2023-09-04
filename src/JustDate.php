@@ -13,12 +13,12 @@ use JsonSerializable;
  * Class representing a single date with no time information
  *
  * @package MadisonSolutions\JustDate
- * @property int $year
- * @property int $month
- * @property int $day
- * @property int $day_of_week
- * @property int $epoch_day
- * @property int $timestamp
+ * @property-read int $year
+ * @property-read int $month
+ * @property-read int $day
+ * @property-read int $day_of_week
+ * @property-read int $epoch_day
+ * @property-read int $timestamp
  */
 class JustDate implements DateRangeList, JsonSerializable
 {
@@ -169,7 +169,7 @@ class JustDate implements DateRangeList, JsonSerializable
      *
      * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
-     * @return array Array containing integers [year, month, day]
+     * @return array{0: int, 1: int, 2: int} Array containing integers [year, month, day]
      */
     public static function parseYmd(string $ymd): array
     {
@@ -281,7 +281,7 @@ class JustDate implements DateRangeList, JsonSerializable
      * @param $name
      * @return mixed
      */
-    public function __get($name)
+    public function __get(mixed $name)
     {
         switch ($name) {
             case 'year':
@@ -300,7 +300,7 @@ class JustDate implements DateRangeList, JsonSerializable
         return null;
     }
 
-    public function __isset($name): bool
+    public function __isset(mixed $name): bool
     {
         switch ($name) {
             case 'year':
@@ -658,6 +658,7 @@ class JustDate implements DateRangeList, JsonSerializable
      * Serialize
      *
      * The integer epoch_day completely defines a JustDate object, so it is sufficient for serialization
+     * @return array{0: int}
      */
     public function __serialize(): array
     {
@@ -667,7 +668,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Unserialize
      *
-     * @param array $data
+     * @param array{0: int} $data
      */
     public function __unserialize(array $data)
     {
@@ -683,6 +684,9 @@ class JustDate implements DateRangeList, JsonSerializable
         return (string) $this;
     }
 
+    /**
+     * @return DateRange[]
+     */
     public function getRanges(): array
     {
         return [new DateRange($this, $this)];

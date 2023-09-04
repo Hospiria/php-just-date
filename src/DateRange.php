@@ -14,16 +14,13 @@ use JsonSerializable;
  * Ranges that contain no dates are impossible
  *
  * @package MadisonSolutions\JustDate
- * @property JustDate $start
- * @property JustDate $end
- * @property int $span
- * @property int $num_nights
- * @property int $num_days
+ * @property-read int $num_nights
+ * @property-read int $num_days
  */
 class DateRange implements DateRangeList, JsonSerializable
 {
-    protected JustDate $start;
-    protected JustDate $end;
+    public readonly JustDate $start;
+    public readonly JustDate $end;
 
     /**
      * Create a new DateRange object from start and end date as Y-m-d formatted strings
@@ -100,13 +97,9 @@ class DateRange implements DateRangeList, JsonSerializable
      * @param $name
      * @return int|JustDate|null
      */
-    public function __get($name)
+    public function __get(mixed $name)
     {
         switch ($name) {
-            case 'start':
-                return $this->start;
-            case 'end':
-                return $this->end;
             case 'num_nights':
                 return JustDate::numNights($this->start, $this->end);
             case 'num_days':
@@ -115,12 +108,11 @@ class DateRange implements DateRangeList, JsonSerializable
         return null;
     }
 
-    public function __isset($name): bool
+    public function __isset(mixed $name): bool
     {
         switch ($name) {
-            case 'start':
-            case 'end':
-            case 'span':
+            case 'num_nights':
+            case 'num_days':
                 return true;
         }
         return false;
@@ -147,6 +139,8 @@ class DateRange implements DateRangeList, JsonSerializable
 
     /**
      * Json representation is object with 'start' and 'end' properties
+     *
+     * @return array{start: string, end: string}
      */
     public function jsonSerialize(): array
     {
@@ -159,7 +153,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the range (inclusive of end points) as a JustDate object
      *
-     * @return Generator
+     * @return Generator<int, JustDate>
      */
     public function each(): Generator
     {
@@ -171,7 +165,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the range (including start but not end) as a JustDate object
      *
-     * @return Generator
+     * @return Generator<int, JustDate>
      */
     public function eachExceptEnd(): Generator
     {
@@ -213,13 +207,14 @@ class DateRange implements DateRangeList, JsonSerializable
      * subranges in turn, together with the callback value. The yield values will
      * be in the format of an array with 'value' and 'range' keys.
      *
-     * @param callable $value_fn Callback used to determine how to delimit the subranges
-     *                 Each subrange will contain dates for which the callback returns
-     *                 the same value.
-     * @param array $opts Array of options. Currently one option is supported, boolean
-     *              'backwards' (default false).  If true the subranges will be returned
-     *              in reverse order.
-     * @return Generator
+     * @template T
+     * @param callable(JustDate): T $value_fn Callback used to determine how to delimit the subranges
+     *     Each subrange will contain dates for which the callback returns
+     *     the same value.
+     * @param array{backwards?: bool} $opts Array of options. Currently one option is supported, boolean
+     *     'backwards' (default false).  If true the subranges will be returned
+     *     in reverse order.
+     * @return Generator<int, array{range: DateRange, value: T}>
      */
     public function iterateSubRanges(callable $value_fn, array $opts = []): Generator
     {
@@ -254,6 +249,9 @@ class DateRange implements DateRangeList, JsonSerializable
         ];
     }
 
+    /**
+     * @return DateRange[]
+     */
     public function getRanges(): array
     {
         return [$this];

@@ -59,9 +59,9 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * Used internally by the DateSet and MutableDateSet classes
      * The supplied array must already be normalized (which is why this function is protected)
      *
-     * @param array $ranges Original sorted, disjoint list of ranges
+     * @param DateRange[] $ranges Original sorted, disjoint list of ranges
      * @param DateRange $cut Range to be subtracted from each of the ranges
-     * @return array Resulting normalized list of ranges after subtracting $cut
+     * @return DateRange[] Resulting normalized list of ranges after subtracting $cut
      */
     protected static function subtractRangeFromSortedRanges(array $ranges, DateRange $cut): array
     {
@@ -172,6 +172,8 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         return $out;
     }
 
+    abstract public function __construct(DateRangeList ...$lists);
+
     /**
      * Determine whether the given date is a member of this set
      *
@@ -225,7 +227,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
     /**
      * Get a generator which yields each range in the set as a DateRange object
      *
-     * @return Generator
+     * @return Generator<int, DateRange>
      */
     public function eachRange(): Generator
     {
@@ -237,7 +239,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
     /**
      * Get a generator which yields each date in the set as a JustDate object
      *
-     * @return Generator
+     * @return Generator<int, DateRange>
      */
     public function eachDate(): Generator
     {
@@ -254,7 +256,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * The second, a boolean, true if the date belongs to this set, and false otherwise.
      *
      * @param DateRange $window
-     * @return Generator
+     * @return Generator<int, array{0: JustDate, 1: bool}>
      */
     public function window(DateRange $window): Generator
     {
@@ -322,6 +324,8 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
 
     /**
      * Json representation is array of ranges
+     *
+     * @return list<array{start: string, end: string}>
      */
     public function jsonSerialize(): array
     {

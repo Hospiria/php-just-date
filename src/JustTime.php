@@ -15,10 +15,7 @@ use Serializable;
  * Class representing a time of day, with no date or timezone information
  *
  * @package MadisonSolutions\JustDate
- * @property int hours
- * @property int minutes
- * @property int seconds
- * @property int since_midnight
+ * @property-read int $since_midnight
  */
 class JustTime implements Serializable, JsonSerializable
 {
@@ -81,7 +78,7 @@ class JustTime implements Serializable, JsonSerializable
      *
      * @param string $his The date in H:i:s format, eg '14:35' (note seconds can be omitted eg '14:35')
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
-     * @return array Array containing integers [year, month, day]
+     * @return array{0: int, 1: int, 2: int} Array containing integers [year, month, day]
      */
     public static function parseHis(string $his): array
     {
@@ -142,13 +139,13 @@ class JustTime implements Serializable, JsonSerializable
      * @deprecated 1.2.0 No longer used by internal code and will be removed in v1.2.0
      * @param int $a the dividend
      * @param int $b the divisor
-     * @return array Returns an array [0 => (int) quotient, 1 => (int) remainder]
+     * @return array{0: int, 1: int} Returns an array [quotient, remainder]
      * @throws DivisionByZeroError If $b is zero
      */
     public static function quotientAndRemainder(int $a, int $b): array
     {
         if ($a < 0) {
-            $c = ceil(-$a / $b);
+            $c = (int) ceil(-$a / $b);
             return [-$c, $a + ($b * $c)];
         } else {
             return [intdiv($a, $b), $a % $b];
@@ -163,7 +160,7 @@ class JustTime implements Serializable, JsonSerializable
      * The return value will be an array of integers [0 => hours, 1 => minutes, 2 => seconds]
      *
      * @param int $seconds_since_midnight The total number of seconds since midnight
-     * @return array The number of hours, minutes and seconds
+     * @return array{0: int, 1: int, 2: int} The number of hours, minutes and seconds
      */
     public static function split(int $seconds_since_midnight): array
     {
@@ -196,17 +193,17 @@ class JustTime implements Serializable, JsonSerializable
     /**
      * @var int
      */
-    protected $hours;
+    public readonly int $hours;
 
     /**
      * @var int
      */
-    protected $minutes;
+    public readonly int $minutes;
 
     /**
      * @var int
      */
-    protected $seconds;
+    public readonly int $seconds;
 
     /**
      * Create a new JustTime instance
@@ -238,27 +235,18 @@ class JustTime implements Serializable, JsonSerializable
      * @param $name
      * @return mixed
      */
-    public function __get($name)
+    public function __get(mixed $name)
     {
         switch ($name) {
-            case 'hours':
-                return $this->hours;
-            case 'minutes':
-                return $this->minutes;
-            case 'seconds':
-                return $this->seconds;
             case 'since_midnight':
                 return ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
         }
         return null;
     }
 
-    public function __isset($name): bool
+    public function __isset(mixed $name): bool
     {
         switch ($name) {
-            case 'hours':
-            case 'minutes':
-            case 'seconds':
             case 'since_midnight':
                 return true;
         }
