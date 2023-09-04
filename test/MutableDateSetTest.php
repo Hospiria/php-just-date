@@ -53,6 +53,8 @@ class MutableDateSetTest extends TestCase
             $this->assertEquals($expected, (string) $set);
             $set = MutableDateSet::union(...$args);
             $this->assertEquals($expected, (string) $set);
+            $set = MutableDateSet::fromString($expected);
+            $this->assertEquals($expected, (string) $set);
         }
 
         // Test creating using only dates

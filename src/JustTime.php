@@ -7,7 +7,6 @@ use DateTimeZone;
 use DivisionByZeroError;
 use InvalidArgumentException;
 use JsonSerializable;
-use Serializable;
 
 /**
  * Class JustTime
@@ -17,7 +16,7 @@ use Serializable;
  * @package MadisonSolutions\JustDate
  * @property-read int $since_midnight
  */
-class JustTime implements Serializable, JsonSerializable
+class JustTime implements JsonSerializable
 {
     /**
      * Create a new JustTime object from a DateTime object
@@ -364,24 +363,6 @@ class JustTime implements Serializable, JsonSerializable
     {
         $rounded = round($this->since_midnight / $interval_seconds) * $interval_seconds;
         return self::fromSecondsSinceMidnight((int) $rounded);
-    }
-
-    /**
-     * Serialization of a JustTime will consist of the H:i:s string
-     */
-    public function serialize(): string
-    {
-        return (string) $this;
-    }
-
-    /**
-     * Unserialize by parsing the H:i:s string
-     *
-     * @param $serialized
-     */
-    public function unserialize($serialized)
-    {
-        $this->__construct(...JustTime::parseHis($serialized));
     }
 
     /**

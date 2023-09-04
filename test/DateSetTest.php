@@ -53,6 +53,8 @@ class DateSetTest extends TestCase
             $this->assertEquals($expected, (string) $set);
             $set = DateSet::union(...$args);
             $this->assertEquals($expected, (string) $set);
+            $set = DateSet::fromString($expected);
+            $this->assertEquals($expected, (string) $set);
         }
 
         // Test creating using only dates

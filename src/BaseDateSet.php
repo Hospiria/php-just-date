@@ -5,7 +5,6 @@ namespace MadisonSolutions\JustDate;
 use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
-use Serializable;
 
 /**
  * Class BaseDateSet
@@ -14,7 +13,7 @@ use Serializable;
  *
  * @package MadisonSolutions\JustDate
  */
-abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializable
+abstract class BaseDateSet implements DateRangeList, JsonSerializable
 {
     /**
      * @var DateRange[]
@@ -239,7 +238,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
     /**
      * Get a generator which yields each date in the set as a JustDate object
      *
-     * @return Generator<int, DateRange>
+     * @return Generator<int, JustDate>
      */
     public function eachDate(): Generator
     {
@@ -335,19 +334,12 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
     }
 
     /**
-     * Use the standard string representation for serialization
-     */
-    public function serialize(): string
-    {
-        return (string) $this;
-    }
-
-    /**
      * Unserialize by parsing the standard string representation
      *
-     * @param $serialized
+     * @param string $serialized
+     * @return static
      */
-    public function unserialize($serialized)
+    public static function fromString(string $serialized): static
     {
         $parts = explode(',', $serialized);
         $args = array_map(function ($part) {
@@ -365,6 +357,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
                     throw new InvalidArgumentException("Invalid date range string '{$part}'");
             }
         }, $parts);
-        $this->__construct(...array_filter($args));
+        return new static (...array_filter($args));
     }
 }
