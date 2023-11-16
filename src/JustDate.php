@@ -13,12 +13,11 @@ use JsonSerializable;
  * Class representing a single date with no time information
  *
  * @package MadisonSolutions\JustDate
- * @property-read int $year
- * @property-read int $month
- * @property-read int $day
- * @property-read int $day_of_week
- * @property-read int $epoch_day
- * @property-read int $timestamp
+ * @property-read int $year The year as an integer
+ * @property-read int $month The month as an integer (1 = January ... 12 = December)
+ * @property-read int $day The day of the month as an integer
+ * @property-read int $day_of_week The day of the week (0 = Sunday ... 6 = Saturday)
+ * @property-read int $timestamp Unix timestamp corresponding to 00:00:00 on this date in UTC
  */
 class JustDate implements DateRangeList, JsonSerializable
 {
@@ -236,8 +235,14 @@ class JustDate implements DateRangeList, JsonSerializable
         return $latest;
     }
 
-    protected int $epoch_day;
+    /**
+     * The number of days since the Unix epoch
+     */
+    public readonly int $epoch_day;
 
+    /**
+     * DateTime object created and used internally for certain operations
+     */
     protected ?DateTime $date;
 
     /**
@@ -272,13 +277,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Getters
      *
-     * year - the year as an integer
-     * month - the month as an integer (1 = January ... 12 = December)
-     * day - the day of the month as an integer
-     * day_of_week - the day of the week (0 = Sunday ... 6 = Saturday)
-     * epoch_day - the number of days since the Unix epoch
-     * timestamp - Unix timestamp corresponding to 00:00:00 on this date in UTC
-     *
      * @param $name
      * @return mixed
      */
@@ -293,8 +291,6 @@ class JustDate implements DateRangeList, JsonSerializable
                 return (int) $this->getInternalDateTime()->format('d');
             case 'day_of_week':
                 return (int) $this->getInternalDateTime()->format('w');
-            case 'epoch_day':
-                return $this->epoch_day;
             case 'timestamp':
                 return (int) $this->epoch_day * JustDate::SECS_PER_DAY;
         }
@@ -308,7 +304,6 @@ class JustDate implements DateRangeList, JsonSerializable
             case 'month':
             case 'day':
             case 'day_of_week':
-            case 'epoch_day':
             case 'timestamp':
                 return true;
         }

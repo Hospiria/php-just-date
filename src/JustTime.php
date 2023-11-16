@@ -14,7 +14,6 @@ use JsonSerializable;
  * Class representing a time of day, with no date or timezone information
  *
  * @package MadisonSolutions\JustDate
- * @property-read int $since_midnight
  */
 class JustTime implements JsonSerializable
 {
@@ -190,17 +189,22 @@ class JustTime implements JsonSerializable
     }
 
     /**
-     * @var int
+     * The number of seconds from midnight to this time
+     */
+    public readonly int $since_midnight;
+
+    /**
+     * Hours, from 0 to 23, as an integer
      */
     public readonly int $hours;
 
     /**
-     * @var int
+     * Minutes from 0 to 59, as an integer
      */
     public readonly int $minutes;
 
     /**
-     * @var int
+     * Seconds, from 0 to 59, as an integer
      */
     public readonly int $seconds;
 
@@ -219,37 +223,9 @@ class JustTime implements JsonSerializable
      */
     public function __construct(int $hours = 0, int $minutes = 0, int $seconds = 0)
     {
-        $secondsSinceMidnight = ($seconds) + ($minutes * 60) + ($hours * 60 * 60);
-        list($this->hours, $this->minutes, $this->seconds) = JustTime::split($secondsSinceMidnight);
-    }
-
-    /**
-     * Getters
-     *
-     * hours - the hour as an integer (0 - 23)
-     * minutes - the minutes as an integer (0 - 59)
-     * seconds - the seconds as an integer (0 - 59)
-     * since_midnight - the number of seconds from midnight to this time
-     *
-     * @param $name
-     * @return mixed
-     */
-    public function __get(mixed $name)
-    {
-        switch ($name) {
-            case 'since_midnight':
-                return ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
-        }
-        return null;
-    }
-
-    public function __isset(mixed $name): bool
-    {
-        switch ($name) {
-            case 'since_midnight':
-                return true;
-        }
-        return false;
+        $seconds_since_midnight = ($seconds) + ($minutes * 60) + ($hours * 60 * 60);
+        list($this->hours, $this->minutes, $this->seconds) = JustTime::split($seconds_since_midnight);
+        $this->since_midnight = ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
     }
 
     /**

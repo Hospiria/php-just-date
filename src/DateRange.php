@@ -14,13 +14,32 @@ use JsonSerializable;
  * Ranges that contain no dates are impossible
  *
  * @package MadisonSolutions\JustDate
- * @property-read int $inner_length
- * @property-read int $outer_length
  */
 class DateRange implements DateRangeList, JsonSerializable
 {
+    /**
+     * The start of the range
+     */
     public readonly JustDate $start;
+
+    /**
+     * The end of the range
+     */
     public readonly JustDate $end;
+
+    /**
+     * The length of the range in days, measuring from the middle of $this->start to the middle of $this->end
+     * So if $start and $end are the same date (shortest possible DateRange), $inner_length will be zero
+     * @var non-negative-int
+     */
+    public readonly int $inner_length;
+
+    /**
+     * The length of the range in days, measuring from the start of $this->start to the end of $this->end
+     * So if $start and $end are the same date (shortest possible DateRange), $outer_length will be one
+     * @var positive-int
+     */
+    public readonly int $outer_length;
 
     /**
      * Create a new DateRange object from start and end date as Y-m-d formatted strings
@@ -69,6 +88,10 @@ class DateRange implements DateRangeList, JsonSerializable
         }
         $this->start = clone $start;
         $this->end = clone $end;
+        $inner_length = JustDate::difference($this->start, $this->end);
+        assert($inner_length >= 0); // It must be because $this->start comes before $this->end
+        $this->inner_length = $inner_length;
+        $this->outer_length = $inner_length + 1;
     }
 
     /**
@@ -84,40 +107,6 @@ class DateRange implements DateRangeList, JsonSerializable
     public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
     {
         return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
-    }
-
-    /**
-     * Getters
-     *
-     * start - The start of the range
-     * end - The end of the range
-     * inner_length - The length of the range in days, measuring from the middle of $this->start to the middle of $this->end
-     *                So if $this->start and $this->end are the same date (shortest possible DateRange), inner_length is zero
-     * outer_length - The length of the range in days, measuring from the start of $this->start to the end of $this->end
-     *                So if $this->start and $this->end are the same date (shortest possible DateRange), outer_length is one
-     *
-     * @param $name
-     * @return int|JustDate|null
-     */
-    public function __get(mixed $name)
-    {
-        switch ($name) {
-            case 'inner_length':
-                return JustDate::difference($this->start, $this->end);
-            case 'outer_length':
-                return JustDate::difference($this->start, $this->end) + 1;
-        }
-        return null;
-    }
-
-    public function __isset(mixed $name): bool
-    {
-        switch ($name) {
-            case 'inner_length':
-            case 'outer_length':
-                return true;
-        }
-        return false;
     }
 
     /**
