@@ -55,6 +55,32 @@ class DateRange implements DateRangeList, JsonSerializable
     }
 
     /**
+     * Create a new DateRange object by specifying the start date and the inner length of the range
+     *
+     * @param JustDate $start Start of range
+     * @param non-negative-int $inner_length The desired inner length of the range
+     * @throws InvalidArgumentException If inner_length is less than zero
+     * @return DateRange The DateRange object
+     */
+    public static function fromStartAndInnerLength(JustDate $start, int $inner_length): DateRange
+    {
+        return new DateRange($start, $start->addDays($inner_length));
+    }
+
+    /**
+     * Create a new DateRange object by specifying the start date and the outer length of the range
+     *
+     * @param JustDate $start Start of range
+     * @param positive-int $outer_length The desired outer length of the range
+     * @throws InvalidArgumentException If inner_length is less than one
+     * @return DateRange The DateRange object
+     */
+    public static function fromStartAndOuterLength(JustDate $start, int $outer_length): DateRange
+    {
+        return new DateRange($start, $start->addDays($outer_length - 1));
+    }
+
+    /**
      * Create a new DateRange object which is the intersection of $r1 and $r2
      *
      * If $r1 and $r2 have no intersection and are totally separate, then this function returns null

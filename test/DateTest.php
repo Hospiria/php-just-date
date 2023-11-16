@@ -368,6 +368,22 @@ class DateTest extends TestCase
         $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
         $r = DateRange::eitherWayRound($d1, $d1);
         $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+
+        // Create by specifying start and length
+        $r = DateRange::fromStartAndInnerLength($d1, 0);
+        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $r = DateRange::fromStartAndInnerLength($d1, 3);
+        $this->assertDateRange("2019-04-21 to 2019-04-24", $r);
+        $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
+            $r = DateRange::fromStartAndInnerLength($d1, -1);
+        });
+        $r = DateRange::fromStartAndOuterLength($d1, 1);
+        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $r = DateRange::fromStartAndOuterLength($d1, 4);
+        $this->assertDateRange("2019-04-21 to 2019-04-24", $r);
+        $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
+            $r = DateRange::fromStartAndOuterLength($d1, 0);
+        });
     }
 
     public function testRangeGetters()
