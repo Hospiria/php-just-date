@@ -185,18 +185,19 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Count the number of nights between $from and $to
+     * Return the (signed) number of days between 2 JustDate objects: $a and $b
      *
-     * If the supplied $from and $to dates are the same date, the result will be zero
-     * If the supplied $to date is before the $from date, the result will be negative
+     * If $a is before $b the return value will be positive
+     * If $a is after $b the return value will be negative
+     * If $a and $b refer to the same date, the return value will be negative
      *
-     * @param JustDate $from The start date
-     * @param JustDate $to The end date
+     * @param JustDate $a The start date
+     * @param JustDate $b The end date
      * @return int The number of days from $from to $to
      */
-    public static function numNights(JustDate $from, JustDate $to): int
+    public static function difference(JustDate $a, JustDate $b): int
     {
-        return $to->epoch_day - $from->epoch_day;
+        return $b->epoch_day - $a->epoch_day;
     }
 
     /**

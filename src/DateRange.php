@@ -14,8 +14,8 @@ use JsonSerializable;
  * Ranges that contain no dates are impossible
  *
  * @package MadisonSolutions\JustDate
- * @property-read int $num_nights
- * @property-read int $num_days
+ * @property-read int $inner_length
+ * @property-read int $outer_length
  */
 class DateRange implements DateRangeList, JsonSerializable
 {
@@ -91,8 +91,10 @@ class DateRange implements DateRangeList, JsonSerializable
      *
      * start - The start of the range
      * end - The end of the range
-     * num_nights - The number of nights between the start and end of the range (if start and end are same day, num_nights is 0)
-     * num_days - The number of days in the range, including start and end (if start and end are same day, num_days is 1)
+     * inner_length - The length of the range in days, measuring from the middle of $this->start to the middle of $this->end
+     *                So if $this->start and $this->end are the same date (shortest possible DateRange), inner_length is zero
+     * outer_length - The length of the range in days, measuring from the start of $this->start to the end of $this->end
+     *                So if $this->start and $this->end are the same date (shortest possible DateRange), outer_length is one
      *
      * @param $name
      * @return int|JustDate|null
@@ -100,10 +102,10 @@ class DateRange implements DateRangeList, JsonSerializable
     public function __get(mixed $name)
     {
         switch ($name) {
-            case 'num_nights':
-                return JustDate::numNights($this->start, $this->end);
-            case 'num_days':
-                return JustDate::numNights($this->start, $this->end) + 1;
+            case 'inner_length':
+                return JustDate::difference($this->start, $this->end);
+            case 'outer_length':
+                return JustDate::difference($this->start, $this->end) + 1;
         }
         return null;
     }
@@ -111,8 +113,8 @@ class DateRange implements DateRangeList, JsonSerializable
     public function __isset(mixed $name): bool
     {
         switch ($name) {
-            case 'num_nights':
-            case 'num_days':
+            case 'inner_length':
+            case 'outer_length':
                 return true;
         }
         return false;

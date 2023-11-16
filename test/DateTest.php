@@ -131,12 +131,12 @@ class DateTest extends TestCase
         $this->assertEquals(strtotime('2021-04-28T00:00:00.03+00:00') / (60 * 60 * 24), JustDate::fromYmd('2021-04-28')->epoch_day);
     }
 
-    public function testNumNights()
+    public function testdifference()
     {
-        $this->assertSame(2, JustDate::numNights(JustDate::make(2019, 04, 21), JustDate::make(2019, 04, 23)));
-        $this->assertSame(0, JustDate::numNights(JustDate::make(2019, 04, 21), JustDate::make(2019, 04, 21)));
-        $this->assertSame(-2, JustDate::numNights(JustDate::make(2019, 04, 23), JustDate::make(2019, 04, 21)));
-        $this->assertSame(365, JustDate::numNights(JustDate::make(2018, 04, 21), JustDate::make(2019, 04, 21)));
+        $this->assertSame(2, JustDate::difference(JustDate::make(2019, 04, 21), JustDate::make(2019, 04, 23)));
+        $this->assertSame(0, JustDate::difference(JustDate::make(2019, 04, 21), JustDate::make(2019, 04, 21)));
+        $this->assertSame(-2, JustDate::difference(JustDate::make(2019, 04, 23), JustDate::make(2019, 04, 21)));
+        $this->assertSame(365, JustDate::difference(JustDate::make(2018, 04, 21), JustDate::make(2019, 04, 21)));
     }
 
     public function testGetters()
@@ -375,14 +375,14 @@ class DateTest extends TestCase
         $r1 = DateRange::fromYmd('2019-04-21', '2019-04-25');
         $this->assertJustDate('2019-04-21', $r1->start);
         $this->assertJustDate('2019-04-25', $r1->end);
-        $this->assertSame(4, $r1->num_nights);
-        $this->assertSame(5, $r1->num_days);
+        $this->assertSame(4, $r1->inner_length);
+        $this->assertSame(5, $r1->outer_length);
 
         $r2 = DateRange::fromYmd('2019-04-21', '2019-04-21');
         $this->assertJustDate('2019-04-21', $r2->start);
         $this->assertJustDate('2019-04-21', $r2->end);
-        $this->assertSame(0, $r2->num_nights);
-        $this->assertSame(1, $r2->num_days);
+        $this->assertSame(0, $r2->inner_length);
+        $this->assertSame(1, $r2->outer_length);
     }
 
     public function testRangeIncludes()
