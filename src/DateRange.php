@@ -42,6 +42,33 @@ class DateRange implements DateRangeList, JsonSerializable
     public readonly int $outer_length;
 
     /**
+     * Create a new DateRange object from start and end dates
+     *
+     * @param JustDate $start Start of range
+     * @param JustDate $end End of range
+     * @throws InvalidArgumentException If end is before start
+     */
+    public static function make(JustDate $start, JustDate $end): DateRange
+    {
+        return new DateRange($start, $end);
+    }
+
+    /**
+     * Create a new DateRange objects from start and end dates specified in any order
+     *
+     * The start date will be whichever of the 2 dates is earliest and the end date
+     * whichever of the 2 dates is latest.
+     *
+     * @param JustDate $a Start or end of range
+     * @param JustDate $b Other side of range
+     * @return DateRange The DateRange object
+     */
+    public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
+    {
+        return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
+    }
+
+    /**
      * Create a new DateRange object from start and end date as Y-m-d formatted strings
      *
      * @param string $start Start of range, in Y-m-d format
@@ -101,13 +128,9 @@ class DateRange implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Create a new DateRange object from start and end dates
-     *
-     * @param JustDate $start Start of range
-     * @param JustDate $end End of range
-     * @throws InvalidArgumentException If end is before start
+     * DateRange constructor
      */
-    public function __construct(JustDate $start, JustDate $end)
+    protected function __construct(JustDate $start, JustDate $end)
     {
         if ($start->isAfter($end)) {
             throw new InvalidArgumentException("Start date cannot be after end date");
@@ -118,21 +141,6 @@ class DateRange implements DateRangeList, JsonSerializable
         assert($inner_length >= 0); // It must be because $this->start comes before $this->end
         $this->inner_length = $inner_length;
         $this->outer_length = $inner_length + 1;
-    }
-
-    /**
-     * Create a new DateRange objects from start and end dates specified in any order
-     *
-     * The start date will be whichever of the 2 dates is earliest and the end date
-     * whichever of the 2 dates is latest.
-     *
-     * @param JustDate $a Start or end of range
-     * @param JustDate $b Other side of range
-     * @return DateRange The DateRange object
-     */
-    public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
-    {
-        return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
     }
 
     /**

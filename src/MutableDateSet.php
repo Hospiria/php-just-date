@@ -136,7 +136,7 @@ class MutableDateSet extends BaseDateSet
         // $new is entirely before (not touching) range $j
         $end = ($j == 0) ? $new->end : JustDate::latest($this->ranges[$j - 1]->end, $new->end);
 
-        array_splice($this->ranges, $i, $j - $i, [new DateRange($start, $end)]);
+        array_splice($this->ranges, $i, $j - $i, [DateRange::make($start, $end)]);
         return $this;
     }
 

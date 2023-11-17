@@ -42,13 +42,13 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
         for ($i = 1; $i < $num; $i++) {
             if ($dates[$i]->isAfter($curr_end->nextDay())) {
                 // there's a gap before the next date
-                $ranges[] = new DateRange($curr_start, $curr_end);
+                $ranges[] = DateRange::make($curr_start, $curr_end);
                 $curr_start = $curr_end = $dates[$i];
             } else {
                 $curr_end = $dates[$i];
             }
         }
-        $ranges[] = new DateRange($curr_start, $curr_end);
+        $ranges[] = DateRange::make($curr_start, $curr_end);
         return $ranges;
     }
 
@@ -88,16 +88,16 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
                     // $cut completely covers $existing, so $existing is removed completely
                 } else {
                     // some of the beginning of $existing is removed by $cut
-                    $new_ranges[] = new DateRange($cut->end->nextDay(), $existing->end);
+                    $new_ranges[] = DateRange::make($cut->end->nextDay(), $existing->end);
                 }
             } else if ($cut->end->isAfterOrSameAs($existing->end)) {
                 // some of the end of $existing is removed by $cut
-                $new_ranges[] = new DateRange($existing->start, $cut->start->prevDay());
+                $new_ranges[] = DateRange::make($existing->start, $cut->start->prevDay());
             } else {
                 // only remaining possibility is that $cut is completely contained within $existing
                 // so it must split $existing into 2 disjoint ranges
-                $new_ranges[] = new DateRange($existing->start, $cut->start->prevDay());
-                $new_ranges[] = new DateRange($cut->end->nextDay(), $existing->end);
+                $new_ranges[] = DateRange::make($existing->start, $cut->start->prevDay());
+                $new_ranges[] = DateRange::make($cut->end->nextDay(), $existing->end);
             }
             $i++;
         }
@@ -161,7 +161,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
                 $curr = $next;
             } elseif ($next->end->isAfter($curr->end)) {
                 // $next overlaps or touches the end of $curr, so extend $curr
-                $curr = new DateRange($curr->start, $next->end);
+                $curr = DateRange::make($curr->start, $next->end);
             } else {
                 // $next is completely contained within $curr
             }
@@ -220,7 +220,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
         }
         $start = $this->ranges[0]->start;
         $end = $this->ranges[$num - 1]->end;
-        return new DateRange($start, $end);
+        return DateRange::make($start, $end);
     }
 
     /**

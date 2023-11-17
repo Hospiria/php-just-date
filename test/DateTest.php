@@ -343,7 +343,7 @@ class DateTest extends TestCase
     {
         $d1 = JustDate::make(2019, 04, 21);
         $d2 = JustDate::make(2019, 04, 25);
-        $r = new DateRange($d1, $d2);
+        $r = DateRange::make($d1, $d2);
         $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
 
         $r = DateRange::fromYmd('2019-04-21', '2019-04-25');
@@ -351,14 +351,14 @@ class DateTest extends TestCase
 
         // Won't let you make a range with end before start
         $this->assertThrows(InvalidArgumentException::class, function () {
-            new DateRange(JustDate::make(2019, 04, 21), JustDate::make(2019, 04, 19));
+            DateRange::make(JustDate::make(2019, 04, 21), JustDate::make(2019, 04, 19));
         });
         $this->assertThrows(InvalidArgumentException::class, function () {
             DateRange::fromYmd('2019-04-21', '2019-04-19');
         });
 
         // Start same as end is allowed though
-        $r = new DateRange($d1, $d1);
+        $r = DateRange::make($d1, $d1);
         $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
 
         // You can use eitherWayRound() to supply the end date first
@@ -576,7 +576,7 @@ class DateTest extends TestCase
         $this->assertNotSame($d1, $_d1);
 
         $d2 = JustDate::make(2019, 4, 25);
-        $r = new DateRange($d1, $d2);
+        $r = DateRange::make($d1, $d2);
         $s = serialize($r);
         $this->assertTrue(is_string($s));
         $_r = unserialize($s);

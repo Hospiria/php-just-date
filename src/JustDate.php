@@ -733,6 +733,6 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function getRanges(): array
     {
-        return [new DateRange($this, $this)];
+        return [DateRange::make($this, $this)];
     }
 }
