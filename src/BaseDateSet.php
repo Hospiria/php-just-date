@@ -226,11 +226,13 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each range in the set as a DateRange object
      *
+     * @param bool $backwards If true the ranges will be returned in reverse order (default false).
      * @return Generator<int, DateRange>
      */
-    public function eachRange(): Generator
+    public function eachRange(bool $backwards = false): Generator
     {
-        foreach ($this->ranges as $range) {
+        $ranges = $backwards ? array_reverse($this->ranges) : $this->ranges;
+        foreach ($ranges as $range) {
             yield $range;
         }
     }
@@ -238,12 +240,13 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the set as a JustDate object
      *
+     * @param bool $backwards If true the dates will be returned in reverse order (default false).
      * @return Generator<int, JustDate>
      */
-    public function eachDate(): Generator
+    public function eachDate(bool $backwards = false): Generator
     {
-        foreach ($this->ranges as $range) {
-            yield from $range->each();
+        foreach ($this->eachRange($backwards) as $range) {
+            yield from $range->each($backwards);
         }
     }
 

@@ -170,24 +170,30 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the range (inclusive of end points) as a JustDate object
      *
+     * @param bool $backwards If true the dates will be returned in reverse order (default false).
      * @return Generator<int, JustDate>
      */
-    public function each(): Generator
+    public function each(bool $backwards = false): Generator
     {
-        for ($day = $this->start; $day->isBeforeOrSameAs($this->end); $day = $day->nextDay()) {
-            yield $day;
+        $direction = $backwards ? -1 : 1;
+        $first = $backwards ? $this->end : $this->start;
+        for ($i = 0; $i < $this->outer_length; $i++) {
+            yield $first->addDays($i * $direction);
         }
     }
 
     /**
      * Get a generator which yields each date in the range (including start but not end) as a JustDate object
      *
+     * @param bool $backwards If true the dates will be returned in reverse order, starting with the end date, up to but not including the start date (default false).
      * @return Generator<int, JustDate>
      */
-    public function eachExceptEnd(): Generator
+    public function eachExceptLast(bool $backwards = false): Generator
     {
-        for ($day = $this->start; $day->isBefore($this->end); $day = $day->nextDay()) {
-            yield $day;
+        $direction = $backwards ? -1 : 1;
+        $first = $backwards ? $this->end : $this->start;
+        for ($i = 0; $i < $this->inner_length; $i++) {
+            yield $first->addDays($i * $direction);
         }
     }
 
@@ -228,14 +234,11 @@ class DateRange implements DateRangeList, JsonSerializable
      * @param callable(JustDate): T $value_fn Callback used to determine how to delimit the subranges
      *     Each subrange will contain dates for which the callback returns
      *     the same value.
-     * @param array{backwards?: bool} $opts Array of options. Currently one option is supported, boolean
-     *     'backwards' (default false).  If true the subranges will be returned
-     *     in reverse order.
+     * @param bool $backwards If true the subranges will be returned in reverse order (default false).
      * @return Generator<int, array{range: DateRange, value: T}>
      */
-    public function iterateSubRanges(callable $value_fn, array $opts = []): Generator
+    public function eachSubRange(callable $value_fn, bool $backwards = false): Generator
     {
-        $backwards = (bool) ($opts['backwards'] ?? false);
         $step = $backwards ? -1 : 1;
         $end = $backwards ? $this->start : $this->end;
 

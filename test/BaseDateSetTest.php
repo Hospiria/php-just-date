@@ -90,14 +90,25 @@ class BaseDateSetTest extends TestCase
                  */
                 $dates = [];
                 foreach ($set->eachDate() as $date) {
-                    $dates[] = (string)$date;
+                    $dates[] = (string) $date;
                 }
                 $this->assertEquals($expected_dates, $dates);
+                $dates = [];
+                foreach ($set->eachDate(backwards: true) as $date) {
+                    $dates[] = (string) $date;
+                }
+                $this->assertEquals(array_reverse($expected_dates), $dates);
+
                 $ranges = [];
                 foreach ($set->eachRange() as $range) {
-                    $ranges[] = (string)$range;
+                    $ranges[] = (string) $range;
                 }
                 $this->assertEquals($expected_ranges, $ranges);
+                $ranges = [];
+                foreach ($set->eachRange(backwards: true) as $range) {
+                    $ranges[] = (string) $range;
+                }
+                $this->assertEquals(array_reverse($expected_ranges), $ranges);
             }
         }
     }

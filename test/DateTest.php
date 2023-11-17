@@ -413,6 +413,7 @@ class DateTest extends TestCase
 
     public function testRangeIterators()
     {
+        // Normal range
         $r1 = DateRange::fromYmd('2019-04-21', '2019-04-25');
 
         $test_str = '';
@@ -423,12 +424,28 @@ class DateTest extends TestCase
         $this->assertSame('2122232425', $test_str);
 
         $test_str = '';
-        foreach ($r1->eachExceptEnd() as $date) {
+        foreach ($r1->eachExceptLast() as $date) {
             $this->assertInstanceOf(JustDate::class, $date);
             $test_str .= $date->day;
         }
         $this->assertSame('21222324', $test_str);
 
+        // Same but in reverse
+        $test_str = '';
+        foreach ($r1->each(backwards: true) as $date) {
+            $this->assertInstanceOf(JustDate::class, $date);
+            $test_str .= $date->day;
+        }
+        $this->assertSame('2524232221', $test_str);
+
+        $test_str = '';
+        foreach ($r1->eachExceptLast(backwards: true) as $date) {
+            $this->assertInstanceOf(JustDate::class, $date);
+            $test_str .= $date->day;
+        }
+        $this->assertSame('25242322', $test_str);
+
+        // Single-day range
         $r2 = DateRange::fromYmd('2019-04-21', '2019-04-21');
 
         $test_str = '';
@@ -440,7 +457,22 @@ class DateTest extends TestCase
 
         $test_var = false;
         /** @noinspection PhpUnusedLocalVariableInspection */
-        foreach ($r2->eachExceptEnd() as $date) {
+        foreach ($r2->eachExceptLast() as $date) {
+            $test_var = true;
+        }
+        $this->assertSame(false, $test_var);
+
+        // Same but in reverse
+        $test_str = '';
+        foreach ($r2->each(backwards: true) as $date) {
+            $this->assertInstanceOf(JustDate::class, $date);
+            $test_str .= $date->day;
+        }
+        $this->assertSame('21', $test_str);
+
+        $test_var = false;
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        foreach ($r2->eachExceptLast(backwards: true) as $date) {
             $test_var = true;
         }
         $this->assertSame(false, $test_var);
@@ -499,7 +531,7 @@ class DateTest extends TestCase
             return $date->month;
         };
         $subranges = [];
-        foreach ($r1->iterateSubRanges($getMonth) as $subrange) {
+        foreach ($r1->eachSubRange($getMonth) as $subrange) {
             $subranges[] = $subrange;
         }
         $this->assertSame(3, count($subranges));
@@ -512,7 +544,7 @@ class DateTest extends TestCase
 
         // Same but backwards
         $subranges = [];
-        foreach ($r1->iterateSubRanges($getMonth, ['backwards' => true]) as $subrange) {
+        foreach ($r1->eachSubRange($getMonth, backwards: true) as $subrange) {
             $subranges[] = $subrange;
         }
         $this->assertSame(3, count($subranges));
@@ -526,7 +558,7 @@ class DateTest extends TestCase
         // Single date range
         $r2 = DateRange::fromYmd('2021-02-28', '2021-02-28');
         $subranges = [];
-        foreach ($r2->iterateSubRanges($getMonth) as $subrange) {
+        foreach ($r2->eachSubRange($getMonth) as $subrange) {
             $subranges[] = $subrange;
         }
         $this->assertSame(1, count($subranges));
