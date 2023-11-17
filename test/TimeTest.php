@@ -28,23 +28,23 @@ class TimeTest extends TestCase
 
     public function testCreateJustTimes()
     {
-        $t = new JustTime(2, 30, 40);
+        $t = JustTime::make(2, 30, 40);
         $this->assertJustTime('02:30:40', $t);
 
         // try some out of range values
-        $t = new JustTime(0, 120, 90);
+        $t = JustTime::make(0, 120, 90);
         $this->assertJustTime('02:01:30', $t);
 
-        $t = new JustTime(2, 65, -10);
+        $t = JustTime::make(2, 65, -10);
         $this->assertJustTime('03:04:50', $t);
 
-        $t = new JustTime(23, 90, 40);
+        $t = JustTime::make(23, 90, 40);
         $this->assertJustTime('00:30:40', $t);
 
-        $t = new JustTime(25, 61, 61);
+        $t = JustTime::make(25, 61, 61);
         $this->assertJustTime('02:02:01', $t);
 
-        $t = new JustTime(-1, -1, -1);
+        $t = JustTime::make(-1, -1, -1);
         $this->assertJustTime('22:58:59', $t);
 
         $t = JustTime::fromSecondsSinceMidnight(1);
@@ -149,7 +149,7 @@ class TimeTest extends TestCase
 
     public function testGetters()
     {
-        $t = new JustTime(16, 35, 17);
+        $t = JustTime::make(16, 35, 17);
         $this->assertSame(16, $t->hours);
         $this->assertSame(35, $t->minutes);
         $this->assertSame(17, $t->seconds);
@@ -158,7 +158,7 @@ class TimeTest extends TestCase
 
     public function testAddTime()
     {
-        $t1 = new JustTime(12, 00, 00);
+        $t1 = JustTime::make(12, 00, 00);
         $this->assertJustTime('12:00:00', $t1->addTime(0, 0, 0));
         $this->assertJustTime('13:01:01', $t1->addTime(1, 1, 1));
         $this->assertJustTime('10:58:59', $t1->addTime(-1, -1, -1));
@@ -180,8 +180,8 @@ class TimeTest extends TestCase
 
     public function testComparisons()
     {
-        $t1 = new JustTime(14, 8, 17);
-        $t2 = new JustTime(14, 8, 18);
+        $t1 = JustTime::make(14, 8, 17);
+        $t2 = JustTime::make(14, 8, 18);
 
         $this->assertTrue($t1->isBefore($t2));
         $this->assertFalse($t2->isBefore($t1));
@@ -199,24 +199,24 @@ class TimeTest extends TestCase
 
     public function testEarliestAndLatest()
     {
-        $t1 = new JustTime(14, 8, 7);
+        $t1 = JustTime::make(14, 8, 7);
         $this->assertJustTime('14:08:07', JustTime::earliest($t1));
         $this->assertJustTime('14:08:07', JustTime::latest($t1));
         $this->assertJustTime('14:08:07', JustTime::earliest($t1, $t1));
         $this->assertJustTime('14:08:07', JustTime::latest($t1, $t1));
 
-        $t2 = new JustTime(14, 8, 8);
+        $t2 = JustTime::make(14, 8, 8);
         $this->assertJustTime('14:08:07', JustTime::earliest($t1, $t2));
         $this->assertJustTime('14:08:08', JustTime::latest($t1, $t2));
 
-        $t3 = new JustTime(14, 8, 6);
+        $t3 = JustTime::make(14, 8, 6);
         $this->assertJustTime('14:08:06', JustTime::earliest($t3, $t2, $t1));
         $this->assertJustTime('14:08:08', JustTime::latest($t3, $t2, $t1));
     }
 
     public function testRounding()
     {
-        $t = new JustTime(15, 47, 12);
+        $t = JustTime::make(15, 47, 12);
 
         $this->assertJustTime('15:47:12', $t->round(1));
         $this->assertJustTime('15:47:10', $t->round(10));
@@ -230,7 +230,7 @@ class TimeTest extends TestCase
 
     public function testSerialization()
     {
-        $t1 = new JustTime(14, 8, 7);
+        $t1 = JustTime::make(14, 8, 7);
         $s = serialize($t1);
         $this->assertTrue(is_string($s));
         $_d1 = unserialize($s);
