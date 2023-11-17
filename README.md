@@ -144,7 +144,7 @@ use MadisonSolutions\JustDate\JustDate;
 $start = JustDate::make(2019, 04, 21);
 $end = $d1->addDays(4);
 
-$range = new DateRange($start, $end);
+$range = DateRange::make($start, $end);
 (string) $range;
 // 2019-04-21 to 2019-04-25
 
@@ -189,7 +189,7 @@ try {
 ```php
 use MadisonSolutions\JustDate\JustTime;
 
-$time = new JustTime(17, 45, 30);
+$time = JustTime::make(17, 45, 30);
 
 (string) $time;
 // 17:45:30
@@ -206,7 +206,7 @@ $time->seconds;
 $time->since_midnight;
 // 63930
 
-$time2 = JustDate::fromHis('17:55:00');
+$time2 = JustTime::fromHis('17:55:00');
 $time->isBefore($time2);
 // true
 
@@ -257,7 +257,7 @@ Note JustTime objects are **immutable** - `addTime()` returns new instances of J
 ```php
 use MadisonSolutions\JustDate\JustTime;
 
-$t1 = new JustTime(12, 0, 0);
+$t1 = JustTime::make(12, 0, 0);
 
 $t2 = $t1->addTime(2, 30, 10);
 (string) $t2;
@@ -278,7 +278,7 @@ $t4 = $t1->addTime(0, 0, -1);
 ```PHP
 use MadisonSolutions\JustDate\JustTime;
 
-$t1 = new JustTime(12, 47, 10);
+$t1 = JustTime::make(12, 47, 10);
 
 // round to nearest minute
 $t2 = $t1->round(60);
