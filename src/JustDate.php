@@ -65,7 +65,7 @@ class JustDate implements DateRangeList, JsonSerializable
         assert(is_int($epoch_day));
 
         $instance = new JustDate($epoch_day);
-        $instance->date = $date;
+        $instance->_date = $date;
         return $instance;
     }
 
@@ -243,7 +243,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * DateTime object created and used internally for certain operations
      */
-    protected ?DateTime $date;
+    protected ?DateTime $_date;
 
     /**
      * JustDate constructor.
@@ -255,9 +255,9 @@ class JustDate implements DateRangeList, JsonSerializable
         // $this->epoch_day uniquely determines this date and must be set
         $this->epoch_day = $epoch_day;
 
-        // $this->date will be a DateTime object for 00:00 on this date (UTC)
+        // $this->_date will be a DateTime object for 00:00 on this date (UTC)
         // it is a helper object which is initially null, and created only when needed for things like formatting
-        $this->date = null;
+        $this->_date = null;
     }
 
     /**
@@ -268,10 +268,10 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     protected function getInternalDateTime(): DateTime
     {
-        if (! $this->date) {
-            $this->date = self::newUtcDateTime()->setTimestamp($this->timestamp);
+        if (! $this->_date) {
+            $this->_date = self::newUtcDateTime()->setTimestamp($this->timestamp);
         }
-        return $this->date;
+        return $this->_date;
     }
 
     /**
@@ -717,7 +717,7 @@ class JustDate implements DateRangeList, JsonSerializable
     public function __unserialize(array $data)
     {
         $this->epoch_day = (int) $data['epoch_day'];
-        $this->date = null;
+        $this->_date = null;
     }
 
     /**

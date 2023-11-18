@@ -230,7 +230,7 @@ class JustTime implements JsonSerializable
     /**
      * DateTime object created and used internally when required for formatting
      */
-    protected ?DateTime $date;
+    protected ?DateTime $_date;
 
     /**
      * JustTime constructor.
@@ -241,7 +241,7 @@ class JustTime implements JsonSerializable
     {
         list($this->hours, $this->minutes, $this->seconds) = JustTime::split($seconds_since_midnight);
         $this->since_midnight = ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
-        $this->date = null;
+        $this->_date = null;
     }
 
     /**
@@ -253,15 +253,15 @@ class JustTime implements JsonSerializable
     protected function getInternalDateTime(): DateTime
     {
         static $utc = null;
-        if (! $this->date) {
+        if (! $this->_date) {
             if (is_null($utc)) {
                 $utc = new DateTimeZone('UTC');
             }
-            $this->date = new DateTime();
-            $this->date->setTimezone($utc);
-            $this->date->setTimestamp($this->since_midnight);
+            $this->_date = new DateTime();
+            $this->_date->setTimezone($utc);
+            $this->_date->setTimestamp($this->since_midnight);
         }
-        return $this->date;
+        return $this->_date;
     }
 
     /**
