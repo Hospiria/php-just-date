@@ -8,6 +8,8 @@ For example, a hotel booking system might care only about a guest's check-in dat
 
 This library aims to make it simple to work with just the date part, or just the time part.
 
+Note these instructions are for version 2 - see the [migration guide](migration.md) for help migrating from version 1.
+
 ## Install
 
 ```
@@ -381,11 +383,10 @@ $set = new DateSet(JustDate::fromYmd('2023-10-17'), DateRange::fromYmd('2023-10-
 foreach ($range->eachRange() as $range) {
     echo $range->start->format('d') . '-' . $range->end->format('d') . ", ";
 }
-// 17-17, 20-25, 
+// 17-17, 20-25,
 
 foreach ($range->eachDate() as $date) {
     echo $date->format('d') . ",";
 }
 // 17,20,21,22,23,24,25,
 ```
-
