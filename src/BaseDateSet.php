@@ -194,6 +194,26 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     }
 
     /**
+     * Create a new set by subtracting a Date or DateRange or set of dates from this set
+     *
+     * The dates in the resulting object will be those that are contained in this set but are not contained
+     * in the supplied object. Returns a new set (does not mutate $this)
+     *
+     * @param DateRangeList $list_to_cut
+     * @return static
+     */
+    public function subtract(DateRangeList $list_to_cut): static
+    {
+        $instance = new static();
+        $ranges = $this->ranges;
+        foreach ($list_to_cut->getRanges() as $range_to_cut) {
+            $ranges = $this->subtractRangeFromSortedRanges($ranges, $range_to_cut);
+        }
+        $instance->ranges = $ranges;
+        return $instance;
+    }
+
+    /**
      * Determine whether this set is empty
      *
      * @return bool True if this set is empty (IE contains no dates), false otherwise

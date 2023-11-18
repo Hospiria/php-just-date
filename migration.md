@@ -81,5 +81,5 @@ no serialize/unserialize methods
 
 MutableDateSet
 
-NOT DONE YET
-will change subtract to return a new instance instead of mutating
+subtract now returns a new instance of MutableDateSet leaving the original unchanged
+In order to mutate the original, instead use remove()

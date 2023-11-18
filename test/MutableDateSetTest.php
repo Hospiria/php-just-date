@@ -159,56 +159,109 @@ class MutableDateSetTest extends TestCase
         $this->assertEquals('2021-03-01 to 2021-05-06', (string) $set);
     }
 
+    public function testRemoving()
+    {
+        $set = new MutableDateSet(DateRange::fromYmd('2021-02-01', '2021-05-30'));
+
+        // Remove a day from the middle
+        $set->remove(JustDate::fromYmd('2021-03-10'));
+        $this->assertEquals('2021-02-01 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
+
+        // Remove from before the set - no change
+        $set->remove(DateRange::fromYmd('2021-01-15', '2021-01-20'));
+        $this->assertEquals('2021-02-01 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
+
+        // Remove from after the set - no change
+        $set->remove(DateRange::fromYmd('2021-01-15', '2021-01-20'));
+        $this->assertEquals('2021-02-01 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
+
+        // Try cutting bits off the start of a range
+        $set->remove(DateRange::fromYmd('2021-01-20', '2021-02-03'));
+        $this->assertEquals('2021-02-04 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
+        $set->remove(DateRange::fromYmd('2021-02-04', '2021-02-05'));
+        $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
+        $set->remove(DateRange::fromYmd('2021-03-11', '2021-03-11'));
+        $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-12 to 2021-05-30', (string) $set);
+
+        // Try cutting bits off the end of a range
+        $set->remove(DateRange::fromYmd('2021-05-20', '2021-06-01'));
+        $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-12 to 2021-05-19', (string) $set);
+        $set->remove(DateRange::fromYmd('2021-05-19', '2021-05-19'));
+        $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-12 to 2021-05-18', (string) $set);
+        $set->remove(DateRange::fromYmd('2021-03-05', '2021-03-09'));
+        $this->assertEquals('2021-02-06 to 2021-03-04, 2021-03-12 to 2021-05-18', (string) $set);
+
+        // Remove from inside a gap - no change
+        $set->remove(DateRange::fromYmd('2021-03-05', '2021-03-11'));
+        $this->assertEquals('2021-02-06 to 2021-03-04, 2021-03-12 to 2021-05-18', (string) $set);
+
+        // Remove from 2 ranges at once
+        $set->remove(DateRange::fromYmd('2021-03-04', '2021-03-12'));
+        $this->assertEquals('2021-02-06 to 2021-03-03, 2021-03-13 to 2021-05-18', (string) $set);
+
+        // Remove a larger gap inside a range
+        $set->remove(DateRange::fromYmd('2021-04-10', '2021-04-20'));
+        $this->assertEquals('2021-02-06 to 2021-03-03, 2021-03-13 to 2021-04-09, 2021-04-21 to 2021-05-18', (string) $set);
+
+        // Remove an entire range
+        $set->remove(DateRange::fromYmd('2021-03-13', '2021-04-09'));
+        $this->assertEquals('2021-02-06 to 2021-03-03, 2021-04-21 to 2021-05-18', (string) $set);
+
+        // Remove several entire ranges
+        $set->remove(DateRange::fromYmd('2021-01-01', '2021-06-01'));
+        $this->assertEquals('', (string) $set);
+    }
+
     public function testSubtracting()
     {
         $set = new MutableDateSet(DateRange::fromYmd('2021-02-01', '2021-05-30'));
 
         // Subtract a day from the middle
-        $set->subtract(JustDate::fromYmd('2021-03-10'));
+        $set = $set->subtract(JustDate::fromYmd('2021-03-10'));
         $this->assertEquals('2021-02-01 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
 
         // Subtract from before the set - no change
-        $set->subtract(DateRange::fromYmd('2021-01-15', '2021-01-20'));
+        $set = $set->subtract(DateRange::fromYmd('2021-01-15', '2021-01-20'));
         $this->assertEquals('2021-02-01 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
 
         // Subtract from after the set - no change
-        $set->subtract(DateRange::fromYmd('2021-01-15', '2021-01-20'));
+        $set = $set->subtract(DateRange::fromYmd('2021-01-15', '2021-01-20'));
         $this->assertEquals('2021-02-01 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
 
         // Try cutting bits off the start of a range
-        $set->subtract(DateRange::fromYmd('2021-01-20', '2021-02-03'));
+        $set = $set->subtract(DateRange::fromYmd('2021-01-20', '2021-02-03'));
         $this->assertEquals('2021-02-04 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
-        $set->subtract(DateRange::fromYmd('2021-02-04', '2021-02-05'));
+        $set = $set->subtract(DateRange::fromYmd('2021-02-04', '2021-02-05'));
         $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-11 to 2021-05-30', (string) $set);
-        $set->subtract(DateRange::fromYmd('2021-03-11', '2021-03-11'));
+        $set = $set->subtract(DateRange::fromYmd('2021-03-11', '2021-03-11'));
         $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-12 to 2021-05-30', (string) $set);
 
         // Try cutting bits off the end of a range
-        $set->subtract(DateRange::fromYmd('2021-05-20', '2021-06-01'));
+        $set = $set->subtract(DateRange::fromYmd('2021-05-20', '2021-06-01'));
         $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-12 to 2021-05-19', (string) $set);
-        $set->subtract(DateRange::fromYmd('2021-05-19', '2021-05-19'));
+        $set = $set->subtract(DateRange::fromYmd('2021-05-19', '2021-05-19'));
         $this->assertEquals('2021-02-06 to 2021-03-09, 2021-03-12 to 2021-05-18', (string) $set);
-        $set->subtract(DateRange::fromYmd('2021-03-05', '2021-03-09'));
+        $set = $set->subtract(DateRange::fromYmd('2021-03-05', '2021-03-09'));
         $this->assertEquals('2021-02-06 to 2021-03-04, 2021-03-12 to 2021-05-18', (string) $set);
 
         // Subtract from inside a gap - no change
-        $set->subtract(DateRange::fromYmd('2021-03-05', '2021-03-11'));
+        $set = $set->subtract(DateRange::fromYmd('2021-03-05', '2021-03-11'));
         $this->assertEquals('2021-02-06 to 2021-03-04, 2021-03-12 to 2021-05-18', (string) $set);
 
         // Subtract from 2 ranges at once
-        $set->subtract(DateRange::fromYmd('2021-03-04', '2021-03-12'));
+        $set = $set->subtract(DateRange::fromYmd('2021-03-04', '2021-03-12'));
         $this->assertEquals('2021-02-06 to 2021-03-03, 2021-03-13 to 2021-05-18', (string) $set);
 
         // Subtract a larger gap inside a range
-        $set->subtract(DateRange::fromYmd('2021-04-10', '2021-04-20'));
+        $set = $set->subtract(DateRange::fromYmd('2021-04-10', '2021-04-20'));
         $this->assertEquals('2021-02-06 to 2021-03-03, 2021-03-13 to 2021-04-09, 2021-04-21 to 2021-05-18', (string) $set);
 
         // Subtract an entire range
-        $set->subtract(DateRange::fromYmd('2021-03-13', '2021-04-09'));
+        $set = $set->subtract(DateRange::fromYmd('2021-03-13', '2021-04-09'));
         $this->assertEquals('2021-02-06 to 2021-03-03, 2021-04-21 to 2021-05-18', (string) $set);
 
         // Subtract several entire ranges
-        $set->subtract(DateRange::fromYmd('2021-01-01', '2021-06-01'));
+        $set = $set->subtract(DateRange::fromYmd('2021-01-01', '2021-06-01'));
         $this->assertEquals('', (string) $set);
     }
 

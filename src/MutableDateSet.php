@@ -141,7 +141,7 @@ class MutableDateSet extends BaseDateSet
     }
 
     /**
-     * Subtract a Date or DateRange or set of dates from this set
+     * Remove a Date or DateRange or set of dates from this set
      *
      * The dates contained in the supplied object will be removed from this set.
      * Note the set is mutated by this function.
@@ -150,7 +150,7 @@ class MutableDateSet extends BaseDateSet
      * @param DateRangeList $list_to_cut
      * @return $this
      */
-    public function subtract(DateRangeList $list_to_cut) : MutableDateSet
+    public function remove(DateRangeList $list_to_cut) : MutableDateSet
     {
         $ranges = $this->ranges;
         foreach ($list_to_cut->getRanges() as $range_to_cut) {
