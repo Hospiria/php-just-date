@@ -702,21 +702,21 @@ class JustDate implements DateRangeList, JsonSerializable
      * Serialize
      *
      * The integer epoch_day completely defines a JustDate object, so it is sufficient for serialization
-     * @return array{0: int}
+     * @return array{epoch_day: int}
      */
     public function __serialize(): array
     {
-        return [$this->epoch_day];
+        return ['epoch_day' => $this->epoch_day];
     }
 
     /**
      * Unserialize
      *
-     * @param array{0: int} $data
+     * @param array{epoch_day: int} $data
      */
     public function __unserialize(array $data)
     {
-        $this->epoch_day = (int) $data[0];
+        $this->epoch_day = (int) $data['epoch_day'];
         $this->date = null;
     }
 

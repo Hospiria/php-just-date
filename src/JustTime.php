@@ -352,6 +352,27 @@ class JustTime implements JsonSerializable
     }
 
     /**
+     * Serialize
+     *
+     * The integer since_midnight completely defines a JustTime object, so it is sufficient for serialization
+     * @return array{since_midnight: int}
+     */
+    public function __serialize(): array
+    {
+        return ['since_midnight' => $this->since_midnight];
+    }
+
+    /**
+     * Unserialize
+     *
+     * @param array{since_midnight: int} $data
+     */
+    public function __unserialize(array $data)
+    {
+        $this->__construct((int) $data['since_midnight']);
+    }
+
+    /**
      * Json serialize to the H:i:s string
      */
     public function jsonSerialize(): string
