@@ -43,6 +43,8 @@ $range = DateRange::fromStartAndInnerLength(JustDate::today(), 3);
 
 ### Other breaking changes
 
+The property `day_of_week` of a JustDate object previously returned an integer between 0 (Sunday) and 6 (Saturday), but now returns an instance of the `DayOfWeek` enum. If you need the integer value instead, then replace `$date->day_of_week` with `$date->day_of_week->value`).
+
 In v1, the `iterateSubRanges` method of DateRange accepted a second argument `array $opts`.  The only supported option was a boolean flag `backwards`.  In v2, in the renamed method `eachSubRange` the second argument is `bool $backwards`. So you must change things like `$range->iterateSubRanges($value_fn, ['backwards' => true])` to `$range->eachSubRange($value_fn, backwards: true)`.
 
 In v1 the `subtract` method of MutableDateSet would mutate the original object. In v2, the `subtract` method will instead return a new object leaving the original unchanged (so behaviour is consistent with the `subtract` method in DateSet).  If you want the original, mutating behaviour, use the new `remove` method of MutableDateSet instead.

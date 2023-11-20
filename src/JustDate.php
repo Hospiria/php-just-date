@@ -16,7 +16,7 @@ use JsonSerializable;
  * @property-read int $year The year as an integer
  * @property-read int $month The month as an integer (1 = January ... 12 = December)
  * @property-read int $day The day of the month as an integer
- * @property-read int $day_of_week The day of the week (0 = Sunday ... 6 = Saturday)
+ * @property-read DayOfWeek $day_of_week The day of the week
  * @property-read int $timestamp Unix timestamp corresponding to 00:00:00 on this date in UTC
  */
 class JustDate implements DateRangeList, JsonSerializable
@@ -241,9 +241,17 @@ class JustDate implements DateRangeList, JsonSerializable
     public readonly int $epoch_day;
 
     /**
-     * DateTime object created and used internally for certain operations
+     * DateTime object created when required
+     * Will be a DateTime object for 00:00 on this date in UTC timezone
+     * @internal
      */
     protected ?DateTime $_date;
+
+    /**
+     * DayOfWeek object created when required
+     * @internal
+     */
+    protected ?DayOfWeek $_dow;
 
     /**
      * JustDate constructor.
@@ -255,9 +263,8 @@ class JustDate implements DateRangeList, JsonSerializable
         // $this->epoch_day uniquely determines this date and must be set
         $this->epoch_day = $epoch_day;
 
-        // $this->_date will be a DateTime object for 00:00 on this date (UTC)
-        // it is a helper object which is initially null, and created only when needed for things like formatting
         $this->_date = null;
+        $this->_dow = null;
     }
 
     /**
@@ -287,7 +294,10 @@ class JustDate implements DateRangeList, JsonSerializable
             case 'day':
                 return (int) $this->getInternalDateTime()->format('d');
             case 'day_of_week':
-                return (int) $this->getInternalDateTime()->format('w');
+                if (is_null($this->_dow)) {
+                    $this->_dow = DayOfWeek::from((int) $this->getInternalDateTime()->format('w'));
+                }
+                return $this->_dow;
             case 'timestamp':
                 return (int) $this->epoch_day * JustDate::SECS_PER_DAY;
         }
@@ -615,7 +625,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isSunday(): bool
     {
-        return $this->day_of_week == 0;
+        return $this->day_of_week == DayOfWeek::Sunday;
     }
 
     /**
@@ -625,7 +635,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isMonday(): bool
     {
-        return $this->day_of_week == 1;
+        return $this->day_of_week == DayOfWeek::Monday;
     }
 
     /**
@@ -635,7 +645,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isTuesday(): bool
     {
-        return $this->day_of_week == 2;
+        return $this->day_of_week == DayOfWeek::Tuesday;
     }
 
     /**
@@ -645,7 +655,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isWednesday(): bool
     {
-        return $this->day_of_week == 3;
+        return $this->day_of_week == DayOfWeek::Wednesday;
     }
 
     /**
@@ -655,7 +665,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isThursday(): bool
     {
-        return $this->day_of_week == 4;
+        return $this->day_of_week == DayOfWeek::Thursday;
     }
 
     /**
@@ -665,7 +675,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isFriday(): bool
     {
-        return $this->day_of_week == 5;
+        return $this->day_of_week == DayOfWeek::Friday;
     }
 
     /**
@@ -675,7 +685,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isSaturday(): bool
     {
-        return $this->day_of_week == 6;
+        return $this->day_of_week == DayOfWeek::Saturday;
     }
 
     /**
@@ -685,8 +695,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isWeekday(): bool
     {
-        $dow = $this->day_of_week;
-        return $dow > 0 && $dow < 6;
+        return $this->day_of_week->isWeekday();
     }
 
     /**
@@ -696,8 +705,7 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function isWeekend(): bool
     {
-        $dow = $this->day_of_week;
-        return $dow == 0 || $dow == 6;
+        return $this->day_of_week->isWeekend();
     }
 
     /**

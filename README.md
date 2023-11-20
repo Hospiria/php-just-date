@@ -42,6 +42,8 @@ $date->month;
 $date->day;
 // 21
 $date->day_of_week;
+// DayOfWeek::Sunday
+$data->day_of_week->value;
 // 0
 
 $date2 = JustDate::fromYmd('2019-04-22');
@@ -114,14 +116,14 @@ JustDate::make($d1->year - 2, $d1->month, $d1->day)->format('l');
 
 // Find the previous Wednesday
 $date = $d1;
-while ($date->day_of_week != 3) {
+while (! $date->isWednesday()) {
     $date = $date->prevDay();
 }
 $date->format('D F jS Y');
 // Wed April 17th 2019
 
 // How many days is it until the start of the next month?
-JustDate::spanDays($d1, $d1->endOfMonth()->nextDay())
+JustDate::difference($d1, $d1->endOfMonth()->nextDay())
 // 10
 ```
 

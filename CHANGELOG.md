@@ -15,6 +15,7 @@ See the [migration guide](migration.md) for help migrating from version 1 to ver
  - Renamed `DateRange::eachExceptEnd` to `DateRange::eachExceptLast`
  - Renamed `DateRange::iterateSubRanges` to `DateRange::eachSubRange` and changed the way options are passed to this method
  - Changed behaviour of `MutableDateSet::subtract` - now returns a new object instead of mutating the original
+ - JustDate property `$day_of_week` now returns an instance of the `DayOfWeek` enum instead of an integer (get the integer with `$date->day_of_week->value`)
 
 ### Added
  - Added `epoch_day` property to JustDate and static `JustDate::fromEpochDay()` function.

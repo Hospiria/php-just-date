@@ -70,10 +70,10 @@ The day of the month as an integer
 
 
 ```php
-public int $day_of_week
+public \MadisonSolutions\JustDate\DayOfWeek $day_of_week
 ```
 
-The day of the week (0 = Sunday ... 6 = Saturday)
+The day of the week
 
 
 

@@ -2,6 +2,7 @@
 
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\DateSet;
+use MadisonSolutions\JustDate\DayOfWeek;
 use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\JustTime;
 use PHPUnit\Framework\TestCase;
@@ -145,7 +146,7 @@ class DateTest extends TestCase
         $this->assertSame(2019, $d->year);
         $this->assertSame(4, $d->month);
         $this->assertSame(21, $d->day);
-        $this->assertSame(0, $d->day_of_week); // Sunday
+        $this->assertSame(DayOfWeek::Sunday, $d->day_of_week);
         $this->assertSame(gmmktime(0, 0, 0, 4, 21, 2019), $d->timestamp);
     }
 
@@ -602,5 +603,24 @@ class DateTest extends TestCase
         $this->assertJustDate('2023-09-12', $d1->addWorkingDays(4, $holidays)); // Next Tue)
         $this->assertJustDate('2023-09-13', $d1->addWorkingDays(5, $holidays)); // Next Wed)
         $this->assertJustDate('2023-09-05', $d1->addWorkingDays(-1, $holidays)); // Tue
+    }
+
+    public function testDayOfWeekEnum()
+    {
+        $mon = DayOfWeek::Monday;
+        $this->assertSame(DayOfWeek::Wednesday, $mon->addDays(2));
+        $this->assertSame(DayOfWeek::Tuesday, $mon->addDays(8));
+        $this->assertSame(DayOfWeek::Sunday, $mon->subDays(1));
+
+        foreach ([0 => true, 1 => false, 2 => false, 3 => false, 4 => false, 5 => false, 6 => true] as $i => $is_weekend) {
+            $dow = DayOfWeek::from($i);
+            if ($is_weekend) {
+                $this->assertTrue($dow->isWeekend());
+                $this->assertFalse($dow->isWeekday());
+            } else {
+                $this->assertFalse($dow->isWeekend());
+                $this->assertTrue($dow->isWeekday());
+            }
+        }
     }
 }
