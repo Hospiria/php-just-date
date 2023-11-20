@@ -7,6 +7,7 @@ See the [migration guide](migration.md) for help migrating from version 1 to ver
 ### Breaking Changes
  - Minimum PHP version required is now 8.1
  - JustDate, JustTime, DateRange constructors are now protected methods, so you can't directly call `new JustDate()` - use `JustDate::make` or `JustTime::make` or `DateRange::make` instead.
+ - Changes to serialize/unserialize mechanism - you cannot unserialize using v2 from strings serialized using v1.  None of the classes now implement the `/Serializable` interface (so do not have the `serialize()` `unserialize()` methods), instead the new `__serialize()` and `__unserialize()` magic methods (introduced in PHP7.4) are now used.
  - `JustDate::spanDays()` renamed to `JustDate::difference()`.
  - Removed `DateRange::span` and `DateRange::num_nights` (use `DateRange::inner_length` instead).
  - Removed `DateRange::num_days` (use `DateRange::outer_length` instead).

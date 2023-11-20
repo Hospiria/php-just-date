@@ -3,6 +3,9 @@
 
 Note the minimum required PHP version is now 8.1.
 
+Warning - the serialize/unserialize mechanism has changed between v1 and v2.  You cannot `unserialize()` using v2 from strings created with `serialize()` in v1.
+
+
 ### Constructor functions
 
 In version 1 you can directly construct instances of JustDate, JustTime and JustDate (the `__construct()` methods are public). In version 2, the constructors are no longer public so JustDate, JustTime and JustDate must be created via suitable static class methods instead.  For all 3, there is new static method `make()` which takes the same areguments as the v1 `__construct()` method.
@@ -44,44 +47,4 @@ In v1, the `iterateSubRanges` method of DateRange accepted a second argument `ar
 
 In v1 the `subtract` method of MutableDateSet would mutate the original object. In v2, the `subtract` method will instead return a new object leaving the original unchanged (so behaviour is consistent with the `subtract` method in DateSet).  If you want the original, mutating behaviour, use the new `remove` method of MutableDateSet instead.
 
-
-### Serialization
-
-@todo Document changes to serialization - when we've decided what they are
-
-JustDate
-
-was
-serialize + unserialize
-now
-__serialize + __unserialize
-
-serialization was
-C:34:"MadisonSolutions\JustDate\JustDate":10:{2023-11-18}
-now
-O:34:"MadisonSolutions\JustDate\JustDate":1:{s:9:"epoch_day";i:19679;}
-
-
-JustTime
-
-was
-serialize + unserialize
-now
-__serialize + __unserialize
-
-serialization
-was
-C:34:"MadisonSolutions\JustDate\JustTime":8:{08:59:44}
-now
-O:34:"MadisonSolutions\JustDate\JustTime":1:{s:14:"since_midnight";i:40473;}
-
-
-DateRange
-
-serialization changed too because it depends on serialization of JustDate
-
-
-BaseDateSet
-
-serialization changed
-no serialize/unserialize methods
+As mentioned above, the serialize/unserialize mechanism has changed between v1 and v2.  You cannot `unserialize()` using v2 from strings created with `serialize()` in v1. In particular, none of the classes now implement the `/Serializable` interface (so do not have the `serialize()` `unserialize()` methods), instead the new `__serialize()` and `__unserialize()` magic methods (introduced in PHP7.4) are now used.
