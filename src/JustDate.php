@@ -188,7 +188,7 @@ class JustDate implements DateRangeList, JsonSerializable
      *
      * If $a is before $b the return value will be positive
      * If $a is after $b the return value will be negative
-     * If $a and $b refer to the same date, the return value will be negative
+     * If $a and $b refer to the same date, the return value will be zero
      *
      * @param JustDate $a The start date
      * @param JustDate $b The end date

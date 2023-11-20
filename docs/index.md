@@ -1,11 +1,11 @@
 
 ***
 
-# Documentation
+# MadisonSolutions/JustDate Documentation
 
 
 
-This is an automatically generated documentation for **Documentation**.
+This is an automatically generated documentation for **MadisonSolutions/JustDate Documentation**.
 
 
 ## Namespaces

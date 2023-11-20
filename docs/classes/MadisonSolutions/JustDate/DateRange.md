@@ -265,33 +265,6 @@ The intersection DateRange object or null
 
 ***
 
-### __construct
-
-DateRange constructor
-
-```php
-protected __construct(\MadisonSolutions\JustDate\JustDate $start, \MadisonSolutions\JustDate\JustDate $end): mixed
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$start` | **\MadisonSolutions\JustDate\JustDate** |  |
-| `$end` | **\MadisonSolutions\JustDate\JustDate** |  |
-
-
-
-
-***
-
 ### isSingleDay
 
 Does this range consist of just a single day?

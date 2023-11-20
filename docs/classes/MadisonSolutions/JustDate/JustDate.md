@@ -35,43 +35,8 @@ public int $epoch_day
 
 ***
 
-### _date
-
-DateTime object created and used internally for certain operations
-
-```php
-protected ?\DateTime $_date
-```
-
-
-
-
-
-
-***
-
 ## Methods
 
-
-### newUtcDateTime
-
-Utility function to create a new DateTime object for the current time, with UTC timezone
-
-```php
-protected static newUtcDateTime(): \DateTime
-```
-
-
-
-* This method is **static**.
-
-
-
-
-
-
-
-***
 
 ### make
 
@@ -361,7 +326,7 @@ public static difference(\MadisonSolutions\JustDate\JustDate $a, \MadisonSolutio
 
 If $a is before $b the return value will be positive
 If $a is after $b the return value will be negative
-If $a and $b refer to the same date, the return value will be negative
+If $a and $b refer to the same date, the return value will be zero
 
 * This method is **static**.
 
@@ -441,53 +406,6 @@ public static latest(\MadisonSolutions\JustDate\JustDate $first, \MadisonSolutio
 **Return Value:**
 
 The latest date from $first and $others
-
-
-
-***
-
-### __construct
-
-JustDate constructor.
-
-```php
-protected __construct(int $epoch_day): mixed
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$epoch_day` | **int** |  |
-
-
-
-
-***
-
-### getInternalDateTime
-
-Get the internal DateTime object for 00:00 on this date (UTC)
-Creates the DateTime object if it doesn't already exists
-
-```php
-protected getInternalDateTime(): \DateTime
-```
-
-
-
-
-
-
-
-
 
 
 

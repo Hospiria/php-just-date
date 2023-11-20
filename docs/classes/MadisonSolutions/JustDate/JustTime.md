@@ -75,21 +75,6 @@ public int $seconds
 
 ***
 
-### _date
-
-DateTime object created and used internally when required for formatting
-
-```php
-protected ?\DateTime $_date
-```
-
-
-
-
-
-
-***
-
 ## Methods
 
 
@@ -430,53 +415,6 @@ The return value will be an array of integers [0 => hours, 1 => minutes, 2 => se
 **Return Value:**
 
 The number of hours, minutes and seconds
-
-
-
-***
-
-### __construct
-
-JustTime constructor.
-
-```php
-protected __construct(int $seconds_since_midnight): mixed
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$seconds_since_midnight` | **int** |  |
-
-
-
-
-***
-
-### getInternalDateTime
-
-Get the internal DateTime object for 00:00 on this date (UTC)
-Creates the DateTime object if it doesn't already exists
-
-```php
-protected getInternalDateTime(): \DateTime
-```
-
-
-
-
-
-
-
-
 
 
 
