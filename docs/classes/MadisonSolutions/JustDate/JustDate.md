@@ -20,6 +20,81 @@ Class representing a single date with no time information
 ## Properties
 
 
+### year
+
+
+
+```php
+public int $year
+```
+
+The year as an integer
+
+
+
+
+***
+
+### month
+
+
+
+```php
+public int $month
+```
+
+The month as an integer (1 = January ... 12 = December)
+
+
+
+
+***
+
+### day
+
+
+
+```php
+public int $day
+```
+
+The day of the month as an integer
+
+
+
+
+***
+
+### day_of_week
+
+
+
+```php
+public int $day_of_week
+```
+
+The day of the week (0 = Sunday ... 6 = Saturday)
+
+
+
+
+***
+
+### timestamp
+
+
+
+```php
+public int $timestamp
+```
+
+Unix timestamp corresponding to 00:00:00 on this date in UTC
+
+
+
+
+***
+
 ### epoch_day
 
 The number of days since the Unix epoch
@@ -411,67 +486,15 @@ The latest date from $first and $others
 
 ***
 
-### __get
-
-Getters
-
-```php
-public __get( $name): mixed
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$name` | **** |  |
-
-
-
-
-***
-
-### __isset
-
-
-
-```php
-public __isset(mixed $name): bool
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$name` | **mixed** |  |
-
-
-
-
-***
-
 ### __toString
 
-Standard string representation is Y-m-d format
+Convert to string
 
 ```php
 public __toString(): string
 ```
 
-
+Standard string representation is Y-m-d format
 
 
 
@@ -1334,52 +1357,6 @@ True if the date is a Saturday or Sunday, false otherwise
 
 ***
 
-### __serialize
-
-Serialize
-
-```php
-public __serialize(): array{epoch_day: int}
-```
-
-The integer epoch_day completely defines a JustDate object, so it is sufficient for serialization
-
-
-
-
-
-
-
-
-
-***
-
-### __unserialize
-
-Unserialize
-
-```php
-public __unserialize(array{epoch_day: int} $data): mixed
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$data` | **array{epoch_day: int}** |  |
-
-
-
-
-***
-
 ### jsonSerialize
 
 Json serialize to the Y-m-d string
@@ -1400,26 +1377,5 @@ public jsonSerialize(): string
 
 ***
 
-### getRanges
-
-Get the DateRange objects associated with this DateRangeList
-
-```php
-public getRanges(): \MadisonSolutions\JustDate\DateRange[]
-```
-
-
-
-
-
-
-
-
-
-
-
 ***
-
-
-***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/) and [saggre/phpdocumentor-markdown](https://github.com/Saggre/phpDocumentor-markdown)
+> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)

@@ -471,26 +471,5 @@ be in the format of an array with 'value' and 'range' keys.
 
 ***
 
-### getRanges
-
-Get the DateRange objects associated with this DateRangeList
-
-```php
-public getRanges(): \MadisonSolutions\JustDate\DateRange[]
-```
-
-
-
-
-
-
-
-
-
-
-
 ***
-
-
-***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/) and [saggre/phpdocumentor-markdown](https://github.com/Saggre/phpDocumentor-markdown)
+> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)

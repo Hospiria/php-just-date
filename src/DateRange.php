@@ -278,6 +278,7 @@ class DateRange implements DateRangeList, JsonSerializable
     }
 
     /**
+     * @internal
      * @return DateRange[]
      */
     public function getRanges(): array

@@ -275,12 +275,9 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Getters
-     *
-     * @param $name
-     * @return mixed
+     * @internal
      */
-    public function __get(mixed $name)
+    public function __get(mixed $name): mixed
     {
         switch ($name) {
             case 'year':
@@ -297,6 +294,9 @@ class JustDate implements DateRangeList, JsonSerializable
         return null;
     }
 
+    /**
+     * @internal
+     */
     public function __isset(mixed $name): bool
     {
         switch ($name) {
@@ -311,6 +311,8 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
+     * Convert to string
+     *
      * Standard string representation is Y-m-d format
      */
     public function __toString(): string
@@ -702,6 +704,7 @@ class JustDate implements DateRangeList, JsonSerializable
      * Serialize
      *
      * The integer epoch_day completely defines a JustDate object, so it is sufficient for serialization
+     * @internal
      * @return array{epoch_day: int}
      */
     public function __serialize(): array
@@ -713,6 +716,7 @@ class JustDate implements DateRangeList, JsonSerializable
      * Unserialize
      *
      * @param array{epoch_day: int} $data
+     * @internal
      */
     public function __unserialize(array $data)
     {
@@ -729,6 +733,7 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
+     * @internal
      * @return DateRange[]
      */
     public function getRanges(): array

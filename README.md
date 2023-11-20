@@ -8,6 +8,8 @@ For example, a hotel booking system might care only about a guest's check-in dat
 
 This library aims to make it simple to work with just the date part, or just the time part.
 
+See below for a quick guide to the functionality, with some examples, or see the [API reference here](docs/index.md).
+
 Note these instructions are for version 2 - see the [migration guide](migration.md) for help migrating from version 1.
 
 ## Install

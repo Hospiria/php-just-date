@@ -161,29 +161,6 @@ class JustTime implements JsonSerializable
     }
 
     /**
-     * Return the quotient and remainder when dividing integer $a by integer $b
-     *
-     * This differs from the PHP intdiv() function by always returning a non-negative remainder
-     * Eg quotientAndRemainder(-10, 60) returns quotient -1 and remainder 50
-     * This makes it suitable for 'clock' calculations (-10 minutes is equivalent to 50 minutes from the previous hour)
-     *
-     * @deprecated 1.2.0 No longer used by internal code and will be removed in v1.2.0
-     * @param int $a the dividend
-     * @param int $b the divisor
-     * @return array{0: int, 1: int} Returns an array [quotient, remainder]
-     * @throws DivisionByZeroError If $b is zero
-     */
-    public static function quotientAndRemainder(int $a, int $b): array
-    {
-        if ($a < 0) {
-            $c = (int) ceil(-$a / $b);
-            return [-$c, $a + ($b * $c)];
-        } else {
-            return [intdiv($a, $b), $a % $b];
-        }
-    }
-
-    /**
      * Get the hours, minutes and seconds given the total number of seconds since midnight
      *
      * Note the hours will wrap around midnight if the total number of seconds is more than a day.
@@ -377,6 +354,8 @@ class JustTime implements JsonSerializable
      * Serialize
      *
      * The integer since_midnight completely defines a JustTime object, so it is sufficient for serialization
+     *
+     * @internal
      * @return array{since_midnight: int}
      */
     public function __serialize(): array
@@ -387,6 +366,7 @@ class JustTime implements JsonSerializable
     /**
      * Unserialize
      *
+     * @internal
      * @param array{since_midnight: int} $data
      */
     public function __unserialize(array $data)

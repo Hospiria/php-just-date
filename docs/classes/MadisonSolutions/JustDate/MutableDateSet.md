@@ -17,200 +17,6 @@ Unlike DateSet, the dates that are included in a MutableDateSet can be modified 
 ## Methods
 
 
-### __construct
-
-Create a MutableDateSet
-
-```php
-public __construct(\MadisonSolutions\JustDate\DateRangeList $lists): mixed
-```
-
-The dates that are initially included in the set can be defined by supplying any number of JustDate, DateRange,
-DateSet or MutableDateSet objects (or any other class implementing DateRangeList) as parameters.
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-### fromDates
-
-Alternative way of constructing a MutableDateSet object that is optimised for creating from JustDate objects
-
-```php
-public static fromDates(\MadisonSolutions\JustDate\JustDate $dates): \MadisonSolutions\JustDate\MutableDateSet
-```
-
-
-
-* This method is **static**.
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$dates` | **\MadisonSolutions\JustDate\JustDate** | Dates that should initially be included in the set |
-
-
-
-
-***
-
-### union
-
-Create a new MutableDateSet whose dates are the union of all of the dates in the supplied objects
-
-```php
-public static union(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\MutableDateSet
-```
-
-Note this is functionally identical to the standard new MutableDateSet() constructor and is included just
-for code readability and contrast with the complementary MutableDateSet::intersection() function.
-
-* This method is **static**.
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-### intersection
-
-Create a new MutableDateSet which is the intersection of the supplied objects
-
-```php
-public static intersection(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\MutableDateSet
-```
-
-The dates in the resulting MutableDateSet will be those dates which are included in every one of the arguments
-
-* This method is **static**.
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-### add
-
-Add a Date or DateRange or set of dates to this set
-
-```php
-public add(\MadisonSolutions\JustDate\DateRangeList $list): $this
-```
-
-The dates contained in the supplied object will be added to this set.
-Note the set is mutated by this function.
-The updated set is returned for chaining.
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$list` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-### addRange
-
-Add the dates in a DateRange to this set
-
-```php
-public addRange(\MadisonSolutions\JustDate\DateRange $new): $this
-```
-
-The dates contained in the supplied object will be added to this set.
-Note the set is mutated by this function.
-The updated set is returned for chaining.
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$new` | **\MadisonSolutions\JustDate\DateRange** |  |
-
-
-
-
-***
-
-### remove
-
-Remove a Date or DateRange or set of dates from this set
-
-```php
-public remove(\MadisonSolutions\JustDate\DateRangeList $list_to_cut): $this
-```
-
-The dates contained in the supplied object will be removed from this set.
-Note the set is mutated by this function.
-The updated set is returned for chaining.
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$list_to_cut` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-
-## Inherited methods
-
-
 ### sortedRangesFromSingleDates
 
 Utility function that takes any number of JustDate objects and turns them into a normalized list of DateRanges
@@ -245,16 +51,17 @@ Resulting normalized list of ranges
 
 ### __construct
 
-
+Create a MutableDateSet
 
 ```php
 public __construct(\MadisonSolutions\JustDate\DateRangeList $lists): mixed
 ```
 
+The dates that are initially included in the set can be defined by supplying any number of JustDate, DateRange,
+DateSet or MutableDateSet objects (or any other class implementing DateRangeList) as parameters.
 
 
 
-* This method is **abstract**.
 
 
 
@@ -538,6 +345,168 @@ public static fromString(string $serialized): static
 
 ***
 
+### fromDates
+
+Alternative way of constructing a MutableDateSet object that is optimised for creating from JustDate objects
+
+```php
+public static fromDates(\MadisonSolutions\JustDate\JustDate $dates): \MadisonSolutions\JustDate\MutableDateSet
+```
+
+
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$dates` | **\MadisonSolutions\JustDate\JustDate** | Dates that should initially be included in the set |
+
+
+
 
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/) and [saggre/phpdocumentor-markdown](https://github.com/Saggre/phpDocumentor-markdown)
+
+### union
+
+Create a new MutableDateSet whose dates are the union of all of the dates in the supplied objects
+
+```php
+public static union(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\MutableDateSet
+```
+
+Note this is functionally identical to the standard new MutableDateSet() constructor and is included just
+for code readability and contrast with the complementary MutableDateSet::intersection() function.
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
+
+
+
+
+***
+
+### intersection
+
+Create a new MutableDateSet which is the intersection of the supplied objects
+
+```php
+public static intersection(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\MutableDateSet
+```
+
+The dates in the resulting MutableDateSet will be those dates which are included in every one of the arguments
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
+
+
+
+
+***
+
+### add
+
+Add a Date or DateRange or set of dates to this set
+
+```php
+public add(\MadisonSolutions\JustDate\DateRangeList $list): $this
+```
+
+The dates contained in the supplied object will be added to this set.
+Note the set is mutated by this function.
+The updated set is returned for chaining.
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$list` | **\MadisonSolutions\JustDate\DateRangeList** |  |
+
+
+
+
+***
+
+### addRange
+
+Add the dates in a DateRange to this set
+
+```php
+public addRange(\MadisonSolutions\JustDate\DateRange $new): $this
+```
+
+The dates contained in the supplied object will be added to this set.
+Note the set is mutated by this function.
+The updated set is returned for chaining.
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$new` | **\MadisonSolutions\JustDate\DateRange** |  |
+
+
+
+
+***
+
+### remove
+
+Remove a Date or DateRange or set of dates from this set
+
+```php
+public remove(\MadisonSolutions\JustDate\DateRangeList $list_to_cut): $this
+```
+
+The dates contained in the supplied object will be removed from this set.
+Note the set is mutated by this function.
+The updated set is returned for chaining.
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$list_to_cut` | **\MadisonSolutions\JustDate\DateRangeList** |  |
+
+
+
+
+***
+
+***
+> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)

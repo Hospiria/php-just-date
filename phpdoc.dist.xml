@@ -17,5 +17,5 @@
             <visibility>public</visibility>
         </api>
     </version>
-    <template name="./vendor/saggre/phpdocumentor-markdown/themes/markdown"/>
+    <template name="./phpdoc-theme"/>
 </phpdocumentor>

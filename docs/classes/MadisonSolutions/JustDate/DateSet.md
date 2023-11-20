@@ -18,116 +18,6 @@ This object is immutable - the dates in the set cannot be altered after the obje
 ## Methods
 
 
-### __construct
-
-Create a DateSet
-
-```php
-public __construct(\MadisonSolutions\JustDate\DateRangeList $lists): mixed
-```
-
-The dates that are included in the set can be defined by supplying any number of JustDate, DateRange,
-DateSet or MutableDateSet objects (or any other class implementing DateRangeList) as parameters.
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-### fromDates
-
-Alternative way of constructing a DateSet object that is optimised for creating from JustDate objects
-
-```php
-public static fromDates(\MadisonSolutions\JustDate\JustDate $dates): \MadisonSolutions\JustDate\DateSet
-```
-
-
-
-* This method is **static**.
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$dates` | **\MadisonSolutions\JustDate\JustDate** | Dates that should be included in the set |
-
-
-
-
-***
-
-### union
-
-Create a new DateSet whose dates are the union of all of the dates in the supplied objects
-
-```php
-public static union(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\DateSet
-```
-
-Note this is functionally identical to the standard new DateSet() constructor and is included just
-for code readability and contrast with the complementary DateSet::intersection() function.
-
-* This method is **static**.
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-### intersection
-
-Create a new DateSet which is the intersection of the supplied objects
-
-```php
-public static intersection(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\DateSet
-```
-
-The dates in the resulting DateSet will be those dates which are included in every one of the arguments
-
-* This method is **static**.
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
-
-
-
-
-***
-
-
-## Inherited methods
-
-
 ### sortedRangesFromSingleDates
 
 Utility function that takes any number of JustDate objects and turns them into a normalized list of DateRanges
@@ -162,16 +52,17 @@ Resulting normalized list of ranges
 
 ### __construct
 
-
+Create a DateSet
 
 ```php
 public __construct(\MadisonSolutions\JustDate\DateRangeList $lists): mixed
 ```
 
+The dates that are included in the set can be defined by supplying any number of JustDate, DateRange,
+DateSet or MutableDateSet objects (or any other class implementing DateRangeList) as parameters.
 
 
 
-* This method is **abstract**.
 
 
 
@@ -455,6 +346,84 @@ public static fromString(string $serialized): static
 
 ***
 
+### fromDates
+
+Alternative way of constructing a DateSet object that is optimised for creating from JustDate objects
+
+```php
+public static fromDates(\MadisonSolutions\JustDate\JustDate $dates): \MadisonSolutions\JustDate\DateSet
+```
+
+
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$dates` | **\MadisonSolutions\JustDate\JustDate** | Dates that should be included in the set |
+
+
+
 
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/) and [saggre/phpdocumentor-markdown](https://github.com/Saggre/phpDocumentor-markdown)
+
+### union
+
+Create a new DateSet whose dates are the union of all of the dates in the supplied objects
+
+```php
+public static union(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\DateSet
+```
+
+Note this is functionally identical to the standard new DateSet() constructor and is included just
+for code readability and contrast with the complementary DateSet::intersection() function.
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
+
+
+
+
+***
+
+### intersection
+
+Create a new DateSet which is the intersection of the supplied objects
+
+```php
+public static intersection(\MadisonSolutions\JustDate\DateRangeList $lists): \MadisonSolutions\JustDate\DateSet
+```
+
+The dates in the resulting DateSet will be those dates which are included in every one of the arguments
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$lists` | **\MadisonSolutions\JustDate\DateRangeList** |  |
+
+
+
+
+***
+
+***
+> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)

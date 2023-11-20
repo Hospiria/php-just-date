@@ -353,41 +353,6 @@ The latest time from $first and $others
 
 ***
 
-### quotientAndRemainder
-
-Return the quotient and remainder when dividing integer $a by integer $b
-
-```php
-public static quotientAndRemainder(int $a, int $b): array{0: int, 1: int}
-```
-
-This differs from the PHP intdiv() function by always returning a non-negative remainder
-Eg quotientAndRemainder(-10, 60) returns quotient -1 and remainder 50
-This makes it suitable for 'clock' calculations (-10 minutes is equivalent to 50 minutes from the previous hour)
-
-* This method is **static**.
-
-
-* **Warning:** this method is **deprecated**. This means that this method will likely be removed in a future version.
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$a` | **int** | the dividend |
-| `$b` | **int** | the divisor |
-
-
-**Return Value:**
-
-Returns an array [quotient, remainder]
-
-
-
-***
-
 ### split
 
 Get the hours, minutes and seconds given the total number of seconds since midnight
@@ -685,52 +650,6 @@ A new JustTime instance with the rounded time
 
 ***
 
-### __serialize
-
-Serialize
-
-```php
-public __serialize(): array{since_midnight: int}
-```
-
-The integer since_midnight completely defines a JustTime object, so it is sufficient for serialization
-
-
-
-
-
-
-
-
-
-***
-
-### __unserialize
-
-Unserialize
-
-```php
-public __unserialize(array{since_midnight: int} $data): mixed
-```
-
-
-
-
-
-
-
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `$data` | **array{since_midnight: int}** |  |
-
-
-
-
-***
-
 ### jsonSerialize
 
 Json serialize to the H:i:s string
@@ -751,6 +670,5 @@ public jsonSerialize(): string
 
 ***
 
-
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/) and [saggre/phpdocumentor-markdown](https://github.com/Saggre/phpDocumentor-markdown)
+> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)
