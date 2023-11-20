@@ -14,23 +14,59 @@ use JsonSerializable;
  * Ranges that contain no dates are impossible
  *
  * @package MadisonSolutions\JustDate
- * @property JustDate $start
- * @property JustDate $end
- * @property int $span
- * @property int $num_nights
- * @property int $num_days
  */
 class DateRange implements DateRangeList, JsonSerializable
 {
     /**
-     * @var JustDate
+     * The start of the range
      */
-    protected $start;
+    public readonly JustDate $start;
 
     /**
-     * @var JustDate
+     * The end of the range
      */
-    protected $end;
+    public readonly JustDate $end;
+
+    /**
+     * The length of the range in days, measuring from the middle of $this->start to the middle of $this->end
+     * So if $start and $end are the same date (shortest possible DateRange), $inner_length will be zero
+     * @var non-negative-int
+     */
+    public readonly int $inner_length;
+
+    /**
+     * The length of the range in days, measuring from the start of $this->start to the end of $this->end
+     * So if $start and $end are the same date (shortest possible DateRange), $outer_length will be one
+     * @var positive-int
+     */
+    public readonly int $outer_length;
+
+    /**
+     * Create a new DateRange object from start and end dates
+     *
+     * @param JustDate $start Start of range
+     * @param JustDate $end End of range
+     * @throws InvalidArgumentException If end is before start
+     */
+    public static function make(JustDate $start, JustDate $end): DateRange
+    {
+        return new DateRange($start, $end);
+    }
+
+    /**
+     * Create a new DateRange objects from start and end dates specified in any order
+     *
+     * The start date will be whichever of the 2 dates is earliest and the end date
+     * whichever of the 2 dates is latest.
+     *
+     * @param JustDate $a Start or end of range
+     * @param JustDate $b Other side of range
+     * @return DateRange The DateRange object
+     */
+    public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
+    {
+        return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
+    }
 
     /**
      * Create a new DateRange object from start and end date as Y-m-d formatted strings
@@ -43,6 +79,32 @@ class DateRange implements DateRangeList, JsonSerializable
     public static function fromYmd(string $start, string $end): DateRange
     {
         return new DateRange(JustDate::fromYmd($start), JustDate::fromYmd($end));
+    }
+
+    /**
+     * Create a new DateRange object by specifying the start date and the inner length of the range
+     *
+     * @param JustDate $start Start of range
+     * @param non-negative-int $inner_length The desired inner length of the range
+     * @throws InvalidArgumentException If inner_length is less than zero
+     * @return DateRange The DateRange object
+     */
+    public static function fromStartAndInnerLength(JustDate $start, int $inner_length): DateRange
+    {
+        return new DateRange($start, $start->addDays($inner_length));
+    }
+
+    /**
+     * Create a new DateRange object by specifying the start date and the outer length of the range
+     *
+     * @param JustDate $start Start of range
+     * @param positive-int $outer_length The desired outer length of the range
+     * @throws InvalidArgumentException If inner_length is less than one
+     * @return DateRange The DateRange object
+     */
+    public static function fromStartAndOuterLength(JustDate $start, int $outer_length): DateRange
+    {
+        return new DateRange($start, $start->addDays($outer_length - 1));
     }
 
     /**
@@ -66,73 +128,30 @@ class DateRange implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Create a new DateRange object from start and end dates
-     *
-     * @param JustDate $start Start of range
-     * @param JustDate $end End of range
-     * @throws InvalidArgumentException If end is before start
+     * DateRange constructor
      */
-    public function __construct(JustDate $start, JustDate $end)
+    protected function __construct(JustDate $start, JustDate $end)
     {
         if ($start->isAfter($end)) {
             throw new InvalidArgumentException("Start date cannot be after end date");
         }
         $this->start = clone $start;
         $this->end = clone $end;
+        $inner_length = JustDate::difference($this->start, $this->end);
+        assert($inner_length >= 0); // It must be because $this->start comes before $this->end
+        $this->inner_length = $inner_length;
+        $this->outer_length = $inner_length + 1;
     }
 
     /**
-     * Create a new DateRange objects from start and end dates specified in any order
+     * Does this range consist of just a single day?
+     * IE start date and end date are the same
      *
-     * The start date will be whichever of the 2 dates is earliest and the end date
-     * whichever of the 2 dates is latest.
-     *
-     * @param JustDate $a Start or end of range
-     * @param JustDate $b Other side of range
-     * @return DateRange The DateRange object
+     * @return bool
      */
-    public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
+    public function isSingleDay(): bool
     {
-        return new DateRange(JustDate::earliest($a, $b), JustDate::latest($a, $b));
-    }
-
-    /**
-     * Getters
-     *
-     * start - The start of the range
-     * end - The end of the range
-     * span - The number of nights between start and end (if start and end are same day, span is 0)
-     * num_nights - Alias for span
-     * num_days - The number of days in the range, including start end end (if start and end are same day, num_days is 1)
-     *
-     * @param $name
-     * @return int|JustDate|null
-     */
-    public function __get($name)
-    {
-        switch ($name) {
-            case 'start':
-                return $this->start;
-            case 'end':
-                return $this->end;
-            case 'span':
-            case 'num_nights':
-                return JustDate::spanDays($this->start, $this->end);
-            case 'num_days':
-                return JustDate::spanDays($this->start, $this->end) + 1;
-        }
-        return null;
-    }
-
-    public function __isset($name): bool
-    {
-        switch ($name) {
-            case 'start':
-            case 'end':
-            case 'span':
-                return true;
-        }
-        return false;
+        return $this->start->isSameAs($this->end);
     }
 
     /**
@@ -145,6 +164,8 @@ class DateRange implements DateRangeList, JsonSerializable
 
     /**
      * Json representation is object with 'start' and 'end' properties
+     *
+     * @return array{start: string, end: string}
      */
     public function jsonSerialize(): array
     {
@@ -157,24 +178,30 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the range (inclusive of end points) as a JustDate object
      *
-     * @return Generator
+     * @param bool $backwards If true the dates will be returned in reverse order (default false).
+     * @return Generator<int, JustDate>
      */
-    public function each(): Generator
+    public function each(bool $backwards = false): Generator
     {
-        for ($day = $this->start; $day->isBeforeOrSameAs($this->end); $day = $day->nextDay()) {
-            yield $day;
+        $direction = $backwards ? -1 : 1;
+        $first = $backwards ? $this->end : $this->start;
+        for ($i = 0; $i < $this->outer_length; $i++) {
+            yield $first->addDays($i * $direction);
         }
     }
 
     /**
      * Get a generator which yields each date in the range (including start but not end) as a JustDate object
      *
-     * @return Generator
+     * @param bool $backwards If true the dates will be returned in reverse order, starting with the end date, up to but not including the start date (default false).
+     * @return Generator<int, JustDate>
      */
-    public function eachExceptEnd(): Generator
+    public function eachExceptLast(bool $backwards = false): Generator
     {
-        for ($day = $this->start; $day->isBefore($this->end); $day = $day->nextDay()) {
-            yield $day;
+        $direction = $backwards ? -1 : 1;
+        $first = $backwards ? $this->end : $this->start;
+        for ($i = 0; $i < $this->inner_length; $i++) {
+            yield $first->addDays($i * $direction);
         }
     }
 
@@ -211,17 +238,15 @@ class DateRange implements DateRangeList, JsonSerializable
      * subranges in turn, together with the callback value. The yield values will
      * be in the format of an array with 'value' and 'range' keys.
      *
-     * @param callable $value_fn Callback used to determine how to delimit the subranges
-     *                 Each subrange will contain dates for which the callback returns
-     *                 the same value.
-     * @param array $opts Array of options. Currently one option is supported, boolean
-     *              'backwards' (default false).  If true the subranges will be returned
-     *              in reverse order.
-     * @return Generator
+     * @template T
+     * @param callable(JustDate): T $value_fn Callback used to determine how to delimit the subranges
+     *     Each subrange will contain dates for which the callback returns
+     *     the same value.
+     * @param bool $backwards If true the subranges will be returned in reverse order (default false).
+     * @return Generator<int, array{range: DateRange, value: T}>
      */
-    public function iterateSubRanges(callable $value_fn, array $opts = []): Generator
+    public function eachSubRange(callable $value_fn, bool $backwards = false): Generator
     {
-        $backwards = (bool) ($opts['backwards'] ?? false);
         $step = $backwards ? -1 : 1;
         $end = $backwards ? $this->start : $this->end;
 
@@ -252,6 +277,10 @@ class DateRange implements DateRangeList, JsonSerializable
         ];
     }
 
+    /**
+     * @internal
+     * @return DateRange[]
+     */
     public function getRanges(): array
     {
         return [$this];

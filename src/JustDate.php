@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeZone;
 use InvalidArgumentException;
 use JsonSerializable;
-use Serializable;
 
 /**
  * Class JustDate
@@ -14,14 +13,73 @@ use Serializable;
  * Class representing a single date with no time information
  *
  * @package MadisonSolutions\JustDate
- * @property int $year
- * @property int $month
- * @property int $day
- * @property int $day_of_week
- * @property int $timestamp
+ * @property-read int $year The year as an integer
+ * @property-read int $month The month as an integer (1 = January ... 12 = December)
+ * @property-read int $day The day of the month as an integer
+ * @property-read DayOfWeek $day_of_week The day of the week
+ * @property-read int $timestamp Unix timestamp corresponding to 00:00:00 on this date in UTC
  */
-class JustDate implements DateRangeList, Serializable, JsonSerializable
+class JustDate implements DateRangeList, JsonSerializable
 {
+    const SECS_PER_DAY = 86400;
+
+    /**
+     * Utility function to create a new DateTime object for the current time, with UTC timezone
+     *
+     * @return DateTime
+     */
+    protected static function newUtcDateTime(): DateTime
+    {
+        static $utc = null;
+        if (is_null($utc)) {
+            $utc = new DateTimeZone('UTC');
+        }
+        $date = new DateTime();
+        $date->setTimezone($utc);
+        return $date;
+    }
+
+    /**
+     * Create a new JustDate object from year, month and day
+     *
+     * Note that once created, the JustDate is immutable, there's no way to alter the internal date.
+     * It is possible to supply numerical values which are outside of the normal ranges and
+     * the internal date value will be adjusted to correspond.
+     * eg supplying 0 for the $day will result in the last day of the previous month.
+     *
+     * @param int $year The Year (full, 4 digit year)
+     * @param int $month The month (1 = January ... 12 = December)
+     * @param int $day The day of the month (first day is 1)
+     * @return JustDate The new JustDate instance
+     */
+    public static function make(int $year, int $month, int $day): JustDate
+    {
+        $date = self::newUtcDateTime()
+            ->setDate($year, $month, $day)
+            ->setTime(0, 0, 0, 0);
+
+        // This is certain to be an integer
+        // because the unix timestamp is *defined* to have exactly 86400 seconds per day
+        // even if in real life the day contained a leap second
+        $epoch_day = $date->getTimestamp() / JustDate::SECS_PER_DAY;
+        assert(is_int($epoch_day));
+
+        $instance = new JustDate($epoch_day);
+        $instance->_date = $date;
+        return $instance;
+    }
+
+    /**
+     * Create a new JustDate object from the epoch day
+     *
+     * @param int $epoch_day The number of days since the Unix epoch
+     * @return JustDate The new JustDate instance
+     */
+    public static function fromEpochDay(int $epoch_day): JustDate
+    {
+        return new JustDate($epoch_day);
+    }
+
     /**
      * Create a new JustDate object from a DateTime object
      *
@@ -30,13 +88,36 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public static function fromDateTime(DateTime $date): JustDate
     {
-        return new JustDate((int) $date->format('Y'), (int) $date->format('m'), (int) $date->format('d'));
+        return JustDate::make((int) $date->format('Y'), (int) $date->format('m'), (int) $date->format('d'));
+    }
+
+    /**
+     * Get the date at the specified timestamp
+     *
+     * If a timezone is specified, the date will be whatever the date is in the specified timezone at the specified timestamp
+     * If timezone is omitted, the date will be whatever the date is in the system default timezone at the specified timestamp
+     *
+     * @param int $timestamp The timestamp
+     * @param ?DateTimeZone $timezone Optional timezone
+     * @return JustDate The new JustDate instance
+     */
+    public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null): JustDate
+    {
+        $dt = new DateTime();
+        $dt->setTimestamp($timestamp);
+        if ($timezone) {
+            $dt->setTimezone($timezone);
+        }
+        return JustDate::fromDateTime($dt);
     }
 
     /**
      * Get the date that it is today
      *
-     * @param ?DateTimeZone $timezone Optional timezone - if specified the date will be whatever the date is right now in the specified timezone
+     * If a timezone is specified, the date will be whatever the date is right now in the specified timezone
+     * If timezone is omitted, the date will be whatever the date is right now in the system default timezone
+     *
+     * @param ?DateTimeZone $timezone Optional timezone
      * @return JustDate The new JustDate instance
      */
     public static function today(?DateTimeZone $timezone = null): JustDate
@@ -71,23 +152,6 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
     }
 
     /**
-     * Get the date at the specified timestamp
-     *
-     * @param int $timestamp The timestamp
-     * @param ?DateTimeZone $timezone Optional timezone - if specified the date will be whatever the date is in the specified timezone at the specified timestamp
-     * @return JustDate The new JustDate instance
-     */
-    public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null): JustDate
-    {
-        $dt = new DateTime();
-        $dt->setTimestamp($timestamp);
-        if ($timezone) {
-            $dt->setTimezone($timezone);
-        }
-        return JustDate::fromDateTime($dt);
-    }
-
-    /**
      * Create a new JustDate object from a string in Y-m-d format
      *
      * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
@@ -96,7 +160,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public static function fromYmd(string $ymd) : JustDate
     {
-        return new JustDate(...JustDate::parseYmd($ymd));
+        return JustDate::make(...JustDate::parseYmd($ymd));
     }
 
     /**
@@ -104,7 +168,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      *
      * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
-     * @return array Array containing integers [year, month, day]
+     * @return array{0: int, 1: int, 2: int} Array containing integers [year, month, day]
      */
     public static function parseYmd(string $ymd): array
     {
@@ -120,17 +184,19 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
     }
 
     /**
-     * Count the number of days from $from to $to
+     * Return the (signed) number of days between 2 JustDate objects: $a and $b
      *
-     * Note if the supplied $to date is before the $from date, the result will be negative
+     * If $a is before $b the return value will be positive
+     * If $a is after $b the return value will be negative
+     * If $a and $b refer to the same date, the return value will be zero
      *
-     * @param JustDate $from The start date
-     * @param JustDate $to The end date
+     * @param JustDate $a The start date
+     * @param JustDate $b The end date
      * @return int The number of days from $from to $to
      */
-    public static function spanDays(JustDate $from, JustDate $to): int
+    public static function difference(JustDate $a, JustDate $b): int
     {
-        return (int) round(($to->timestamp - $from->timestamp) / (60 * 60 * 24));
+        return $b->epoch_day - $a->epoch_day;
     }
 
     /**
@@ -170,65 +236,78 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
     }
 
     /**
-     * @var DateTime
+     * The number of days since the Unix epoch
      */
-    protected $date;
+    public readonly int $epoch_day;
 
     /**
-     * Create a new JustDate instance
-     *
-     * Note that once created, the JustDate is immutable, there's no way to alter the internal date.
-     * It is possible to supply numerical values which are outside of the normal ranges and
-     * the internal date value will be adjusted to correspond.
-     * eg supplying 0 for the $day will result in the last day of the previous month.
-     *
-     * @param int $year The Year (full, 4 digit year)
-     * @param int $month The month (1 = January ... 12 = December)
-     * @param int $day The day of the month (first day is 1)
+     * DateTime object created when required
+     * Will be a DateTime object for 00:00 on this date in UTC timezone
+     * @internal
      */
-    public function __construct(int $year, int $month, int $day)
+    protected ?DateTime $_date;
+
+    /**
+     * DayOfWeek object created when required
+     * @internal
+     */
+    protected ?DayOfWeek $_dow;
+
+    /**
+     * JustDate constructor.
+     *
+     * @param int $epoch_day
+     */
+    protected function __construct(int $epoch_day)
     {
-        static $utc = null;
-        if (is_null($utc)) {
-            $utc = new DateTimeZone('UTC');
-        }
-        $this->date = new DateTime();
-        $this->date->setTimezone($utc)
-            ->setDate($year, $month, $day)
-            ->setTime(0, 0, 0, 0);
+        // $this->epoch_day uniquely determines this date and must be set
+        $this->epoch_day = $epoch_day;
+
+        $this->_date = null;
+        $this->_dow = null;
     }
 
     /**
-     * Getters
+     * Get the internal DateTime object for 00:00 on this date (UTC)
+     * Creates the DateTime object if it doesn't already exists
      *
-     * year - the year as an integer
-     * month - the month as an integer (1 = January ... 12 = December)
-     * day - the day of the month as an integer
-     * day_of_week - the day of the week (0 = Sunday ... 6 = Saturday)
-     * timestamp - unix timestamp corresponding to 00:00:00 on this date in UTC
-     *
-     * @param $name
-     * @return mixed
-     * @noinspection PhpMissingReturnTypeInspection
+     * @return DateTime
      */
-    public function __get($name)
+    protected function getInternalDateTime(): DateTime
+    {
+        if (! $this->_date) {
+            $this->_date = self::newUtcDateTime()->setTimestamp($this->timestamp);
+        }
+        return $this->_date;
+    }
+
+    /**
+     * @internal
+     */
+    public function __get(mixed $name): mixed
     {
         switch ($name) {
             case 'year':
-                return (int) $this->date->format('Y');
+                return (int) $this->getInternalDateTime()->format('Y');
             case 'month':
-                return (int) $this->date->format('m');
+                return (int) $this->getInternalDateTime()->format('m');
             case 'day':
-                return (int) $this->date->format('d');
+                return (int) $this->getInternalDateTime()->format('d');
             case 'day_of_week':
-                return (int) $this->date->format('w');
+                if (is_null($this->_dow)) {
+                    $this->_dow = DayOfWeek::from((int) $this->getInternalDateTime()->format('w'));
+                }
+                return $this->_dow;
             case 'timestamp':
-                return (int) $this->date->getTimestamp();
+                return (int) $this->epoch_day * JustDate::SECS_PER_DAY;
         }
         return null;
     }
 
-    public function __isset($name): bool
+    /**
+     * @internal
+     */
+    public function __isset(mixed $name): bool
     {
         switch ($name) {
             case 'year':
@@ -242,11 +321,13 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
     }
 
     /**
+     * Convert to string
+     *
      * Standard string representation is Y-m-d format
      */
     public function __toString(): string
     {
-        return $this->date->format('Y-m-d');
+        return $this->getInternalDateTime()->format('Y-m-d');
     }
 
     /**
@@ -259,7 +340,60 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function format(string $format = 'Y-m-d'): string
     {
-        return $this->date->format($format);
+        return $this->getInternalDateTime()->format($format);
+    }
+
+    /**
+     * Get a DateTime object for this date at the specified time in the specified timezone
+     *
+     * If no time is specified, the DateTime will be set to 00:00:00
+     * If no timezone is specified the DateTime will use the system default timezone
+     *
+     * @param ?JustTime $time Optional time
+     * @param ?DateTimeZone $timezone Optional timezone
+     * @return DateTime
+     */
+    public function toDateTime(?JustTime $time = null, ?DateTimeZone $timezone = null)
+    {
+        $dt = new DateTime();
+        if ($timezone) {
+            $dt->setTimezone($timezone);
+        }
+        $dt->setDate($this->year, $this->month, $this->day);
+        if ($time) {
+            $dt->setTime($time->hours, $time->minutes, $time->seconds, 0);
+        } else {
+            $dt->setTime(0, 0, 0, 0);
+        }
+        return $dt;
+    }
+
+    /**
+     * Add the specified number of days to this date, and return a new JustDate object for the result
+     *
+     * Note if a negative number of days is supplied then the result will be an earlier date
+     * IE $date->addDays(-1) is the same as $date->subDays(1)
+     *
+     * @param int $days The number of days to add
+     * @return JustDate The new JustDate object
+     */
+    public function addDays(int $days): JustDate
+    {
+        return new JustDate($this->epoch_day + $days);
+    }
+
+    /**
+     * Subtract the specified number of days from this date, and return a new JustDate object for the result
+     *
+     * Note if a negative number of days is supplied then the result will be a later date.
+     * IE $date->subDays(-1) is the same as $date->addDays(1)
+     *
+     * @param int $days The number of days to subtract
+     * @return JustDate The new JustDate object
+     */
+    public function subDays(int $days): JustDate
+    {
+        return new JustDate($this->epoch_day - $days);
     }
 
     /**
@@ -272,24 +406,13 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function add(int $years, int $months, int $days): JustDate
     {
-        return new JustDate($this->year + $years, $this->month + $months, $this->day + $days);
-    }
-
-    /**
-     * Add the specified number of days to this date, and return a new JustDate object for the result
-     *
-     * @param int $days The number of days to add (use negative values to get earlier dates)
-     * @return JustDate The new JustDate object
-     */
-    public function addDays(int $days): JustDate
-    {
-        return $this->add(0, 0, $days);
+        return JustDate::make($this->year + $years, $this->month + $months, $this->day + $days);
     }
 
     /**
      * Add the specified number of weeks to this date, and return a new JustDate object for the result
      *
-     * @param int $weeks The number of weeks to add (use negative values to get earlier dates)
+     * @param int $weeks The number of weeks to add
      * @return JustDate The new JustDate object
      */
     public function addWeeks(int $weeks): JustDate
@@ -298,9 +421,20 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
     }
 
     /**
+     * Subtract the specified number of weeks from this date, and return a new JustDate object for the result
+     *
+     * @param int $weeks The number of weeks to subtract
+     * @return JustDate The new JustDate object
+     */
+    public function subWeeks(int $weeks): JustDate
+    {
+        return $this->add(0, 0, $weeks * -7);
+    }
+
+    /**
      * Add the specified number of months to this date, and return a new JustDate object for the result
      *
-     * @param int $months The number of months to add (use negative values to get earlier dates)
+     * @param int $months The number of months to add
      * @return JustDate The new JustDate object
      */
     public function addMonths(int $months): JustDate
@@ -309,14 +443,36 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
     }
 
     /**
+     * Subtract the specified number of months from this date, and return a new JustDate object for the result
+     *
+     * @param int $months The number of months to subtract
+     * @return JustDate The new JustDate object
+     */
+    public function subMonths(int $months): JustDate
+    {
+        return $this->add(0, -$months, 0);
+    }
+
+    /**
      * Add the specified number of years to this date, and return a new JustDate object for the result
      *
-     * @param int $years The number of years to add (use negative values to get earlier dates)
+     * @param int $years The number of years to add
      * @return JustDate The new JustDate object
      */
     public function addYears(int $years): JustDate
     {
         return $this->add($years, 0, 0);
+    }
+
+    /**
+     * Subtract the specified number of years from this date, and return a new JustDate object for the result
+     *
+     * @param int $years The number of years to subtract
+     * @return JustDate The new JustDate object
+     */
+    public function subYears(int $years): JustDate
+    {
+        return $this->add(-$years, 0, 0);
     }
 
     /**
@@ -336,7 +492,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function prevDay(): JustDate
     {
-        return $this->addDays(-1);
+        return $this->subDays(1);
     }
 
     /**
@@ -346,7 +502,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function startOfMonth(): JustDate
     {
-        return new JustDate($this->year, $this->month, 1);
+        return JustDate::make($this->year, $this->month, 1);
     }
 
     /**
@@ -356,7 +512,55 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function endOfMonth(): JustDate
     {
-        return new JustDate($this->year, $this->month + 1, 0);
+        return JustDate::make($this->year, $this->month + 1, 0);
+    }
+
+    /**
+     * Add the given number of dates which pass the test function
+     * Typical use is to add a number of 'working days' to a date, where the test function identifies the 'working' dates
+     * Note if $num_to_add is zero (or negative) the behaviour is to advance to the first date that does pass the test and return it
+     *
+     * @param int $num_to_add The number of days to add.
+     * @param callable(JustDate): bool $test_fn Function for testing whether or not this date counts for reducing $num_to_add
+     * @return JustDate
+     */
+    public function addDaysPassingTest(int $num_to_add, callable $test_fn): JustDate
+    {
+        $curr = $this;
+        if (! $test_fn($curr)) {
+            $curr = $curr->nextDay();
+        }
+        while ($num_to_add > 0) {
+            $curr = $curr->nextDay();
+            if ($test_fn($curr)) {
+                $num_to_add--;
+            }
+        }
+        return $curr;
+    }
+
+    /**
+     * Add the given number of working days to the date, where a working day is assumed to be Mon to Fri
+     *
+     * Note if $num_to_add is zero (or negative) the first working date equal or later than $this is returned
+     * If a different definition of 'working day' is required, use JustDate::addDaysPassingTest() with a custom test function
+     *
+     * @param int $num_to_add The number of 'working' days to add.
+     * @param ?BaseDateSet $holidays Optionally provide a set of holiday dates that will not be counted as working days
+     * @return JustDate
+     */
+    public function addWorkingDays(int $num_to_add, ?BaseDateSet $holidays = null): JustDate
+    {
+        if (($holidays instanceof BaseDateSet) && ! $holidays->isEmpty()) {
+            $test_fn = function (JustDate $date) use ($holidays): bool {
+                return !($date->isWeekend() || $holidays->includes($date));
+            };
+        } else {
+            $test_fn = function (JustDate $date): bool {
+                return ! $date->isWeekend();
+            };
+        }
+        return $this->addDaysPassingTest($num_to_add, $test_fn);
     }
 
     /**
@@ -367,7 +571,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isSameAs(JustDate $other): bool
     {
-        return $this->timestamp == $other->timestamp;
+        return $this->epoch_day == $other->epoch_day;
     }
 
     /**
@@ -378,7 +582,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isBefore(JustDate $other): bool
     {
-        return $this->timestamp < $other->timestamp;
+        return $this->epoch_day < $other->epoch_day;
     }
 
     /**
@@ -389,7 +593,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isBeforeOrSameAs(JustDate $other): bool
     {
-        return $this->timestamp <= $other->timestamp;
+        return $this->epoch_day <= $other->epoch_day;
     }
 
     /**
@@ -400,7 +604,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isAfter(JustDate $other): bool
     {
-        return $this->timestamp > $other->timestamp;
+        return $this->epoch_day > $other->epoch_day;
     }
 
     /**
@@ -411,7 +615,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isAfterOrSameAs(JustDate $other): bool
     {
-        return $this->timestamp >= $other->timestamp;
+        return $this->epoch_day >= $other->epoch_day;
     }
 
     /**
@@ -421,7 +625,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isSunday(): bool
     {
-        return $this->day_of_week == 0;
+        return $this->day_of_week == DayOfWeek::Sunday;
     }
 
     /**
@@ -431,7 +635,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isMonday(): bool
     {
-        return $this->day_of_week == 1;
+        return $this->day_of_week == DayOfWeek::Monday;
     }
 
     /**
@@ -441,7 +645,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isTuesday(): bool
     {
-        return $this->day_of_week == 2;
+        return $this->day_of_week == DayOfWeek::Tuesday;
     }
 
     /**
@@ -451,7 +655,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isWednesday(): bool
     {
-        return $this->day_of_week == 3;
+        return $this->day_of_week == DayOfWeek::Wednesday;
     }
 
     /**
@@ -461,7 +665,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isThursday(): bool
     {
-        return $this->day_of_week == 4;
+        return $this->day_of_week == DayOfWeek::Thursday;
     }
 
     /**
@@ -471,7 +675,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isFriday(): bool
     {
-        return $this->day_of_week == 5;
+        return $this->day_of_week == DayOfWeek::Friday;
     }
 
     /**
@@ -481,7 +685,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isSaturday(): bool
     {
-        return $this->day_of_week == 6;
+        return $this->day_of_week == DayOfWeek::Saturday;
     }
 
     /**
@@ -491,8 +695,7 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isWeekday(): bool
     {
-        $dow = $this->day_of_week;
-        return $dow > 0 && $dow < 6;
+        return $this->day_of_week->isWeekday();
     }
 
     /**
@@ -502,26 +705,31 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
      */
     public function isWeekend(): bool
     {
-        $dow = $this->day_of_week;
-        return $dow == 0 || $dow == 6;
+        return $this->day_of_week->isWeekend();
     }
 
     /**
-     * Serialization of a JustDate will consist of the Y-m-d string
-     */
-    public function serialize(): string
-    {
-        return (string) $this;
-    }
-
-    /**
-     * Unserialize by parsing the Y-m-d string
+     * Serialize
      *
-     * @param $serialized
+     * The integer epoch_day completely defines a JustDate object, so it is sufficient for serialization
+     * @internal
+     * @return array{epoch_day: int}
      */
-    public function unserialize($serialized)
+    public function __serialize(): array
     {
-        $this->__construct(...JustDate::parseYmd($serialized));
+        return ['epoch_day' => $this->epoch_day];
+    }
+
+    /**
+     * Unserialize
+     *
+     * @param array{epoch_day: int} $data
+     * @internal
+     */
+    public function __unserialize(array $data)
+    {
+        $this->epoch_day = (int) $data['epoch_day'];
+        $this->_date = null;
     }
 
     /**
@@ -532,8 +740,12 @@ class JustDate implements DateRangeList, Serializable, JsonSerializable
         return (string) $this;
     }
 
+    /**
+     * @internal
+     * @return DateRange[]
+     */
     public function getRanges(): array
     {
-        return [new DateRange($this, $this)];
+        return [DateRange::make($this, $this)];
     }
 }

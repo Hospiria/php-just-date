@@ -79,24 +79,4 @@ class DateSet extends BaseDateSet
         }
         return $curr;
     }
-
-    /**
-     * Create a new DateSet object by subtracting a Date or DateRange or set of dates from this set
-     *
-     * The dates in the resulting object will be those that are contained in this set but are not contained
-     * in the supplied object.
-     *
-     * @param DateRangeList $list_to_cut
-     * @return DateSet
-     */
-    public function subtract(DateRangeList $list_to_cut) : DateSet
-    {
-        $instance = new DateSet();
-        $ranges = $this->ranges;
-        foreach ($list_to_cut->getRanges() as $range_to_cut) {
-            $ranges = $this->subtractRangeFromSortedRanges($ranges, $range_to_cut);
-        }
-        $instance->ranges = $ranges;
-        return $instance;
-    }
 }

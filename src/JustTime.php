@@ -7,7 +7,6 @@ use DateTimeZone;
 use DivisionByZeroError;
 use InvalidArgumentException;
 use JsonSerializable;
-use Serializable;
 
 /**
  * Class JustTime
@@ -15,13 +14,42 @@ use Serializable;
  * Class representing a time of day, with no date or timezone information
  *
  * @package MadisonSolutions\JustDate
- * @property int hours
- * @property int minutes
- * @property int seconds
- * @property int since_midnight
  */
-class JustTime implements Serializable, JsonSerializable
+class JustTime implements JsonSerializable
 {
+    /**
+     * Create a new JustTime instance from hours, minutes and seconds
+     *
+     * Note that once created, the JustTime is immutable, there's no way to alter the internal date.
+     * It is possible to supply numerical values which are outside of the normal ranges and
+     * the internal date value will be adjusted to correspond.
+     * eg supplying 10:65:00 will result in 11:05:00
+     * eg supplying 26:-10:00 will result in 01:50:00
+     *
+     * @param int $hours The hours (0 - 23)
+     * @param int $minutes The minutes (0 - 59)
+     * @param int $seconds The seconds (0 - 59)
+     * @return JustTime
+     */
+    public static function make(int $hours = 0, int $minutes = 0, int $seconds = 0): JustTime
+    {
+        $seconds_since_midnight = ($seconds) + ($minutes * 60) + ($hours * 60 * 60);
+        return new JustTime($seconds_since_midnight);
+    }
+
+    /**
+     * Create a new JustTime instance from the total number of seconds since midnight
+     *
+     * Note the hours will wrap around midnight if the total number of seconds is more than a day.
+     *
+     * @param int $seconds_since_midnight The total number of seconds since midnight
+     * @return JustTime The new JustTime instance
+     */
+    public static function fromSecondsSinceMidnight(int $seconds_since_midnight): JustTime
+    {
+        return new JustTime($seconds_since_midnight);
+    }
+
     /**
      * Create a new JustTime object from a DateTime object
      *
@@ -30,7 +58,7 @@ class JustTime implements Serializable, JsonSerializable
      */
     public static function fromDateTime(DateTime $date) : JustTime
     {
-        return new JustTime((int) $date->format('H'), (int) $date->format('i'), (int) $date->format('s'));
+        return JustTime::make((int) $date->format('H'), (int) $date->format('i'), (int) $date->format('s'));
     }
 
     /**
@@ -73,7 +101,7 @@ class JustTime implements Serializable, JsonSerializable
      */
     public static function fromHis(string $his) : JustTime
     {
-        return new JustTime(...JustTime::parseHis($his));
+        return JustTime::make(...JustTime::parseHis($his));
     }
 
     /**
@@ -81,7 +109,7 @@ class JustTime implements Serializable, JsonSerializable
      *
      * @param string $his The date in H:i:s format, eg '14:35' (note seconds can be omitted eg '14:35')
      * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
-     * @return array Array containing integers [year, month, day]
+     * @return array{0: int, 1: int, 2: int} Array containing integers [year, month, day]
      */
     public static function parseHis(string $his): array
     {
@@ -133,29 +161,6 @@ class JustTime implements Serializable, JsonSerializable
     }
 
     /**
-     * Return the quotient and remainder when dividing integer $a by integer $b
-     *
-     * This differs from the PHP intdiv() function by always returning a non-negative remainder
-     * Eg quotientAndRemainder(-10, 60) returns quotient -1 and remainder 50
-     * This makes it suitable for 'clock' calculations (-10 minutes is equivalent to 50 minutes from the previous hour)
-     *
-     * @deprecated 1.2.0 No longer used by internal code and will be removed in v1.2.0
-     * @param int $a the dividend
-     * @param int $b the divisor
-     * @return array Returns an array [0 => (int) quotient, 1 => (int) remainder]
-     * @throws DivisionByZeroError If $b is zero
-     */
-    public static function quotientAndRemainder(int $a, int $b): array
-    {
-        if ($a < 0) {
-            $c = ceil(-$a / $b);
-            return [-$c, $a + ($b * $c)];
-        } else {
-            return [intdiv($a, $b), $a % $b];
-        }
-    }
-
-    /**
      * Get the hours, minutes and seconds given the total number of seconds since midnight
      *
      * Note the hours will wrap around midnight if the total number of seconds is more than a day.
@@ -163,7 +168,7 @@ class JustTime implements Serializable, JsonSerializable
      * The return value will be an array of integers [0 => hours, 1 => minutes, 2 => seconds]
      *
      * @param int $seconds_since_midnight The total number of seconds since midnight
-     * @return array The number of hours, minutes and seconds
+     * @return array{0: int, 1: int, 2: int} The number of hours, minutes and seconds
      */
     public static function split(int $seconds_since_midnight): array
     {
@@ -180,89 +185,60 @@ class JustTime implements Serializable, JsonSerializable
     }
 
     /**
-     * Create a new JustTime instance from the total number of seconds since midnight
-     *
-     * Note the hours will wrap around midnight if the total number of seconds is more than a day.
-     *
-     * @param int $seconds_since_midnight The total number of seconds since midnight
-     * @return JustTime The new JustTime instance
+     * The number of seconds from midnight to this time
      */
-    public static function fromSecondsSinceMidnight(int $seconds_since_midnight): JustTime
+    public readonly int $since_midnight;
+
+    /**
+     * Hours, from 0 to 23, as an integer
+     */
+    public readonly int $hours;
+
+    /**
+     * Minutes from 0 to 59, as an integer
+     */
+    public readonly int $minutes;
+
+    /**
+     * Seconds, from 0 to 59, as an integer
+     */
+    public readonly int $seconds;
+
+    /**
+     * DateTime object created and used internally when required for formatting
+     */
+    protected ?DateTime $_date;
+
+    /**
+     * JustTime constructor.
+     *
+     * @param int $seconds_since_midnight
+     */
+    protected function __construct(int $seconds_since_midnight)
     {
-        list($hours, $mins, $secs) = JustTime::split($seconds_since_midnight);
-        return new JustTime($hours, $mins, $secs);
+        list($this->hours, $this->minutes, $this->seconds) = JustTime::split($seconds_since_midnight);
+        $this->since_midnight = ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
+        $this->_date = null;
     }
 
     /**
-     * @var int
-     */
-    protected $hours;
-
-    /**
-     * @var int
-     */
-    protected $minutes;
-
-    /**
-     * @var int
-     */
-    protected $seconds;
-
-    /**
-     * Create a new JustTime instance
+     * Get the internal DateTime object for 00:00 on this date (UTC)
+     * Creates the DateTime object if it doesn't already exists
      *
-     * Note that once created, the JustTime is immutable, there's no way to alter the internal date.
-     * It is possible to supply numerical values which are outside of the normal ranges and
-     * the internal date value will be adjusted to correspond.
-     * eg supplying 10:65:00 will result in 11:05:00
-     * eg supplying 26:-10:00 will result in 01:50:00
-     *
-     * @param int $hours The hours (0 - 23)
-     * @param int $minutes The minutes (0 - 59)
-     * @param int $seconds The seconds (0 - 59)
+     * @return DateTime
      */
-    public function __construct(int $hours = 0, int $minutes = 0, int $seconds = 0)
+    protected function getInternalDateTime(): DateTime
     {
-        $secondsSinceMidnight = ($seconds) + ($minutes * 60) + ($hours * 60 * 60);
-        list($this->hours, $this->minutes, $this->seconds) = JustTime::split($secondsSinceMidnight);
-    }
-
-    /**
-     * Getters
-     *
-     * hours - the hour as an integer (0 - 23)
-     * minutes - the minutes as an integer (0 - 59)
-     * seconds - the seconds as an integer (0 - 59)
-     * since_midnight - the number of seconds from midnight to this time
-     *
-     * @param $name
-     * @return mixed
-     */
-    public function __get($name)
-    {
-        switch ($name) {
-            case 'hours':
-                return $this->hours;
-            case 'minutes':
-                return $this->minutes;
-            case 'seconds':
-                return $this->seconds;
-            case 'since_midnight':
-                return ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
+        static $utc = null;
+        if (! $this->_date) {
+            if (is_null($utc)) {
+                $utc = new DateTimeZone('UTC');
+            }
+            $this->_date = new DateTime();
+            $this->_date->setTimezone($utc);
+            $this->_date->setTimestamp($this->since_midnight);
         }
-        return null;
-    }
-
-    public function __isset($name): bool
-    {
-        switch ($name) {
-            case 'hours':
-            case 'minutes':
-            case 'seconds':
-            case 'since_midnight':
-                return true;
-        }
-        return false;
+        return $this->_date;
     }
 
     /**
@@ -283,11 +259,7 @@ class JustTime implements Serializable, JsonSerializable
      */
     public function format(string $format = 'H:i:s') : string
     {
-        static $utc = null;
-        if (is_null($utc)) {
-            $utc = new DateTimeZone('UTC');
-        }
-        return (new DateTime())->setTimezone($utc)->setTimestamp($this->since_midnight)->format($format);
+        return $this->getInternalDateTime()->format($format);
     }
 
     /**
@@ -305,7 +277,7 @@ class JustTime implements Serializable, JsonSerializable
      */
     public function addTime(int $hours = 0, int $minutes = 0, int $seconds = 0) : JustTime
     {
-        return new JustTime($this->hours + $hours, $this->minutes + $minutes, $this->seconds + $seconds);
+        return JustTime::make($this->hours + $hours, $this->minutes + $minutes, $this->seconds + $seconds);
     }
 
     /**
@@ -367,7 +339,7 @@ class JustTime implements Serializable, JsonSerializable
      * Round a time to a given interval
      *
      * For example to round 09:47 to the nearest 15 minutes:
-     * $time = (new JustTime(9, 47))->round(15 * 60); // 09:45
+     * $time = (JustTime::make(9, 47))->round(15 * 60); // 09:45
      *
      * @param int $interval_seconds The length of the interval to round to, in seconds
      * @return JustTime A new JustTime instance with the rounded time
@@ -379,21 +351,27 @@ class JustTime implements Serializable, JsonSerializable
     }
 
     /**
-     * Serialization of a JustTime will consist of the H:i:s string
+     * Serialize
+     *
+     * The integer since_midnight completely defines a JustTime object, so it is sufficient for serialization
+     *
+     * @internal
+     * @return array{since_midnight: int}
      */
-    public function serialize(): string
+    public function __serialize(): array
     {
-        return (string) $this;
+        return ['since_midnight' => $this->since_midnight];
     }
 
     /**
-     * Unserialize by parsing the H:i:s string
+     * Unserialize
      *
-     * @param $serialized
+     * @internal
+     * @param array{since_midnight: int} $data
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data)
     {
-        $this->__construct(...JustTime::parseHis($serialized));
+        $this->__construct((int) $data['since_midnight']);
     }
 
     /**

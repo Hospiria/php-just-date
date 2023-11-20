@@ -5,7 +5,6 @@ namespace MadisonSolutions\JustDate;
 use Generator;
 use InvalidArgumentException;
 use JsonSerializable;
-use Serializable;
 
 /**
  * Class BaseDateSet
@@ -14,7 +13,7 @@ use Serializable;
  *
  * @package MadisonSolutions\JustDate
  */
-abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializable
+abstract class BaseDateSet implements DateRangeList, JsonSerializable
 {
     /**
      * @var DateRange[]
@@ -38,20 +37,18 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         if ($num == 0) {
             return $ranges;
         }
-        usort($dates, function ($a, $b) {
-            return $a->timestamp - $b->timestamp;
-        });
+        usort($dates, fn($a, $b) => $a->epoch_day - $b->epoch_day);
         $curr_start = $curr_end = $dates[0];
         for ($i = 1; $i < $num; $i++) {
             if ($dates[$i]->isAfter($curr_end->nextDay())) {
                 // there's a gap before the next date
-                $ranges[] = new DateRange($curr_start, $curr_end);
+                $ranges[] = DateRange::make($curr_start, $curr_end);
                 $curr_start = $curr_end = $dates[$i];
             } else {
                 $curr_end = $dates[$i];
             }
         }
-        $ranges[] = new DateRange($curr_start, $curr_end);
+        $ranges[] = DateRange::make($curr_start, $curr_end);
         return $ranges;
     }
 
@@ -61,9 +58,9 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * Used internally by the DateSet and MutableDateSet classes
      * The supplied array must already be normalized (which is why this function is protected)
      *
-     * @param array $ranges Original sorted, disjoint list of ranges
+     * @param DateRange[] $ranges Original sorted, disjoint list of ranges
      * @param DateRange $cut Range to be subtracted from each of the ranges
-     * @return array Resulting normalized list of ranges after subtracting $cut
+     * @return DateRange[] Resulting normalized list of ranges after subtracting $cut
      */
     protected static function subtractRangeFromSortedRanges(array $ranges, DateRange $cut): array
     {
@@ -91,16 +88,16 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
                     // $cut completely covers $existing, so $existing is removed completely
                 } else {
                     // some of the beginning of $existing is removed by $cut
-                    $new_ranges[] = new DateRange($cut->end->nextDay(), $existing->end);
+                    $new_ranges[] = DateRange::make($cut->end->nextDay(), $existing->end);
                 }
             } else if ($cut->end->isAfterOrSameAs($existing->end)) {
                 // some of the end of $existing is removed by $cut
-                $new_ranges[] = new DateRange($existing->start, $cut->start->prevDay());
+                $new_ranges[] = DateRange::make($existing->start, $cut->start->prevDay());
             } else {
                 // only remaining possibility is that $cut is completely contained within $existing
                 // so it must split $existing into 2 disjoint ranges
-                $new_ranges[] = new DateRange($existing->start, $cut->start->prevDay());
-                $new_ranges[] = new DateRange($cut->end->nextDay(), $existing->end);
+                $new_ranges[] = DateRange::make($existing->start, $cut->start->prevDay());
+                $new_ranges[] = DateRange::make($cut->end->nextDay(), $existing->end);
             }
             $i++;
         }
@@ -152,9 +149,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
             return [];
         }
 
-        usort($in, function ($a, $b) {
-            return $a->start->timestamp - $b->start->timestamp;
-        });
+        usort($in, fn($a, $b) => $a->start->epoch_day - $b->start->epoch_day);
 
         $out = [];
         $curr = $in[0];
@@ -166,7 +161,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
                 $curr = $next;
             } elseif ($next->end->isAfter($curr->end)) {
                 // $next overlaps or touches the end of $curr, so extend $curr
-                $curr = new DateRange($curr->start, $next->end);
+                $curr = DateRange::make($curr->start, $next->end);
             } else {
                 // $next is completely contained within $curr
             }
@@ -175,6 +170,8 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
 
         return $out;
     }
+
+    abstract public function __construct(DateRangeList ...$lists);
 
     /**
      * Determine whether the given date is a member of this set
@@ -194,6 +191,26 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
             }
         }
         return false;
+    }
+
+    /**
+     * Create a new set by subtracting a Date or DateRange or set of dates from this set
+     *
+     * The dates in the resulting object will be those that are contained in this set but are not contained
+     * in the supplied object. Returns a new set (does not mutate $this)
+     *
+     * @param DateRangeList $list_to_cut
+     * @return static
+     */
+    public function subtract(DateRangeList $list_to_cut): static
+    {
+        $instance = new static();
+        $ranges = $this->ranges;
+        foreach ($list_to_cut->getRanges() as $range_to_cut) {
+            $ranges = $this->subtractRangeFromSortedRanges($ranges, $range_to_cut);
+        }
+        $instance->ranges = $ranges;
+        return $instance;
     }
 
     /**
@@ -223,17 +240,19 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
         }
         $start = $this->ranges[0]->start;
         $end = $this->ranges[$num - 1]->end;
-        return new DateRange($start, $end);
+        return DateRange::make($start, $end);
     }
 
     /**
      * Get a generator which yields each range in the set as a DateRange object
      *
-     * @return Generator
+     * @param bool $backwards If true the ranges will be returned in reverse order (default false).
+     * @return Generator<int, DateRange>
      */
-    public function eachRange(): Generator
+    public function eachRange(bool $backwards = false): Generator
     {
-        foreach ($this->ranges as $range) {
+        $ranges = $backwards ? array_reverse($this->ranges) : $this->ranges;
+        foreach ($ranges as $range) {
             yield $range;
         }
     }
@@ -241,12 +260,13 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
     /**
      * Get a generator which yields each date in the set as a JustDate object
      *
-     * @return Generator
+     * @param bool $backwards If true the dates will be returned in reverse order (default false).
+     * @return Generator<int, JustDate>
      */
-    public function eachDate(): Generator
+    public function eachDate(bool $backwards = false): Generator
     {
-        foreach ($this->ranges as $range) {
-            yield from $range->each();
+        foreach ($this->eachRange($backwards) as $range) {
+            yield from $range->each($backwards);
         }
     }
 
@@ -258,7 +278,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
      * The second, a boolean, true if the date belongs to this set, and false otherwise.
      *
      * @param DateRange $window
-     * @return Generator
+     * @return Generator<int, array{0: JustDate, 1: bool}>
      */
     public function window(DateRange $window): Generator
     {
@@ -326,6 +346,8 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
 
     /**
      * Json representation is array of ranges
+     *
+     * @return list<array{start: string, end: string}>
      */
     public function jsonSerialize(): array
     {
@@ -335,19 +357,12 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
     }
 
     /**
-     * Use the standard string representation for serialization
-     */
-    public function serialize(): string
-    {
-        return (string) $this;
-    }
-
-    /**
      * Unserialize by parsing the standard string representation
      *
-     * @param $serialized
+     * @param string $serialized
+     * @return static
      */
-    public function unserialize($serialized)
+    public static function fromString(string $serialized): static
     {
         $parts = explode(',', $serialized);
         $args = array_map(function ($part) {
@@ -365,6 +380,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable, Serializa
                     throw new InvalidArgumentException("Invalid date range string '{$part}'");
             }
         }, $parts);
-        $this->__construct(...array_filter($args));
+        return new static (...array_filter($args));
     }
 }
