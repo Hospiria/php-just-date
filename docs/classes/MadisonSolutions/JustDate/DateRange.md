@@ -234,6 +234,153 @@ The DateRange object
 
 ***
 
+### fromStartAndDuration
+
+Create a new DateRange object by specifying the start date and the duration of the range in years, months and days
+
+```php
+public static fromStartAndDuration(\MadisonSolutions\JustDate\JustDate $start, int $years, int $months, int $days): \MadisonSolutions\JustDate\DateRange
+```
+
+Individual components of the duration can be negative, but an exception will be thrown if the total duration is negative.
+So for example, it is ok to specify +1 month and -5 days as that will always be a positive total duration.
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$start` | **\MadisonSolutions\JustDate\JustDate** | Start of range |
+| `$years` | **int** | The number of years of the duration (default 0) |
+| `$months` | **int** | The number of months of the duration (default 0) |
+| `$days` | **int** | The number of days of the duration (default 0) |
+
+
+**Return Value:**
+
+The DateRange object
+
+
+
+***
+
+### fromEndAndDuration
+
+Create a new DateRange object by specifying the end date and the (positive) duration of the range in years, months and days
+
+```php
+public static fromEndAndDuration(\MadisonSolutions\JustDate\JustDate $end, int $years, int $months, int $days): \MadisonSolutions\JustDate\DateRange
+```
+
+Individual components of the duration can be negative, but an exception will be thrown if the total duration is negative.
+So for example, it is ok to specify +1 month and -5 days as that will always be a positive total duration.
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$end` | **\MadisonSolutions\JustDate\JustDate** | End of range |
+| `$years` | **int** | The number of years of the duration (default 0) |
+| `$months` | **int** | The number of months of the duration (default 0) |
+| `$days` | **int** | The number of days of the duration (default 0) |
+
+
+**Return Value:**
+
+The DateRange object
+
+
+
+***
+
+### currentMonth
+
+Create a new DateRange object spanning the current month
+
+```php
+public static currentMonth(): \MadisonSolutions\JustDate\DateRange
+```
+
+Start date will be the first day of the current month and end date will be the last day of the current month
+
+* This method is **static**.
+
+
+
+
+
+**Return Value:**
+
+The DateRange object
+
+
+
+***
+
+### currentWeek
+
+Create a new DateRange object spanning the current week
+
+```php
+public static currentWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\DateRange
+```
+
+Returns a DateRange with the first day of the current week as the start date, and the final day of the current week as the end date.
+By default, Monday is taken to be the 'first' day of the week, but this can be overridden with the optional $week_starts_on parameter.
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$week_starts_on` | **\MadisonSolutions\JustDate\DayOfWeek** | Optionally specify which day of the week to be considered as the &#039;first&#039;, default is Monday |
+
+
+**Return Value:**
+
+The DateRange object
+
+
+
+***
+
+### currentYear
+
+Create a new DateRange object spanning the current year
+
+```php
+public static currentYear(): \MadisonSolutions\JustDate\DateRange
+```
+
+Start date will be January 1st of the current year and end date will be December 31st of the current year
+
+* This method is **static**.
+
+
+
+
+
+**Return Value:**
+
+The DateRange object
+
+
+
+***
+
 ### intersection
 
 Create a new DateRange object which is the intersection of $r1 and $r2
@@ -463,7 +610,7 @@ be in the format of an array with 'value' and 'range' keys.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `$value_fn` | **callable** |  |
+| `$value_fn` | **callable** | Callback used to determine how to delimit the subranges<br />Each subrange will contain dates for which the callback returns<br />the same value. |
 | `$backwards` | **bool** | If true the subranges will be returned in reverse order (default false). |
 
 
@@ -472,4 +619,4 @@ be in the format of an array with 'value' and 'range' keys.
 ***
 
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)

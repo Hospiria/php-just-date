@@ -156,5 +156,71 @@ public subDays(int $num): \MadisonSolutions\JustDate\DayOfWeek
 
 ***
 
+### numDaysUntil
+
+Return the number of days, counting forward from this DayOfWeek, until the next instance of the specified DayOfWeek
+
+```php
+public numDaysUntil(\MadisonSolutions\JustDate\DayOfWeek $to): int
+```
+
+Returns zero if the specified DayOfWeek is the same as this one
+
+For example DayOfWeek::Sunday->numDaysUntil(DayOfWeek::Monday) is 1
+DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday) is 6
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$to` | **\MadisonSolutions\JustDate\DayOfWeek** | The target DayOfWeek |
+
+
+**Return Value:**
+
+The number of days until the target DayOfWeek
+
+
+
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)
+
+### numDaysSince
+
+Return the number of days, counting backwards from this DayOfWeek, until the previous instance of the specified DayOfWeek
+
+```php
+public numDaysSince(\MadisonSolutions\JustDate\DayOfWeek $from): int
+```
+
+Returns zero if the specified DayOfWeek is the same as this one
+
+For example DayOfWeek::Sunday->numDaysSince(DayOfWeek::Monday) is 6
+DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday) is 1
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$from` | **\MadisonSolutions\JustDate\DayOfWeek** | The target DayOfWeek |
+
+
+**Return Value:**
+
+The number of days until the target DayOfWeek
+
+
+
+***
+
+***
+> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)

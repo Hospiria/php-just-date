@@ -345,4 +345,4 @@ public static fromString(string $serialized): static
 ***
 
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)

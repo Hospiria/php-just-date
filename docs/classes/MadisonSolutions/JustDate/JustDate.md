@@ -886,6 +886,68 @@ The new JustDate object
 
 ***
 
+### startOfWeek
+
+Get the date which is/was the first day of the current week
+
+```php
+public startOfWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\JustDate
+```
+
+By default weeks are assumed to 'start' on a Monday (so Sunday is the final day).
+This can be overridden with the optional $week_starts_on parameter.
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$week_starts_on` | **\MadisonSolutions\JustDate\DayOfWeek** |  |
+
+
+**Return Value:**
+
+The new JustDate object
+
+
+
+***
+
+### endOfWeek
+
+Get the date which is/will be the final day of the current week
+
+```php
+public endOfWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\JustDate
+```
+
+By default weeks are assumed to 'start' on a Monday (so Sunday is the final day).
+This can be overridden with the optional $week_starts_on parameter.
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$week_starts_on` | **\MadisonSolutions\JustDate\DayOfWeek** |  |
+
+
+**Return Value:**
+
+The new JustDate object
+
+
+
+***
+
 ### startOfMonth
 
 Get the date which is the start of this date's month
@@ -956,7 +1018,7 @@ public addDaysPassingTest(int $num_to_add, callable $test_fn): \MadisonSolutions
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `$num_to_add` | **int** | The number of days to add. |
-| `$test_fn` | **callable** |  |
+| `$test_fn` | **callable** | Function for testing whether or not this date counts for reducing $num_to_add |
 
 
 
@@ -1378,4 +1440,4 @@ public jsonSerialize(): string
 ***
 
 ***
-> Automatically generated from source code comments on 2023-11-20 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)
