@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.0]
+
+### Added
+ - Added `fromStartAndDuration()`, `fromEndAndDuration()`, `currentMonth()`, `currentWeek()` and `currentYear()` static methods to DateRange
+ - Added `numDaysUntil()` and `numDaysSince()` methods to DayOfWeek
+ - Added `startOfWeek()` and `endOfWeek()` methods to JustDate
+
+
+
 ## [2.0.0]
 
 See the [migration guide](migration.md) for help migrating from version 1 to version 2.
@@ -21,7 +30,7 @@ See the [migration guide](migration.md) for help migrating from version 1 to ver
  - Added `epoch_day` property to JustDate and static `JustDate::fromEpochDay()` function.
  - Added `subDays()`, `subWeeks()`, `subMonths()` and `subYears()` functions to JustDate as alternatives to using a negative quantity in
 the old `addDays()`, `addWeeks()`, `addMonths()` and `addYears()` methods.
- - Added `toDateTime()` method to JustDate.  
+ - Added `toDateTime()` method to JustDate.
  - Added `addDaysPassingTest()` and `addWorkingDays()` methods to JustDate.
  - Added `fromStartAndInnerLength` and `fromStartAndOuterLength` static methods to DateRange.
  - All iterator methods can now be run in reverse by supplying the `backwards: true` argument.

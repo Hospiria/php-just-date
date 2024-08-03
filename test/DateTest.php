@@ -264,6 +264,23 @@ class DateTest extends TestCase
         $this->assertJustDate('2019-04-30', $d1->endOfMonth());
     }
 
+    public function testStartAndEndOfWeeks()
+    {
+        $d1 = JustDate::make(2024, 8, 2); // Friday
+        $this->assertJustDate('2024-07-29', $d1->startOfWeek()); // Monday
+        $this->assertJustDate('2024-08-04', $d1->endOfWeek()); // Sunday
+
+        // Take Sunday as the 'first' day of the week
+        $this->assertJustDate('2024-07-28', $d1->startOfWeek(week_starts_on: DayOfWeek::Sunday)); // Sunday
+        $this->assertJustDate('2024-08-03', $d1->endOfWeek(week_starts_on: DayOfWeek::Sunday)); // Saturday
+
+        // Make sure it still works when start/end is the same date
+        $d2 = JustDate::make(2024, 7, 29); // Monday
+        $this->assertJustDate('2024-07-29', $d2->startOfWeek()); // Monday
+        $d3 = JustDate::make(2024, 8, 4); // Sunday
+        $this->assertJustDate('2024-08-04', $d3->endOfWeek()); // Sunday
+    }
+
     public function testEarliestAndLatest()
     {
         $d1 = JustDate::make(2019, 04, 21);
@@ -385,6 +402,56 @@ class DateTest extends TestCase
         $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
             $r = DateRange::fromStartAndOuterLength($d1, 0);
         });
+
+        // Create by specifying start/end and duration
+        $r = DateRange::fromStartAndDuration($d1, 0, 0, 0);
+        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $r = DateRange::fromStartAndDuration($d1, days: 3);
+        $this->assertDateRange("2019-04-21 to 2019-04-24", $r);
+        $r = DateRange::fromStartAndDuration($d1, months: 3);
+        $this->assertDateRange("2019-04-21 to 2019-07-21", $r);
+        $r = DateRange::fromStartAndDuration($d1, years: 3);
+        $this->assertDateRange("2019-04-21 to 2022-04-21", $r);
+        $r = DateRange::fromStartAndDuration($d1, 1, 1, 1);
+        $this->assertDateRange("2019-04-21 to 2020-05-22", $r);
+        $r = DateRange::fromStartAndDuration($d1, months: 2, days: -6);
+        $this->assertDateRange("2019-04-21 to 2019-06-15", $r);
+        $r = DateRange::fromEndAndDuration($d1, 0, 0, 0);
+        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $r = DateRange::fromEndAndDuration($d1, days: 3);
+        $this->assertDateRange("2019-04-18 to 2019-04-21", $r);
+        $r = DateRange::fromEndAndDuration($d1, months: 3);
+        $this->assertDateRange("2019-01-21 to 2019-04-21", $r);
+        $r = DateRange::fromEndAndDuration($d1, years: 3);
+        $this->assertDateRange("2016-04-21 to 2019-04-21", $r);
+        $r = DateRange::fromEndAndDuration($d1, 1, 1, 1);
+        $this->assertDateRange("2018-03-20 to 2019-04-21", $r);
+        $r = DateRange::fromEndAndDuration($d1, months: 2, days: -6);
+        $this->assertDateRange("2019-02-27 to 2019-04-21", $r);
+        $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
+            $r = DateRange::fromStartAndDuration($d1, years: -1);
+        });
+        $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
+            $r = DateRange::fromEndAndDuration($d1, years: -1);
+        });
+
+        // Test creating for currentWeek, currentMonth, currentYear
+        $today = JustDate::today();
+        $start_of_week = $today->subDays($today->day_of_week->numDaysSince(DayOfWeek::Monday));
+        $end_of_week = $start_of_week->addDays(6);
+        $r = DateRange::currentWeek();
+        $this->assertDateRange("{$start_of_week} to {$end_of_week}", $r);
+        foreach (DayOfWeek::cases() as $dow) {
+            $offset = (($today->day_of_week->value - $dow->value) + 7) % 7;
+            $start_of_week = $today->subDays($offset);
+            $end_of_week = $start_of_week->addDays(6);
+            $r = DateRange::currentWeek(week_starts_on: $dow);
+            $this->assertDateRange("{$start_of_week} to {$end_of_week}", $r);
+        }
+        $r = DateRange::currentMonth();
+        $this->assertDateRange(date('Y-m-01') . ' to ' . date('Y-m-t'), $r);
+        $r = DateRange::currentYear();
+        $this->assertDateRange(date('Y-01-01') . ' to ' . date('Y-12-31'), $r);
     }
 
     public function testRangeGetters()
@@ -621,6 +688,17 @@ class DateTest extends TestCase
                 $this->assertFalse($dow->isWeekend());
                 $this->assertTrue($dow->isWeekday());
             }
+            $this->assertEquals(0, $dow->numDaysUntil($dow));
+            $this->assertEquals(0, $dow->numDaysSince($dow));
         }
+
+        $this->assertEquals(1, DayOfWeek::Sunday->numDaysUntil(DayOfWeek::Monday));
+        $this->assertEquals(4, DayOfWeek::Friday->numDaysUntil(DayOfWeek::Tuesday));
+        $this->assertEquals(5, DayOfWeek::Monday->numDaysUntil(DayOfWeek::Saturday));
+        $this->assertEquals(6, DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday));
+        $this->assertEquals(6, DayOfWeek::Sunday->numDaysSince(DayOfWeek::Monday));
+        $this->assertEquals(3, DayOfWeek::Friday->numDaysSince(DayOfWeek::Tuesday));
+        $this->assertEquals(2, DayOfWeek::Monday->numDaysSince(DayOfWeek::Saturday));
+        $this->assertEquals(1, DayOfWeek::Monday->numDaysSince(DayOfWeek::Sunday));
     }
 }

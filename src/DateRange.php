@@ -108,6 +108,83 @@ class DateRange implements DateRangeList, JsonSerializable
     }
 
     /**
+     * Create a new DateRange object by specifying the start date and the duration of the range in years, months and days
+     *
+     * Individual components of the duration can be negative, but an exception will be thrown if the total duration is negative.
+     * So for example, it is ok to specify +1 month and -5 days as that will always be a positive total duration.
+     *
+     * @param JustDate $start Start of range
+     * @param int $years The number of years of the duration (default 0)
+     * @param int $months The number of months of the duration (default 0)
+     * @param int $days The number of days of the duration (default 0)
+     * @throws InvalidArgumentException If the duration resolves to a negative total
+     * @return DateRange The DateRange object
+     */
+    public static function fromStartAndDuration(JustDate $start, int $years = 0, int $months = 0, int $days = 0): DateRange
+    {
+        return new DateRange($start, $start->add($years, $months, $days));
+    }
+
+    /**
+     * Create a new DateRange object by specifying the end date and the (positive) duration of the range in years, months and days
+     *
+     * Individual components of the duration can be negative, but an exception will be thrown if the total duration is negative.
+     * So for example, it is ok to specify +1 month and -5 days as that will always be a positive total duration.
+     *
+     * @param JustDate $end End of range
+     * @param int $years The number of years of the duration (default 0)
+     * @param int $months The number of months of the duration (default 0)
+     * @param int $days The number of days of the duration (default 0)
+     * @throws InvalidArgumentException If the duration resolves to a negative total
+     * @return DateRange The DateRange object
+     */
+    public static function fromEndAndDuration(JustDate $end, int $years = 0, int $months = 0, int $days = 0): DateRange
+    {
+        return new DateRange($end->add(-$years, -$months, -$days), $end);
+    }
+
+    /**
+     * Create a new DateRange object spanning the current month
+     *
+     * Start date will be the first day of the current month and end date will be the last day of the current month
+     *
+     * @return DateRange The DateRange object
+     */
+    public static function currentMonth(): DateRange
+    {
+        $today = JustDate::today();
+        return new DateRange($today->startOfMonth(), $today->endOfMonth());
+    }
+
+    /**
+     * Create a new DateRange object spanning the current week
+     *
+     * Returns a DateRange with the first day of the current week as the start date, and the final day of the current week as the end date.
+     * By default, Monday is taken to be the 'first' day of the week, but this can be overridden with the optional $week_starts_on parameter.
+     *
+     * @param DayOfWeek $week_starts_on Optionally specify which day of the week to be considered as the 'first', default is Monday
+     * @return DateRange The DateRange object
+     */
+    public static function currentWeek($week_starts_on = DayOfWeek::Monday): DateRange
+    {
+        $start = JustDate::today()->startOfWeek($week_starts_on);
+        return new DateRange($start, $start->addDays(6));
+    }
+
+    /**
+     * Create a new DateRange object spanning the current year
+     *
+     * Start date will be January 1st of the current year and end date will be December 31st of the current year
+     *
+     * @return DateRange The DateRange object
+     */
+    public static function currentYear(): DateRange
+    {
+        $year = JustDate::today()->year;
+        return new DateRange(JustDate::make($year, 1, 1), JustDate::make($year, 12, 31));
+    }
+
+    /**
      * Create a new DateRange object which is the intersection of $r1 and $r2
      *
      * If $r1 and $r2 have no intersection and are totally separate, then this function returns null

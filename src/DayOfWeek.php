@@ -54,4 +54,36 @@ enum DayOfWeek: int
     {
         return $this->addDays(-$num);
     }
+
+    /**
+     * Return the number of days, counting forward from this DayOfWeek, until the next instance of the specified DayOfWeek
+     *
+     * Returns zero if the specified DayOfWeek is the same as this one
+     *
+     * For example DayOfWeek::Sunday->numDaysUntil(DayOfWeek::Monday) is 1
+     * DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday) is 6
+     *
+     * @param DayOfWeek $to The target DayOfWeek
+     * @return int The number of days until the target DayOfWeek
+     */
+    public function numDaysUntil(DayOfWeek $to): int
+    {
+        return (($to->value - $this->value) + 7) % 7;
+    }
+
+    /**
+     * Return the number of days, counting backwards from this DayOfWeek, until the previous instance of the specified DayOfWeek
+     *
+     * Returns zero if the specified DayOfWeek is the same as this one
+     *
+     * For example DayOfWeek::Sunday->numDaysSince(DayOfWeek::Monday) is 6
+     * DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday) is 1
+     *
+     * @param DayOfWeek $from The target DayOfWeek
+     * @return int The number of days until the target DayOfWeek
+     */
+    public function numDaysSince(DayOfWeek $from): int
+    {
+        return $from->numDaysUntil($this);
+    }
 }
