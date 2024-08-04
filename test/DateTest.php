@@ -357,6 +357,38 @@ class DateTest extends TestCase
         $this->assertEquals($tahiti, $td->getTimezone());
     }
 
+    public function testCompare()
+    {
+        $jan1 = JustDate::fromYmd('2024-01-01');
+        $jan2 = JustDate::fromYmd('2024-01-02');
+
+        $this->assertEquals(-1, JustDate::compare($jan1, $jan2));
+        $this->assertEquals(0, JustDate::compare($jan1, $jan1));
+        $this->assertEquals(1, JustDate::compare($jan2, $jan1));
+
+        $dates = [
+            JustDate::fromYmd('2024-10-20'),
+            JustDate::fromYmd('2024-03-17'),
+            JustDate::fromYmd('2024-01-01'),
+            JustDate::fromYmd('2024-10-20'),
+            JustDate::fromYmd('2024-12-31'),
+        ];
+        $ordered = '2024-01-01, 2024-03-17, 2024-10-20, 2024-10-20, 2024-12-31';
+        $reverse_ordered = '2024-12-31, 2024-10-20, 2024-10-20, 2024-03-17, 2024-01-01';
+
+        $dates_copy_1 = $dates;
+        usort($dates_copy_1, [JustDate::class, 'compare']);
+        $this->assertEquals($ordered, implode(', ', $dates_copy_1));
+
+        $dates_copy_2 = $dates;
+        usort($dates_copy_2, fn ($a, $b) => JustDate::compare($a, $b));
+        $this->assertEquals($ordered, implode(', ', $dates_copy_2));
+
+        $dates_copy_3 = $dates;
+        usort($dates_copy_3, fn ($a, $b) => -JustDate::compare($a, $b));
+        $this->assertEquals($reverse_ordered, implode(', ', $dates_copy_3));
+    }
+
     public function testCreateRange()
     {
         $d1 = JustDate::make(2019, 04, 21);

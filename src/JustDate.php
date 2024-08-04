@@ -200,6 +200,25 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
+     * Compare 2 JustDate objects and return an integer to indicate which one is earlier
+     *
+     * Returns -1, 0 or 1, depending on whether $a is respectively earlier than, the same as, or later than $b
+     * Can be used as the comparison function in PHP sorting functions, for example usort()
+     *
+     * If $a is earlier than $b, returns -1
+     * If $a and $b refer to the same date, returns zero
+     * If $a is later than $b, returns 1
+     *
+     * @param JustDate $a The first date
+     * @param JustDate $b The second date
+     * @return int Result of comparison: -1, 0 or 1
+     */
+    public static function compare(JustDate $a, JustDate $b): int
+    {
+        return $a->epoch_day <=> $b->epoch_day;
+    }
+
+    /**
      * Return the earliest of a set of dates
      *
      * @param JustDate $first
