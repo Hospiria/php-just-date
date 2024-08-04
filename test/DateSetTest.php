@@ -1,8 +1,10 @@
-<?php /** @noinspection DuplicatedCode */
+<?php
+
+/** @noinspection DuplicatedCode */
 
 use MadisonSolutions\JustDate\DateRange;
-use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\DateSet;
+use MadisonSolutions\JustDate\JustDate;
 use PHPUnit\Framework\TestCase;
 
 class DateSetTest extends TestCase
@@ -64,7 +66,7 @@ class DateSetTest extends TestCase
 
     public function testAddingRanges()
     {
-        $set = new DateSet();
+        $set = new DateSet;
         $this->assertEquals('', (string) $set);
 
         // Add a range
@@ -110,7 +112,7 @@ class DateSetTest extends TestCase
 
     public function testAddingDates()
     {
-        $set = new DateSet();
+        $set = new DateSet;
         $this->assertEquals('', (string) $set);
 
         // Add a date
@@ -203,7 +205,7 @@ class DateSetTest extends TestCase
 
     public function testIntersections()
     {
-        $set0 = new DateSet();
+        $set0 = new DateSet;
         $set1 = new DateSet(DateRange::fromYmd('2021-02-01', '2021-05-30'));
         $set2 = new DateSet(JustDate::fromYmd('2021-04-10'));
         $set3 = new DateSet(DateRange::fromYmd('2021-07-01', '2021-07-20'));
@@ -272,7 +274,7 @@ class DateSetTest extends TestCase
 
     public function testIsEmpty()
     {
-        $set = new DateSet();
+        $set = new DateSet;
         $this->assertTrue($set->isEmpty());
 
         $set = new DateSet(JustDate::fromYmd('2021-04-10'));
@@ -287,7 +289,7 @@ class DateSetTest extends TestCase
 
     public function testSpanningRange()
     {
-        $set = new DateSet();
+        $set = new DateSet;
         $this->assertNull($set->getSpanningRange());
 
         $set = new DateSet(JustDate::fromYmd('2021-04-10'));
@@ -302,7 +304,7 @@ class DateSetTest extends TestCase
         $tests = [
             [
                 // Empty set, all dates in window false
-                new DateSet(),
+                new DateSet,
                 DateRange::fromYmd('2021-04-01', '2021-04-05'),
                 ['2021-04-01' => false, '2021-04-02' => false, '2021-04-03' => false, '2021-04-04' => false, '2021-04-05' => false],
             ],
@@ -350,7 +352,7 @@ class DateSetTest extends TestCase
              */
             $actual = [];
             foreach ($set->window($window) as [$date, $in_set]) {
-                $actual[(string)$date] = $in_set;
+                $actual[(string) $date] = $in_set;
             }
             $this->assertEquals($expected, $actual);
         }

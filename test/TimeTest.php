@@ -92,7 +92,7 @@ class TimeTest extends TestCase
         // Get the time now in Kathmandu and check it's correct
         $kmdZone = new DateTimeZone('Asia/Kathmandu');
         $t3 = JustTime::now($kmdZone);
-        $kmdNow = (new DateTime())->setTimezone($kmdZone);
+        $kmdNow = (new DateTime)->setTimezone($kmdZone);
         $this->assertJustTime($kmdNow->format('H:i:s'), $t3);
     }
 
@@ -113,7 +113,7 @@ class TimeTest extends TestCase
         // Same timestamp but with Sydney timezone explicitly set
         $sydZone = new DateTimeZone('Australia/Sydney');
         $t3 = JustTime::fromTimestamp($ts, $sydZone);
-        $sydTime = (new DateTime())->setTimezone($sydZone)->setTimestamp($ts);
+        $sydTime = (new DateTime)->setTimezone($sydZone)->setTimestamp($ts);
         $this->assertJustTime($sydTime->format('H:i:s'), $t3);
     }
 

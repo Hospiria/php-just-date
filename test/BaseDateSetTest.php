@@ -1,16 +1,19 @@
-<?php /** @noinspection DuplicatedCode */
+<?php
+
+/** @noinspection DuplicatedCode */
 
 use MadisonSolutions\JustDate\BaseDateSet;
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\DateRangeList;
-use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\DateSet;
+use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\MutableDateSet;
 use PHPUnit\Framework\TestCase;
 
 class BaseDateSetTest extends TestCase
 {
-    public function testSerialization() {
+    public function testSerialization()
+    {
         $tests = [
             [
                 [],
@@ -35,7 +38,7 @@ class BaseDateSetTest extends TestCase
                     ['start' => '2021-04-04', 'end' => '2021-04-04'],
                     ['start' => '2021-05-20', 'end' => '2021-05-22'],
                 ],
-            ]
+            ],
         ];
 
         foreach ($tests as [$args, $expected_string, $expected_json_obj]) {
@@ -120,8 +123,8 @@ class BaseDateSetTest extends TestCase
         $this->assertTrue($set->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-03')));
 
         $same = [
-            ['', new DateSet()],
-            ['', new MutableDateSet()],
+            ['', new DateSet],
+            ['', new MutableDateSet],
             ['2024-08-04', JustDate::fromYmd('2024-08-04')],
             ['2024-08-04', DateRange::fromYmd('2024-08-04', '2024-08-04')],
             ['2024-08-04 to 2024-08-10', DateRange::fromYmd('2024-08-04', '2024-08-10')],
@@ -210,7 +213,7 @@ class BaseDateSetTest extends TestCase
             ['2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-15', '2024-08-20'), true],
             ['2024-08-01 to 2024-08-20', JustDate::fromYmd('2024-08-21'), false],
             ['2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-15', '2024-08-21'), false],
-            ['2024-08-01 to 2024-08-20', '2024-08-02 to 2024-08-07, 2024-08-14 to 2024-08-20' , true],
+            ['2024-08-01 to 2024-08-20', '2024-08-02 to 2024-08-07, 2024-08-14 to 2024-08-20', true],
             ['2024-01-01, 2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-05', '2024-08-15'), true],
             ['2024-01-01, 2024-08-01 to 2024-08-20', JustDate::fromYmd('2024-01-01'), true],
             ['2024-01-01, 2024-08-01 to 2024-08-20', '2024-01-01, 2024-08-01, 2024-08-05 to 2024-08-10, 2024-08-20', true],

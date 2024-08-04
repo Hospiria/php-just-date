@@ -12,8 +12,6 @@ use JsonSerializable;
  * Class representing a range of dates
  * Ranges that contain a single date are allowed (IE the start and end date are the same)
  * Ranges that contain no dates are impossible
- *
- * @package MadisonSolutions\JustDate
  */
 class DateRange implements DateRangeList, JsonSerializable
 {
@@ -30,6 +28,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * The length of the range in days, measuring from the middle of $this->start to the middle of $this->end
      * So if $start and $end are the same date (shortest possible DateRange), $inner_length will be zero
+     *
      * @var non-negative-int
      */
     public readonly int $inner_length;
@@ -37,6 +36,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * The length of the range in days, measuring from the start of $this->start to the end of $this->end
      * So if $start and $end are the same date (shortest possible DateRange), $outer_length will be one
+     *
      * @var positive-int
      */
     public readonly int $outer_length;
@@ -44,8 +44,9 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Create a new DateRange object from start and end dates
      *
-     * @param JustDate $start Start of range
-     * @param JustDate $end End of range
+     * @param  JustDate  $start  Start of range
+     * @param  JustDate  $end  End of range
+     *
      * @throws InvalidArgumentException If end is before start
      */
     public static function make(JustDate $start, JustDate $end): DateRange
@@ -59,8 +60,8 @@ class DateRange implements DateRangeList, JsonSerializable
      * The start date will be whichever of the 2 dates is earliest and the end date
      * whichever of the 2 dates is latest.
      *
-     * @param JustDate $a Start or end of range
-     * @param JustDate $b Other side of range
+     * @param  JustDate  $a  Start or end of range
+     * @param  JustDate  $b  Other side of range
      * @return DateRange The DateRange object
      */
     public static function eitherWayRound(JustDate $a, JustDate $b): DateRange
@@ -71,10 +72,11 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Create a new DateRange object from start and end date as Y-m-d formatted strings
      *
-     * @param string $start Start of range, in Y-m-d format
-     * @param string $end End of range, in Y-m-d format
-     * @throws InvalidArgumentException If start or end are invalid Y-m-d strings, or if end is before start
+     * @param  string  $start  Start of range, in Y-m-d format
+     * @param  string  $end  End of range, in Y-m-d format
      * @return DateRange The DateRange object
+     *
+     * @throws InvalidArgumentException If start or end are invalid Y-m-d strings, or if end is before start
      */
     public static function fromYmd(string $start, string $end): DateRange
     {
@@ -84,10 +86,11 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Create a new DateRange object by specifying the start date and the inner length of the range
      *
-     * @param JustDate $start Start of range
-     * @param non-negative-int $inner_length The desired inner length of the range
-     * @throws InvalidArgumentException If inner_length is less than zero
+     * @param  JustDate  $start  Start of range
+     * @param  non-negative-int  $inner_length  The desired inner length of the range
      * @return DateRange The DateRange object
+     *
+     * @throws InvalidArgumentException If inner_length is less than zero
      */
     public static function fromStartAndInnerLength(JustDate $start, int $inner_length): DateRange
     {
@@ -97,10 +100,11 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Create a new DateRange object by specifying the start date and the outer length of the range
      *
-     * @param JustDate $start Start of range
-     * @param positive-int $outer_length The desired outer length of the range
-     * @throws InvalidArgumentException If inner_length is less than one
+     * @param  JustDate  $start  Start of range
+     * @param  positive-int  $outer_length  The desired outer length of the range
      * @return DateRange The DateRange object
+     *
+     * @throws InvalidArgumentException If inner_length is less than one
      */
     public static function fromStartAndOuterLength(JustDate $start, int $outer_length): DateRange
     {
@@ -113,12 +117,13 @@ class DateRange implements DateRangeList, JsonSerializable
      * Individual components of the duration can be negative, but an exception will be thrown if the total duration is negative.
      * So for example, it is ok to specify +1 month and -5 days as that will always be a positive total duration.
      *
-     * @param JustDate $start Start of range
-     * @param int $years The number of years of the duration (default 0)
-     * @param int $months The number of months of the duration (default 0)
-     * @param int $days The number of days of the duration (default 0)
-     * @throws InvalidArgumentException If the duration resolves to a negative total
+     * @param  JustDate  $start  Start of range
+     * @param  int  $years  The number of years of the duration (default 0)
+     * @param  int  $months  The number of months of the duration (default 0)
+     * @param  int  $days  The number of days of the duration (default 0)
      * @return DateRange The DateRange object
+     *
+     * @throws InvalidArgumentException If the duration resolves to a negative total
      */
     public static function fromStartAndDuration(JustDate $start, int $years = 0, int $months = 0, int $days = 0): DateRange
     {
@@ -131,12 +136,13 @@ class DateRange implements DateRangeList, JsonSerializable
      * Individual components of the duration can be negative, but an exception will be thrown if the total duration is negative.
      * So for example, it is ok to specify +1 month and -5 days as that will always be a positive total duration.
      *
-     * @param JustDate $end End of range
-     * @param int $years The number of years of the duration (default 0)
-     * @param int $months The number of months of the duration (default 0)
-     * @param int $days The number of days of the duration (default 0)
-     * @throws InvalidArgumentException If the duration resolves to a negative total
+     * @param  JustDate  $end  End of range
+     * @param  int  $years  The number of years of the duration (default 0)
+     * @param  int  $months  The number of months of the duration (default 0)
+     * @param  int  $days  The number of days of the duration (default 0)
      * @return DateRange The DateRange object
+     *
+     * @throws InvalidArgumentException If the duration resolves to a negative total
      */
     public static function fromEndAndDuration(JustDate $end, int $years = 0, int $months = 0, int $days = 0): DateRange
     {
@@ -162,7 +168,7 @@ class DateRange implements DateRangeList, JsonSerializable
      * Returns a DateRange with the first day of the current week as the start date, and the final day of the current week as the end date.
      * By default, Monday is taken to be the 'first' day of the week, but this can be overridden with the optional $week_starts_on parameter.
      *
-     * @param DayOfWeek $week_starts_on Optionally specify which day of the week to be considered as the 'first', default is Monday
+     * @param  DayOfWeek  $week_starts_on  Optionally specify which day of the week to be considered as the 'first', default is Monday
      * @return DateRange The DateRange object
      */
     public static function currentWeek($week_starts_on = DayOfWeek::Monday): DateRange
@@ -189,8 +195,8 @@ class DateRange implements DateRangeList, JsonSerializable
      *
      * If $r1 and $r2 have no intersection and are totally separate, then this function returns null
      *
-     * @param DateRange $r1 The first range
-     * @param DateRange $r2 The second range
+     * @param  DateRange  $r1  The first range
+     * @param  DateRange  $r2  The second range
      * @return ?DateRange The intersection DateRange object or null
      */
     public static function intersection(DateRange $r1, DateRange $r2): ?DateRange
@@ -210,7 +216,7 @@ class DateRange implements DateRangeList, JsonSerializable
     protected function __construct(JustDate $start, JustDate $end)
     {
         if ($start->isAfter($end)) {
-            throw new InvalidArgumentException("Start date cannot be after end date");
+            throw new InvalidArgumentException('Start date cannot be after end date');
         }
         $this->start = clone $start;
         $this->end = clone $end;
@@ -223,8 +229,6 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Does this range consist of just a single day?
      * IE start date and end date are the same
-     *
-     * @return bool
      */
     public function isSingleDay(): bool
     {
@@ -255,7 +259,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the range (inclusive of end points) as a JustDate object
      *
-     * @param bool $backwards If true the dates will be returned in reverse order (default false).
+     * @param  bool  $backwards  If true the dates will be returned in reverse order (default false).
      * @return Generator<int, JustDate>
      */
     public function each(bool $backwards = false): Generator
@@ -270,7 +274,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the range (including start but not end) as a JustDate object
      *
-     * @param bool $backwards If true the dates will be returned in reverse order, starting with the end date, up to but not including the start date (default false).
+     * @param  bool  $backwards  If true the dates will be returned in reverse order, starting with the end date, up to but not including the start date (default false).
      * @return Generator<int, JustDate>
      */
     public function eachExceptLast(bool $backwards = false): Generator
@@ -285,7 +289,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Test whether a particular date lies within this range
      *
-     * @param JustDate $date The date to test
+     * @param  JustDate  $date  The date to test
      * @return bool True if the date is within this range (including endpoints), false otherwise
      */
     public function includes(JustDate $date): bool
@@ -296,7 +300,7 @@ class DateRange implements DateRangeList, JsonSerializable
     /**
      * Test whether a particular date range is completely contained within this range
      *
-     * @param DateRange $range The range to test
+     * @param  DateRange  $range  The range to test
      * @return bool True if $range is completely contained within this range, false otherwise
      */
     public function contains(DateRange $range): bool
@@ -316,10 +320,11 @@ class DateRange implements DateRangeList, JsonSerializable
      * be in the format of an array with 'value' and 'range' keys.
      *
      * @template T
-     * @param callable(JustDate): T $value_fn Callback used to determine how to delimit the subranges
-     *     Each subrange will contain dates for which the callback returns
-     *     the same value.
-     * @param bool $backwards If true the subranges will be returned in reverse order (default false).
+     *
+     * @param  callable(JustDate): T  $value_fn  Callback used to determine how to delimit the subranges
+     *                                           Each subrange will contain dates for which the callback returns
+     *                                           the same value.
+     * @param  bool  $backwards  If true the subranges will be returned in reverse order (default false).
      * @return Generator<int, array{range: DateRange, value: T}>
      */
     public function eachSubRange(callable $value_fn, bool $backwards = false): Generator
@@ -356,6 +361,7 @@ class DateRange implements DateRangeList, JsonSerializable
 
     /**
      * @internal
+     *
      * @return DateRange[]
      */
     public function getRanges(): array

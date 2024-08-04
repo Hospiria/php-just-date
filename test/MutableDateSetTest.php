@@ -1,4 +1,6 @@
-<?php /** @noinspection DuplicatedCode */
+<?php
+
+/** @noinspection DuplicatedCode */
 
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\JustDate;
@@ -64,7 +66,7 @@ class MutableDateSetTest extends TestCase
 
     public function testAddingRanges()
     {
-        $set = new MutableDateSet();
+        $set = new MutableDateSet;
         $this->assertEquals('', (string) $set);
 
         // Add a range
@@ -110,7 +112,7 @@ class MutableDateSetTest extends TestCase
 
     public function testAddingDates()
     {
-        $set = new MutableDateSet();
+        $set = new MutableDateSet;
         $this->assertEquals('', (string) $set);
 
         // Add a date
@@ -135,7 +137,7 @@ class MutableDateSetTest extends TestCase
 
     public function testAddingSets()
     {
-        $set = new MutableDateSet();
+        $set = new MutableDateSet;
 
         // Add $set1 to $set (should result in both $set and $set1 having the dates from $set1)
         $set1 = new MutableDateSet(DateRange::fromYmd('2021-04-01', '2021-04-05'), DateRange::fromYmd('2021-04-20', '2021-04-25'));
@@ -267,7 +269,7 @@ class MutableDateSetTest extends TestCase
 
     public function testIntersections()
     {
-        $set0 = new MutableDateSet();
+        $set0 = new MutableDateSet;
         $set1 = new MutableDateSet(DateRange::fromYmd('2021-02-01', '2021-05-30'));
         $set2 = new MutableDateSet(JustDate::fromYmd('2021-04-10'));
         $set3 = new MutableDateSet(DateRange::fromYmd('2021-07-01', '2021-07-20'));

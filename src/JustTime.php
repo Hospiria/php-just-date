@@ -4,7 +4,6 @@ namespace MadisonSolutions\JustDate;
 
 use DateTime;
 use DateTimeZone;
-use DivisionByZeroError;
 use InvalidArgumentException;
 use JsonSerializable;
 
@@ -12,8 +11,6 @@ use JsonSerializable;
  * Class JustTime
  *
  * Class representing a time of day, with no date or timezone information
- *
- * @package MadisonSolutions\JustDate
  */
 class JustTime implements JsonSerializable
 {
@@ -26,10 +23,9 @@ class JustTime implements JsonSerializable
      * eg supplying 10:65:00 will result in 11:05:00
      * eg supplying 26:-10:00 will result in 01:50:00
      *
-     * @param int $hours The hours (0 - 23)
-     * @param int $minutes The minutes (0 - 59)
-     * @param int $seconds The seconds (0 - 59)
-     * @return JustTime
+     * @param  int  $hours  The hours (0 - 23)
+     * @param  int  $minutes  The minutes (0 - 59)
+     * @param  int  $seconds  The seconds (0 - 59)
      */
     public static function make(int $hours = 0, int $minutes = 0, int $seconds = 0): JustTime
     {
@@ -42,7 +38,7 @@ class JustTime implements JsonSerializable
      *
      * Note the hours will wrap around midnight if the total number of seconds is more than a day.
      *
-     * @param int $seconds_since_midnight The total number of seconds since midnight
+     * @param  int  $seconds_since_midnight  The total number of seconds since midnight
      * @return JustTime The new JustTime instance
      */
     public static function fromSecondsSinceMidnight(int $seconds_since_midnight): JustTime
@@ -53,10 +49,10 @@ class JustTime implements JsonSerializable
     /**
      * Create a new JustTime object from a DateTime object
      *
-     * @param DateTime $date The DateTime object (remains unchanged)
+     * @param  DateTime  $date  The DateTime object (remains unchanged)
      * @return JustTime The new JustTime instance
      */
-    public static function fromDateTime(DateTime $date) : JustTime
+    public static function fromDateTime(DateTime $date): JustTime
     {
         return JustTime::make((int) $date->format('H'), (int) $date->format('i'), (int) $date->format('s'));
     }
@@ -64,12 +60,12 @@ class JustTime implements JsonSerializable
     /**
      * Get the current time
      *
-     * @param ?DateTimeZone $timezone Optional timezone - if specified the time will be whatever the time is right now in the specified timezone
+     * @param  ?DateTimeZone  $timezone  Optional timezone - if specified the time will be whatever the time is right now in the specified timezone
      * @return JustTime The new JustTime instance
      */
-    public static function now(?DateTimeZone $timezone = null) : JustTime
+    public static function now(?DateTimeZone $timezone = null): JustTime
     {
-        $dt = new DateTime();
+        $dt = new DateTime;
         if ($timezone) {
             $dt->setTimezone($timezone);
         }
@@ -79,13 +75,12 @@ class JustTime implements JsonSerializable
     /**
      * Get the time at the specified timestamp
      *
-     * @param int $timestamp
-     * @param ?DateTimeZone $timezone Optional timezone - if specified the time will be whatever the time is in the specified timezone at the specified timestamp
+     * @param  ?DateTimeZone  $timezone  Optional timezone - if specified the time will be whatever the time is in the specified timezone at the specified timestamp
      * @return JustTime The new JustTime instance
      */
-    public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null) : JustTime
+    public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null): JustTime
     {
-        $dt = new DateTime();
+        $dt = new DateTime;
         if ($timezone) {
             $dt->setTimezone($timezone);
         }
@@ -96,10 +91,10 @@ class JustTime implements JsonSerializable
     /**
      * Create a new JustTime object from a string in H:i:s format
      *
-     * @param string $his The date in H:i:s format, eg '14:35:02' (note seconds can be omitted eg '14:35')
+     * @param  string  $his  The date in H:i:s format, eg '14:35:02' (note seconds can be omitted eg '14:35')
      * @return JustTime The new JustTime instance
      */
-    public static function fromHis(string $his) : JustTime
+    public static function fromHis(string $his): JustTime
     {
         return JustTime::make(...JustTime::parseHis($his));
     }
@@ -107,9 +102,10 @@ class JustTime implements JsonSerializable
     /**
      * Get hours minutes and seconds integers from a string in H:i:s format, if valid
      *
-     * @param string $his The date in H:i:s format, eg '14:35' (note seconds can be omitted eg '14:35')
-     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
+     * @param  string  $his  The date in H:i:s format, eg '14:35' (note seconds can be omitted eg '14:35')
      * @return array{0: int, 1: int, 2: int} Array containing integers [year, month, day]
+     *
+     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
      */
     public static function parseHis(string $his): array
     {
@@ -127,11 +123,9 @@ class JustTime implements JsonSerializable
     /**
      * Return the earliest of a set of times
      *
-     * @param JustTime $first
-     * @param JustTime ...$others
      * @return JustTime The earliest time from $first and $others
      */
-    public static function earliest(JustTime $first, JustTime ...$others) : JustTime
+    public static function earliest(JustTime $first, JustTime ...$others): JustTime
     {
         $earliest = $first;
         foreach ($others as $time) {
@@ -145,11 +139,9 @@ class JustTime implements JsonSerializable
     /**
      * Return the latest of a set of times
      *
-     * @param JustTime $first
-     * @param JustTime ...$others
      * @return JustTime The latest time from $first and $others
      */
-    public static function latest(JustTime $first, JustTime ...$others) : JustTime
+    public static function latest(JustTime $first, JustTime ...$others): JustTime
     {
         $latest = $first;
         foreach ($others as $time) {
@@ -167,7 +159,7 @@ class JustTime implements JsonSerializable
      * The hours returned will always be in the interval 0-23.
      * The return value will be an array of integers [0 => hours, 1 => minutes, 2 => seconds]
      *
-     * @param int $seconds_since_midnight The total number of seconds since midnight
+     * @param  int  $seconds_since_midnight  The total number of seconds since midnight
      * @return array{0: int, 1: int, 2: int} The number of hours, minutes and seconds
      */
     public static function split(int $seconds_since_midnight): array
@@ -211,12 +203,10 @@ class JustTime implements JsonSerializable
 
     /**
      * JustTime constructor.
-     *
-     * @param int $seconds_since_midnight
      */
     protected function __construct(int $seconds_since_midnight)
     {
-        list($this->hours, $this->minutes, $this->seconds) = JustTime::split($seconds_since_midnight);
+        [$this->hours, $this->minutes, $this->seconds] = JustTime::split($seconds_since_midnight);
         $this->since_midnight = ($this->hours * 60 * 60) + ($this->minutes * 60) + ($this->seconds);
         $this->_date = null;
     }
@@ -224,8 +214,6 @@ class JustTime implements JsonSerializable
     /**
      * Get the internal DateTime object for 00:00 on this date (UTC)
      * Creates the DateTime object if it doesn't already exists
-     *
-     * @return DateTime
      */
     protected function getInternalDateTime(): DateTime
     {
@@ -234,7 +222,7 @@ class JustTime implements JsonSerializable
             if (is_null($utc)) {
                 $utc = new DateTimeZone('UTC');
             }
-            $this->_date = new DateTime();
+            $this->_date = new DateTime;
             $this->_date->setTimezone($utc);
             $this->_date->setTimestamp($this->since_midnight);
         }
@@ -254,10 +242,10 @@ class JustTime implements JsonSerializable
      *
      * Note that any date values which are requested in the format will have values from the Unix epoch - Jan 1st 1970
      *
-     * @param string $format The format, as per PHP's date() function
+     * @param  string  $format  The format, as per PHP's date() function
      * @return string The formatted string
      */
-    public function format(string $format = 'H:i:s') : string
+    public function format(string $format = 'H:i:s'): string
     {
         return $this->getInternalDateTime()->format($format);
     }
@@ -269,13 +257,12 @@ class JustTime implements JsonSerializable
      * (This implies that sometimes adding positive values can lead to a time which is considered 'before' the original)
      * Note any of the values can be negative to subtract that amount of time instead of adding
      *
-     * @param int $hours The number of hours to add
-     * @param int $minutes The number of minutes to add
-     * @param int $seconds The number of seconds to add
-     *
+     * @param  int  $hours  The number of hours to add
+     * @param  int  $minutes  The number of minutes to add
+     * @param  int  $seconds  The number of seconds to add
      * @return JustTime The new JustTime object
      */
-    public function addTime(int $hours = 0, int $minutes = 0, int $seconds = 0) : JustTime
+    public function addTime(int $hours = 0, int $minutes = 0, int $seconds = 0): JustTime
     {
         return JustTime::make($this->hours + $hours, $this->minutes + $minutes, $this->seconds + $seconds);
     }
@@ -283,7 +270,6 @@ class JustTime implements JsonSerializable
     /**
      * Test whether a JustTime object refers to the same time as this one
      *
-     * @param JustTime $other
      * @return bool True if $other is the same time
      */
     public function isSameAs(JustTime $other): bool
@@ -294,7 +280,6 @@ class JustTime implements JsonSerializable
     /**
      * Test whether a JustTime object refers to a time before this one
      *
-     * @param JustTime $other
      * @return bool True if $other is before this time
      */
     public function isBefore(JustTime $other): bool
@@ -305,7 +290,6 @@ class JustTime implements JsonSerializable
     /**
      * Test whether a JustTime object refers to a time before or equal to this one
      *
-     * @param JustTime $other
      * @return bool True if $other is before or the same as this date
      */
     public function isBeforeOrSameAs(JustTime $other): bool
@@ -316,7 +300,6 @@ class JustTime implements JsonSerializable
     /**
      * Test whether a JustTime object refers to a time after this one
      *
-     * @param JustTime $other
      * @return bool True if $other is after this date
      */
     public function isAfter(JustTime $other): bool
@@ -327,7 +310,6 @@ class JustTime implements JsonSerializable
     /**
      * Test whether a JustTime object refers to a time after or equal to this one
      *
-     * @param JustTime $other
      * @return bool True if $other is after or the same as this time
      */
     public function isAfterOrSameAs(JustTime $other): bool
@@ -341,7 +323,7 @@ class JustTime implements JsonSerializable
      * For example to round 09:47 to the nearest 15 minutes:
      * $time = (JustTime::make(9, 47))->round(15 * 60); // 09:45
      *
-     * @param int $interval_seconds The length of the interval to round to, in seconds
+     * @param  int  $interval_seconds  The length of the interval to round to, in seconds
      * @return JustTime A new JustTime instance with the rounded time
      */
     public function round(int $interval_seconds): JustTime
@@ -356,6 +338,7 @@ class JustTime implements JsonSerializable
      * The integer since_midnight completely defines a JustTime object, so it is sufficient for serialization
      *
      * @internal
+     *
      * @return array{since_midnight: int}
      */
     public function __serialize(): array
@@ -367,7 +350,8 @@ class JustTime implements JsonSerializable
      * Unserialize
      *
      * @internal
-     * @param array{since_midnight: int} $data
+     *
+     * @param  array{since_midnight: int}  $data
      */
     public function __unserialize(array $data)
     {

@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpRedundantOptionalArgumentInspection */
+<?php
+
+/** @noinspection PhpRedundantOptionalArgumentInspection */
 
 namespace MadisonSolutions\JustDate;
 
@@ -12,7 +14,6 @@ use JsonSerializable;
  *
  * Class representing a single date with no time information
  *
- * @package MadisonSolutions\JustDate
  * @property-read int $year The year as an integer
  * @property-read int $month The month as an integer (1 = January ... 12 = December)
  * @property-read int $day The day of the month as an integer
@@ -25,8 +26,6 @@ class JustDate implements DateRangeList, JsonSerializable
 
     /**
      * Utility function to create a new DateTime object for the current time, with UTC timezone
-     *
-     * @return DateTime
      */
     protected static function newUtcDateTime(): DateTime
     {
@@ -34,7 +33,7 @@ class JustDate implements DateRangeList, JsonSerializable
         if (is_null($utc)) {
             $utc = new DateTimeZone('UTC');
         }
-        $date = new DateTime();
+        $date = new DateTime;
         $date->setTimezone($utc);
         return $date;
     }
@@ -47,9 +46,9 @@ class JustDate implements DateRangeList, JsonSerializable
      * the internal date value will be adjusted to correspond.
      * eg supplying 0 for the $day will result in the last day of the previous month.
      *
-     * @param int $year The Year (full, 4 digit year)
-     * @param int $month The month (1 = January ... 12 = December)
-     * @param int $day The day of the month (first day is 1)
+     * @param  int  $year  The Year (full, 4 digit year)
+     * @param  int  $month  The month (1 = January ... 12 = December)
+     * @param  int  $day  The day of the month (first day is 1)
      * @return JustDate The new JustDate instance
      */
     public static function make(int $year, int $month, int $day): JustDate
@@ -72,7 +71,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Create a new JustDate object from the epoch day
      *
-     * @param int $epoch_day The number of days since the Unix epoch
+     * @param  int  $epoch_day  The number of days since the Unix epoch
      * @return JustDate The new JustDate instance
      */
     public static function fromEpochDay(int $epoch_day): JustDate
@@ -83,7 +82,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Create a new JustDate object from a DateTime object
      *
-     * @param DateTime $date The DateTime object (remains unchanged)
+     * @param  DateTime  $date  The DateTime object (remains unchanged)
      * @return JustDate The new JustDate instance
      */
     public static function fromDateTime(DateTime $date): JustDate
@@ -97,13 +96,13 @@ class JustDate implements DateRangeList, JsonSerializable
      * If a timezone is specified, the date will be whatever the date is in the specified timezone at the specified timestamp
      * If timezone is omitted, the date will be whatever the date is in the system default timezone at the specified timestamp
      *
-     * @param int $timestamp The timestamp
-     * @param ?DateTimeZone $timezone Optional timezone
+     * @param  int  $timestamp  The timestamp
+     * @param  ?DateTimeZone  $timezone  Optional timezone
      * @return JustDate The new JustDate instance
      */
     public static function fromTimestamp(int $timestamp, ?DateTimeZone $timezone = null): JustDate
     {
-        $dt = new DateTime();
+        $dt = new DateTime;
         $dt->setTimestamp($timestamp);
         if ($timezone) {
             $dt->setTimezone($timezone);
@@ -117,12 +116,12 @@ class JustDate implements DateRangeList, JsonSerializable
      * If a timezone is specified, the date will be whatever the date is right now in the specified timezone
      * If timezone is omitted, the date will be whatever the date is right now in the system default timezone
      *
-     * @param ?DateTimeZone $timezone Optional timezone
+     * @param  ?DateTimeZone  $timezone  Optional timezone
      * @return JustDate The new JustDate instance
      */
     public static function today(?DateTimeZone $timezone = null): JustDate
     {
-        $dt = new DateTime();
+        $dt = new DateTime;
         if ($timezone) {
             $dt->setTimezone($timezone);
         }
@@ -132,7 +131,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Get the date that it was yesterday
      *
-     * @param ?DateTimeZone $timezone Optional timezone - if specified the date will one day before whatever the date is right now in the specified timezone
+     * @param  ?DateTimeZone  $timezone  Optional timezone - if specified the date will one day before whatever the date is right now in the specified timezone
      * @return JustDate The new JustDate instance
      */
     public static function yesterday(?DateTimeZone $timezone = null): JustDate
@@ -143,7 +142,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Get the date that it will be tomorrow
      *
-     * @param ?DateTimeZone $timezone Optional timezone - if specified the date will one day after whatever the date is right now in the specified timezone
+     * @param  ?DateTimeZone  $timezone  Optional timezone - if specified the date will one day after whatever the date is right now in the specified timezone
      * @return JustDate The new JustDate instance
      */
     public static function tomorrow(?DateTimeZone $timezone = null): JustDate
@@ -154,11 +153,12 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Create a new JustDate object from a string in Y-m-d format
      *
-     * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
-     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
+     * @param  string  $ymd  The date in Y-m-d format, eg '2019-04-21'
      * @return JustDate The new JustDate instance
+     *
+     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
      */
-    public static function fromYmd(string $ymd) : JustDate
+    public static function fromYmd(string $ymd): JustDate
     {
         return JustDate::make(...JustDate::parseYmd($ymd));
     }
@@ -166,9 +166,10 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Get year month and day integers from a string in Y-m-d format, if valid
      *
-     * @param string $ymd The date in Y-m-d format, eg '2019-04-21'
-     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
+     * @param  string  $ymd  The date in Y-m-d format, eg '2019-04-21'
      * @return array{0: int, 1: int, 2: int} Array containing integers [year, month, day]
+     *
+     * @throws InvalidArgumentException If the string does not contain a valid date in Y-m-d format
      */
     public static function parseYmd(string $ymd): array
     {
@@ -190,8 +191,8 @@ class JustDate implements DateRangeList, JsonSerializable
      * If $a is after $b the return value will be negative
      * If $a and $b refer to the same date, the return value will be zero
      *
-     * @param JustDate $a The start date
-     * @param JustDate $b The end date
+     * @param  JustDate  $a  The start date
+     * @param  JustDate  $b  The end date
      * @return int The number of days from $from to $to
      */
     public static function difference(JustDate $a, JustDate $b): int
@@ -209,8 +210,8 @@ class JustDate implements DateRangeList, JsonSerializable
      * If $a and $b refer to the same date, returns zero
      * If $a is later than $b, returns 1
      *
-     * @param JustDate $a The first date
-     * @param JustDate $b The second date
+     * @param  JustDate  $a  The first date
+     * @param  JustDate  $b  The second date
      * @return int Result of comparison: -1, 0 or 1
      */
     public static function compare(JustDate $a, JustDate $b): int
@@ -221,8 +222,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Return the earliest of a set of dates
      *
-     * @param JustDate $first
-     * @param JustDate ...$others
      * @return JustDate The earliest date from $first and $others
      */
     public static function earliest(JustDate $first, JustDate ...$others): JustDate
@@ -239,8 +238,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Return the latest of a set of dates
      *
-     * @param JustDate $first
-     * @param JustDate ...$others
      * @return JustDate The latest date from $first and $others
      */
     public static function latest(JustDate $first, JustDate ...$others): JustDate
@@ -262,20 +259,20 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * DateTime object created when required
      * Will be a DateTime object for 00:00 on this date in UTC timezone
+     *
      * @internal
      */
     protected ?DateTime $_date;
 
     /**
      * DayOfWeek object created when required
+     *
      * @internal
      */
     protected ?DayOfWeek $_dow;
 
     /**
      * JustDate constructor.
-     *
-     * @param int $epoch_day
      */
     protected function __construct(int $epoch_day)
     {
@@ -289,8 +286,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Get the internal DateTime object for 00:00 on this date (UTC)
      * Creates the DateTime object if it doesn't already exists
-     *
-     * @return DateTime
      */
     protected function getInternalDateTime(): DateTime
     {
@@ -354,7 +349,7 @@ class JustDate implements DateRangeList, JsonSerializable
      *
      * Note that any time values which are requested in the format will always be zero
      *
-     * @param string $format The format, as per PHP's date() function
+     * @param  string  $format  The format, as per PHP's date() function
      * @return string The formatted string
      */
     public function format(string $format = 'Y-m-d'): string
@@ -368,13 +363,13 @@ class JustDate implements DateRangeList, JsonSerializable
      * If no time is specified, the DateTime will be set to 00:00:00
      * If no timezone is specified the DateTime will use the system default timezone
      *
-     * @param ?JustTime $time Optional time
-     * @param ?DateTimeZone $timezone Optional timezone
+     * @param  ?JustTime  $time  Optional time
+     * @param  ?DateTimeZone  $timezone  Optional timezone
      * @return DateTime
      */
     public function toDateTime(?JustTime $time = null, ?DateTimeZone $timezone = null)
     {
-        $dt = new DateTime();
+        $dt = new DateTime;
         if ($timezone) {
             $dt->setTimezone($timezone);
         }
@@ -393,7 +388,7 @@ class JustDate implements DateRangeList, JsonSerializable
      * Note if a negative number of days is supplied then the result will be an earlier date
      * IE $date->addDays(-1) is the same as $date->subDays(1)
      *
-     * @param int $days The number of days to add
+     * @param  int  $days  The number of days to add
      * @return JustDate The new JustDate object
      */
     public function addDays(int $days): JustDate
@@ -407,7 +402,7 @@ class JustDate implements DateRangeList, JsonSerializable
      * Note if a negative number of days is supplied then the result will be a later date.
      * IE $date->subDays(-1) is the same as $date->addDays(1)
      *
-     * @param int $days The number of days to subtract
+     * @param  int  $days  The number of days to subtract
      * @return JustDate The new JustDate object
      */
     public function subDays(int $days): JustDate
@@ -418,9 +413,9 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Add the specified number of years, months and days to this date, and return a new JustDate object for the result
      *
-     * @param int $years The number of years to add (use negative values to get earlier dates)
-     * @param int $months The number of months to add (use negative values to get earlier dates)
-     * @param int $days The number of days to add (use negative values to get earlier dates)
+     * @param  int  $years  The number of years to add (use negative values to get earlier dates)
+     * @param  int  $months  The number of months to add (use negative values to get earlier dates)
+     * @param  int  $days  The number of days to add (use negative values to get earlier dates)
      * @return JustDate The new JustDate object
      */
     public function add(int $years, int $months, int $days): JustDate
@@ -431,7 +426,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Add the specified number of weeks to this date, and return a new JustDate object for the result
      *
-     * @param int $weeks The number of weeks to add
+     * @param  int  $weeks  The number of weeks to add
      * @return JustDate The new JustDate object
      */
     public function addWeeks(int $weeks): JustDate
@@ -442,7 +437,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Subtract the specified number of weeks from this date, and return a new JustDate object for the result
      *
-     * @param int $weeks The number of weeks to subtract
+     * @param  int  $weeks  The number of weeks to subtract
      * @return JustDate The new JustDate object
      */
     public function subWeeks(int $weeks): JustDate
@@ -453,7 +448,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Add the specified number of months to this date, and return a new JustDate object for the result
      *
-     * @param int $months The number of months to add
+     * @param  int  $months  The number of months to add
      * @return JustDate The new JustDate object
      */
     public function addMonths(int $months): JustDate
@@ -464,7 +459,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Subtract the specified number of months from this date, and return a new JustDate object for the result
      *
-     * @param int $months The number of months to subtract
+     * @param  int  $months  The number of months to subtract
      * @return JustDate The new JustDate object
      */
     public function subMonths(int $months): JustDate
@@ -475,7 +470,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Add the specified number of years to this date, and return a new JustDate object for the result
      *
-     * @param int $years The number of years to add
+     * @param  int  $years  The number of years to add
      * @return JustDate The new JustDate object
      */
     public function addYears(int $years): JustDate
@@ -486,7 +481,7 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Subtract the specified number of years from this date, and return a new JustDate object for the result
      *
-     * @param int $years The number of years to subtract
+     * @param  int  $years  The number of years to subtract
      * @return JustDate The new JustDate object
      */
     public function subYears(int $years): JustDate
@@ -566,9 +561,8 @@ class JustDate implements DateRangeList, JsonSerializable
      * Typical use is to add a number of 'working days' to a date, where the test function identifies the 'working' dates
      * Note if $num_to_add is zero (or negative) the behaviour is to advance to the first date that does pass the test and return it
      *
-     * @param int $num_to_add The number of days to add.
-     * @param callable(JustDate): bool $test_fn Function for testing whether or not this date counts for reducing $num_to_add
-     * @return JustDate
+     * @param  int  $num_to_add  The number of days to add.
+     * @param  callable(JustDate): bool  $test_fn  Function for testing whether or not this date counts for reducing $num_to_add
      */
     public function addDaysPassingTest(int $num_to_add, callable $test_fn): JustDate
     {
@@ -591,9 +585,8 @@ class JustDate implements DateRangeList, JsonSerializable
      * Note if $num_to_add is zero (or negative) the first working date equal or later than $this is returned
      * If a different definition of 'working day' is required, use JustDate::addDaysPassingTest() with a custom test function
      *
-     * @param int $num_to_add The number of 'working' days to add.
-     * @param ?BaseDateSet $holidays Optionally provide a set of holiday dates that will not be counted as working days
-     * @return JustDate
+     * @param  int  $num_to_add  The number of 'working' days to add.
+     * @param  ?BaseDateSet  $holidays  Optionally provide a set of holiday dates that will not be counted as working days
      */
     public function addWorkingDays(int $num_to_add, ?BaseDateSet $holidays = null): JustDate
     {
@@ -612,7 +605,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Test whether a JustDate object refers to the same date as this one
      *
-     * @param JustDate $other
      * @return bool True if $other is the same date
      */
     public function isSameAs(JustDate $other): bool
@@ -623,7 +615,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date before this one
      *
-     * @param JustDate $other
      * @return bool True if $other is before this date
      */
     public function isBefore(JustDate $other): bool
@@ -634,7 +625,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date before or equal to this one
      *
-     * @param JustDate $other
      * @return bool True if $other is before or the same as this date
      */
     public function isBeforeOrSameAs(JustDate $other): bool
@@ -645,7 +635,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date after this one
      *
-     * @param JustDate $other
      * @return bool True if $other is after this date
      */
     public function isAfter(JustDate $other): bool
@@ -656,7 +645,6 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Test whether a JustDate object refers to a date after or equal to this one
      *
-     * @param JustDate $other
      * @return bool True if $other is after or the same as this date
      */
     public function isAfterOrSameAs(JustDate $other): bool
@@ -758,7 +746,9 @@ class JustDate implements DateRangeList, JsonSerializable
      * Serialize
      *
      * The integer epoch_day completely defines a JustDate object, so it is sufficient for serialization
+     *
      * @internal
+     *
      * @return array{epoch_day: int}
      */
     public function __serialize(): array
@@ -769,7 +759,8 @@ class JustDate implements DateRangeList, JsonSerializable
     /**
      * Unserialize
      *
-     * @param array{epoch_day: int} $data
+     * @param  array{epoch_day: int}  $data
+     *
      * @internal
      */
     public function __unserialize(array $data)
@@ -788,6 +779,7 @@ class JustDate implements DateRangeList, JsonSerializable
 
     /**
      * @internal
+     *
      * @return DateRange[]
      */
     public function getRanges(): array

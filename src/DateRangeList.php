@@ -11,8 +11,6 @@ namespace MadisonSolutions\JustDate;
  * DateRange objects (a list containing a single DateRange)
  * DateSet objects (the list of included ranges)
  * MutableDateSet objects (the list of included ranges)
- *
- * @package MadisonSolutions\JustDate
  */
 interface DateRangeList
 {
@@ -21,5 +19,5 @@ interface DateRangeList
      *
      * @return DateRange[] An array of DateRange objects
      */
-    public function getRanges() : array;
+    public function getRanges(): array;
 }

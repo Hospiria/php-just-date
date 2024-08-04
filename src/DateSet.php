@@ -9,8 +9,6 @@ namespace MadisonSolutions\JustDate;
  * Internally represented as a list of sorted, disjoint DateRange objects
  * This object is immutable - the dates in the set cannot be altered after the object is created.
  * (although new sets can be constructed from other sets via the union(), and intersection() methods etc)
- *
- * @package MadisonSolutions\JustDate
  */
 class DateSet extends BaseDateSet
 {
@@ -19,8 +17,6 @@ class DateSet extends BaseDateSet
      *
      * The dates that are included in the set can be defined by supplying any number of JustDate, DateRange,
      * DateSet or MutableDateSet objects (or any other class implementing DateRangeList) as parameters.
-     *
-     * @param DateRangeList ...$lists
      */
     public function __construct(DateRangeList ...$lists)
     {
@@ -34,12 +30,11 @@ class DateSet extends BaseDateSet
     /**
      * Alternative way of constructing a DateSet object that is optimised for creating from JustDate objects
      *
-     * @param JustDate ...$dates Dates that should be included in the set
-     * @return DateSet
+     * @param  JustDate  ...$dates  Dates that should be included in the set
      */
-    public static function fromDates(JustDate ...$dates) : DateSet
+    public static function fromDates(JustDate ...$dates): DateSet
     {
-        $instance = new DateSet();
+        $instance = new DateSet;
         $instance->ranges = BaseDateSet::sortedRangesFromSingleDates(...$dates);
         return $instance;
     }
@@ -49,11 +44,8 @@ class DateSet extends BaseDateSet
      *
      * Note this is functionally identical to the standard new DateSet() constructor and is included just
      * for code readability and contrast with the complementary DateSet::intersection() function.
-     *
-     * @param DateRangeList ...$lists
-     * @return DateSet
      */
-    public static function union(DateRangeList ...$lists) : DateSet
+    public static function union(DateRangeList ...$lists): DateSet
     {
         return new DateSet(...$lists);
     }
@@ -62,15 +54,12 @@ class DateSet extends BaseDateSet
      * Create a new DateSet which is the intersection of the supplied objects
      *
      * The dates in the resulting DateSet will be those dates which are included in every one of the arguments
-     *
-     * @param DateRangeList ...$lists
-     * @return DateSet
      */
-    public static function intersection(DateRangeList... $lists) : DateSet
+    public static function intersection(DateRangeList ... $lists): DateSet
     {
         $num = count($lists);
         if ($num == 0) {
-            return new DateSet();
+            return new DateSet;
         }
         $curr = new DateSet($lists[0]);
         for ($i = 1; $i < $num; $i++) {

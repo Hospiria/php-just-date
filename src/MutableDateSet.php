@@ -8,8 +8,6 @@ namespace MadisonSolutions\JustDate;
  * Class for storing a set of unique dates
  * Internally represented as a list of sorted, disjoint DateRange objects
  * Unlike DateSet, the dates that are included in a MutableDateSet can be modified after the object is created
- *
- * @package MadisonSolutions\JustDate
  */
 class MutableDateSet extends BaseDateSet
 {
@@ -18,8 +16,6 @@ class MutableDateSet extends BaseDateSet
      *
      * The dates that are initially included in the set can be defined by supplying any number of JustDate, DateRange,
      * DateSet or MutableDateSet objects (or any other class implementing DateRangeList) as parameters.
-     *
-     * @param DateRangeList ...$lists
      */
     public function __construct(DateRangeList ...$lists)
     {
@@ -32,12 +28,11 @@ class MutableDateSet extends BaseDateSet
     /**
      * Alternative way of constructing a MutableDateSet object that is optimised for creating from JustDate objects
      *
-     * @param JustDate ...$dates Dates that should initially be included in the set
-     * @return MutableDateSet
+     * @param  JustDate  ...$dates  Dates that should initially be included in the set
      */
-    public static function fromDates(JustDate ...$dates) : MutableDateSet
+    public static function fromDates(JustDate ...$dates): MutableDateSet
     {
-        $instance = new MutableDateSet();
+        $instance = new MutableDateSet;
         $instance->ranges = BaseDateSet::sortedRangesFromSingleDates(...$dates);
         return $instance;
     }
@@ -47,11 +42,8 @@ class MutableDateSet extends BaseDateSet
      *
      * Note this is functionally identical to the standard new MutableDateSet() constructor and is included just
      * for code readability and contrast with the complementary MutableDateSet::intersection() function.
-     *
-     * @param DateRangeList ...$lists
-     * @return MutableDateSet
      */
-    public static function union(DateRangeList ...$lists) : MutableDateSet
+    public static function union(DateRangeList ...$lists): MutableDateSet
     {
         return new MutableDateSet(...$lists);
     }
@@ -60,15 +52,12 @@ class MutableDateSet extends BaseDateSet
      * Create a new MutableDateSet which is the intersection of the supplied objects
      *
      * The dates in the resulting MutableDateSet will be those dates which are included in every one of the arguments
-     *
-     * @param DateRangeList ...$lists
-     * @return MutableDateSet
      */
-    public static function intersection(DateRangeList... $lists) : MutableDateSet
+    public static function intersection(DateRangeList ... $lists): MutableDateSet
     {
         $num = count($lists);
         if ($num == 0) {
-            return new MutableDateSet();
+            return new MutableDateSet;
         }
         $curr = new MutableDateSet($lists[0]);
         for ($i = 1; $i < $num; $i++) {
@@ -85,10 +74,9 @@ class MutableDateSet extends BaseDateSet
      * Note the set is mutated by this function.
      * The updated set is returned for chaining.
      *
-     * @param DateRangeList $list
      * @return $this
      */
-    public function add(DateRangeList $list) : MutableDateSet
+    public function add(DateRangeList $list): MutableDateSet
     {
         foreach ($list->getRanges() as $range) {
             $this->addRange($range);
@@ -103,10 +91,9 @@ class MutableDateSet extends BaseDateSet
      * Note the set is mutated by this function.
      * The updated set is returned for chaining.
      *
-     * @param DateRange $new
      * @return $this
      */
-    public function addRange(DateRange $new) : MutableDateSet
+    public function addRange(DateRange $new): MutableDateSet
     {
         $num = count($this->ranges);
         if ($num == 0) {
@@ -147,10 +134,9 @@ class MutableDateSet extends BaseDateSet
      * Note the set is mutated by this function.
      * The updated set is returned for chaining.
      *
-     * @param DateRangeList $list_to_cut
      * @return $this
      */
-    public function remove(DateRangeList $list_to_cut) : MutableDateSet
+    public function remove(DateRangeList $list_to_cut): MutableDateSet
     {
         $ranges = $this->ranges;
         foreach ($list_to_cut->getRanges() as $range_to_cut) {

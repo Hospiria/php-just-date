@@ -10,8 +10,6 @@ use JsonSerializable;
  * Class BaseDateSet
  *
  * Base class for DateSet and MutableDateSet
- *
- * @package MadisonSolutions\JustDate
  */
 abstract class BaseDateSet implements DateRangeList, JsonSerializable
 {
@@ -27,17 +25,17 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      * Any repeated dates will be merged together
      * The resulting list of ranges will be sorted and disjoint
      *
-     * @param JustDate ...$dates The input dates
+     * @param  JustDate  ...$dates  The input dates
      * @return DateRange[] Resulting normalized list of ranges
      */
-    public static function sortedRangesFromSingleDates(JustDate ...$dates) : array
+    public static function sortedRangesFromSingleDates(JustDate ...$dates): array
     {
         $ranges = [];
         $num = count($dates);
         if ($num == 0) {
             return $ranges;
         }
-        usort($dates, fn($a, $b) => $a->epoch_day - $b->epoch_day);
+        usort($dates, fn ($a, $b) => $a->epoch_day - $b->epoch_day);
         $curr_start = $curr_end = $dates[0];
         for ($i = 1; $i < $num; $i++) {
             if ($dates[$i]->isAfter($curr_end->nextDay())) {
@@ -58,8 +56,8 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      * Used internally by the DateSet and MutableDateSet classes
      * The supplied array must already be normalized (which is why this function is protected)
      *
-     * @param DateRange[] $ranges Original sorted, disjoint list of ranges
-     * @param DateRange $cut Range to be subtracted from each of the ranges
+     * @param  DateRange[]  $ranges  Original sorted, disjoint list of ranges
+     * @param  DateRange  $cut  Range to be subtracted from each of the ranges
      * @return DateRange[] Resulting normalized list of ranges after subtracting $cut
      */
     protected static function subtractRangeFromSortedRanges(array $ranges, DateRange $cut): array
@@ -90,7 +88,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
                     // some of the beginning of $existing is removed by $cut
                     $new_ranges[] = DateRange::make($cut->end->nextDay(), $existing->end);
                 }
-            } else if ($cut->end->isAfterOrSameAs($existing->end)) {
+            } elseif ($cut->end->isAfterOrSameAs($existing->end)) {
                 // some of the end of $existing is removed by $cut
                 $new_ranges[] = DateRange::make($existing->start, $cut->start->prevDay());
             } else {
@@ -117,8 +115,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      * Used internally by DateSet and MutableDateSet objects
      * The returned array of ranges is normalized (sorted and disjoint)
      *
-     * @param BaseDateSet $a
-     * @param BaseDateSet $b
      * @return DateRange[] Normalised list of ranges in the intersection of $a and $b
      */
     protected static function getIntersectingRanges(BaseDateSet $a, BaseDateSet $b): array
@@ -139,7 +135,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      * The resulting array of ranges are guaranteed to be sorted and disjoint.
      * Used internally by DateSet and MutableDate set objects.
      *
-     * @param DateRange[] $in
+     * @param  DateRange[]  $in
      * @return DateRange[]
      */
     protected static function normalizeRanges(array $in): array
@@ -149,7 +145,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
             return [];
         }
 
-        usort($in, fn($a, $b) => $a->start->epoch_day - $b->start->epoch_day);
+        usort($in, fn ($a, $b) => $a->start->epoch_day - $b->start->epoch_day);
 
         $out = [];
         $curr = $in[0];
@@ -175,9 +171,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
 
     /**
      * Determine whether the given date is a member of this set
-     *
-     * @param JustDate $date
-     * @return bool
      */
     public function includes(JustDate $date): bool
     {
@@ -198,13 +191,10 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      *
      * The dates in the resulting object will be those that are contained in this set but are not contained
      * in the supplied object. Returns a new set (does not mutate $this)
-     *
-     * @param DateRangeList $list_to_cut
-     * @return static
      */
     public function subtract(DateRangeList $list_to_cut): static
     {
-        $instance = new static();
+        $instance = new static;
         $ranges = $this->ranges;
         foreach ($list_to_cut->getRanges() as $range_to_cut) {
             $ranges = $this->subtractRangeFromSortedRanges($ranges, $range_to_cut);
@@ -246,7 +236,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each range in the set as a DateRange object
      *
-     * @param bool $backwards If true the ranges will be returned in reverse order (default false).
+     * @param  bool  $backwards  If true the ranges will be returned in reverse order (default false).
      * @return Generator<int, DateRange>
      */
     public function eachRange(bool $backwards = false): Generator
@@ -260,7 +250,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     /**
      * Get a generator which yields each date in the set as a JustDate object
      *
-     * @param bool $backwards If true the dates will be returned in reverse order (default false).
+     * @param  bool  $backwards  If true the dates will be returned in reverse order (default false).
      * @return Generator<int, JustDate>
      */
     public function eachDate(bool $backwards = false): Generator
@@ -277,7 +267,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      * The first element of the array will be the JustDate object for that date
      * The second, a boolean, true if the date belongs to this set, and false otherwise.
      *
-     * @param DateRange $window
      * @return Generator<int, array{0: JustDate, 1: bool}>
      */
     public function window(DateRange $window): Generator
@@ -324,10 +313,8 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
 
     /**
      * Get the string representation of this set
-     *
-     * @return string
      */
-    public function __toString() : string
+    public function __toString(): string
     {
         return implode(', ', array_map(function (DateRange $range) {
             return (string) ($range->start->isSameAs($range->end) ? $range->start : $range);
@@ -358,9 +345,6 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
 
     /**
      * Unserialize by parsing the standard string representation
-     *
-     * @param string $serialized
-     * @return static
      */
     public static function fromString(string $serialized): static
     {
@@ -386,7 +370,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     /**
      * Test whether the given object consists of the exact same set of dates as this one
      *
-     * @param DateRangeList $other An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
+     * @param  DateRangeList  $other  An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
      * @return bool True if the set of dates in $other is exactly the same as the set of dates in this set, false otherwise
      */
     public function isSameAs(DateRangeList $other): bool
@@ -422,7 +406,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     /**
      * Test whether this set contains all of the dates in the given DateRange
      *
-     * @param DateRange $other DateRange to compare with
+     * @param  DateRange  $other  DateRange to compare with
      * @return bool True if this set contains all of the dates in $other, false otherwise
      */
     protected function containsRange(DateRange $other): bool
@@ -440,7 +424,7 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
      *
      * Note: returns true if $other is an empty DateSet or MutableDateSet.
      *
-     * @param DateRangeList $other An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
+     * @param  DateRangeList  $other  An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
      * @return bool True if this set contains all of the dates in $other, false otherwise
      */
     public function contains(DateRangeList $other): bool

@@ -1,4 +1,6 @@
-<?php /** @noinspection DuplicatedCode */
+<?php
+
+/** @noinspection DuplicatedCode */
 
 use MadisonSolutions\JustDate\DateRange;
 use MadisonSolutions\JustDate\DateSet;
@@ -394,10 +396,10 @@ class DateTest extends TestCase
         $d1 = JustDate::make(2019, 04, 21);
         $d2 = JustDate::make(2019, 04, 25);
         $r = DateRange::make($d1, $d2);
-        $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-25', $r);
 
         $r = DateRange::fromYmd('2019-04-21', '2019-04-25');
-        $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-25', $r);
 
         // Won't let you make a range with end before start
         $this->assertThrows(InvalidArgumentException::class, function () {
@@ -409,57 +411,57 @@ class DateTest extends TestCase
 
         // Start same as end is allowed though
         $r = DateRange::make($d1, $d1);
-        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-21', $r);
 
         // You can use eitherWayRound() to supply the end date first
         $r = DateRange::eitherWayRound($d1, $d2);
-        $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-25', $r);
         $r = DateRange::eitherWayRound($d2, $d1);
-        $this->assertDateRange("2019-04-21 to 2019-04-25", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-25', $r);
         $r = DateRange::eitherWayRound($d1, $d1);
-        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-21', $r);
 
         // Create by specifying start and length
         $r = DateRange::fromStartAndInnerLength($d1, 0);
-        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-21', $r);
         $r = DateRange::fromStartAndInnerLength($d1, 3);
-        $this->assertDateRange("2019-04-21 to 2019-04-24", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-24', $r);
         $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
             $r = DateRange::fromStartAndInnerLength($d1, -1);
         });
         $r = DateRange::fromStartAndOuterLength($d1, 1);
-        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-21', $r);
         $r = DateRange::fromStartAndOuterLength($d1, 4);
-        $this->assertDateRange("2019-04-21 to 2019-04-24", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-24', $r);
         $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
             $r = DateRange::fromStartAndOuterLength($d1, 0);
         });
 
         // Create by specifying start/end and duration
         $r = DateRange::fromStartAndDuration($d1, 0, 0, 0);
-        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-21', $r);
         $r = DateRange::fromStartAndDuration($d1, days: 3);
-        $this->assertDateRange("2019-04-21 to 2019-04-24", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-24', $r);
         $r = DateRange::fromStartAndDuration($d1, months: 3);
-        $this->assertDateRange("2019-04-21 to 2019-07-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-07-21', $r);
         $r = DateRange::fromStartAndDuration($d1, years: 3);
-        $this->assertDateRange("2019-04-21 to 2022-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2022-04-21', $r);
         $r = DateRange::fromStartAndDuration($d1, 1, 1, 1);
-        $this->assertDateRange("2019-04-21 to 2020-05-22", $r);
+        $this->assertDateRange('2019-04-21 to 2020-05-22', $r);
         $r = DateRange::fromStartAndDuration($d1, months: 2, days: -6);
-        $this->assertDateRange("2019-04-21 to 2019-06-15", $r);
+        $this->assertDateRange('2019-04-21 to 2019-06-15', $r);
         $r = DateRange::fromEndAndDuration($d1, 0, 0, 0);
-        $this->assertDateRange("2019-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-21 to 2019-04-21', $r);
         $r = DateRange::fromEndAndDuration($d1, days: 3);
-        $this->assertDateRange("2019-04-18 to 2019-04-21", $r);
+        $this->assertDateRange('2019-04-18 to 2019-04-21', $r);
         $r = DateRange::fromEndAndDuration($d1, months: 3);
-        $this->assertDateRange("2019-01-21 to 2019-04-21", $r);
+        $this->assertDateRange('2019-01-21 to 2019-04-21', $r);
         $r = DateRange::fromEndAndDuration($d1, years: 3);
-        $this->assertDateRange("2016-04-21 to 2019-04-21", $r);
+        $this->assertDateRange('2016-04-21 to 2019-04-21', $r);
         $r = DateRange::fromEndAndDuration($d1, 1, 1, 1);
-        $this->assertDateRange("2018-03-20 to 2019-04-21", $r);
+        $this->assertDateRange('2018-03-20 to 2019-04-21', $r);
         $r = DateRange::fromEndAndDuration($d1, months: 2, days: -6);
-        $this->assertDateRange("2019-02-27 to 2019-04-21", $r);
+        $this->assertDateRange('2019-02-27 to 2019-04-21', $r);
         $this->assertThrows(InvalidArgumentException::class, function () use ($d1) {
             $r = DateRange::fromStartAndDuration($d1, years: -1);
         });
@@ -584,19 +586,19 @@ class DateTest extends TestCase
 
         // Overlap before
         $r2 = DateRange::fromYmd('2019-04-18', '2019-04-23');
-        $this->assertDateRange("2019-04-21 to 2019-04-23", DateRange::intersection($r1, $r2));
+        $this->assertDateRange('2019-04-21 to 2019-04-23', DateRange::intersection($r1, $r2));
         $this->assertFalse($r1->contains($r2));
         $this->assertFalse($r2->contains($r1));
 
         // Overlap after
         $r2 = DateRange::fromYmd('2019-04-22', '2019-04-28');
-        $this->assertDateRange("2019-04-22 to 2019-04-25", DateRange::intersection($r1, $r2));
+        $this->assertDateRange('2019-04-22 to 2019-04-25', DateRange::intersection($r1, $r2));
         $this->assertFalse($r1->contains($r2));
         $this->assertFalse($r2->contains($r1));
 
         // Completely surrounding
         $r2 = DateRange::fromYmd('2019-04-22', '2019-04-24');
-        $this->assertDateRange("2019-04-22 to 2019-04-24", DateRange::intersection($r1, $r2));
+        $this->assertDateRange('2019-04-22 to 2019-04-24', DateRange::intersection($r1, $r2));
         $this->assertTrue($r1->contains($r2));
         $this->assertFalse($r2->contains($r1));
 
@@ -613,12 +615,12 @@ class DateTest extends TestCase
 
         // Endpoints only
         $r2 = DateRange::fromYmd('2019-04-21', '2019-04-21');
-        $this->assertDateRange("2019-04-21 to 2019-04-21", DateRange::intersection($r1, $r2));
+        $this->assertDateRange('2019-04-21 to 2019-04-21', DateRange::intersection($r1, $r2));
         $this->assertTrue($r1->contains($r2));
         $this->assertFalse($r2->contains($r1));
 
         $r2 = DateRange::fromYmd('2019-04-25', '2019-04-25');
-        $this->assertDateRange("2019-04-25 to 2019-04-25", DateRange::intersection($r1, $r2));
+        $this->assertDateRange('2019-04-25 to 2019-04-25', DateRange::intersection($r1, $r2));
         $this->assertTrue($r1->contains($r2));
         $this->assertFalse($r2->contains($r1));
     }
@@ -635,11 +637,11 @@ class DateTest extends TestCase
             $subranges[] = $subrange;
         }
         $this->assertSame(3, count($subranges));
-        $this->assertDateRange("2021-02-28 to 2021-02-28", $subranges[0]['range']);
+        $this->assertDateRange('2021-02-28 to 2021-02-28', $subranges[0]['range']);
         $this->assertSame(2, $subranges[0]['value']);
-        $this->assertDateRange("2021-03-01 to 2021-03-31", $subranges[1]['range']);
+        $this->assertDateRange('2021-03-01 to 2021-03-31', $subranges[1]['range']);
         $this->assertSame(3, $subranges[1]['value']);
-        $this->assertDateRange("2021-04-01 to 2021-04-02", $subranges[2]['range']);
+        $this->assertDateRange('2021-04-01 to 2021-04-02', $subranges[2]['range']);
         $this->assertSame(4, $subranges[2]['value']);
 
         // Same but backwards
@@ -648,11 +650,11 @@ class DateTest extends TestCase
             $subranges[] = $subrange;
         }
         $this->assertSame(3, count($subranges));
-        $this->assertDateRange("2021-04-01 to 2021-04-02", $subranges[0]['range']);
+        $this->assertDateRange('2021-04-01 to 2021-04-02', $subranges[0]['range']);
         $this->assertSame(4, $subranges[0]['value']);
-        $this->assertDateRange("2021-03-01 to 2021-03-31", $subranges[1]['range']);
+        $this->assertDateRange('2021-03-01 to 2021-03-31', $subranges[1]['range']);
         $this->assertSame(3, $subranges[1]['value']);
-        $this->assertDateRange("2021-02-28 to 2021-02-28", $subranges[2]['range']);
+        $this->assertDateRange('2021-02-28 to 2021-02-28', $subranges[2]['range']);
         $this->assertSame(2, $subranges[2]['value']);
 
         // Single date range
@@ -662,7 +664,7 @@ class DateTest extends TestCase
             $subranges[] = $subrange;
         }
         $this->assertSame(1, count($subranges));
-        $this->assertDateRange("2021-02-28 to 2021-02-28", $subranges[0]['range']);
+        $this->assertDateRange('2021-02-28 to 2021-02-28', $subranges[0]['range']);
         $this->assertSame(2, $subranges[0]['value']);
     }
 

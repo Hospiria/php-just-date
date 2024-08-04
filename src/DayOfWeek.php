@@ -4,8 +4,6 @@ namespace MadisonSolutions\JustDate;
 
 /**
  * Enum DayOfWeek
- *
- * @package MadisonSolutions\JustDate
  */
 enum DayOfWeek: int
 {
@@ -63,7 +61,7 @@ enum DayOfWeek: int
      * For example DayOfWeek::Sunday->numDaysUntil(DayOfWeek::Monday) is 1
      * DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday) is 6
      *
-     * @param DayOfWeek $to The target DayOfWeek
+     * @param  DayOfWeek  $to  The target DayOfWeek
      * @return int The number of days until the target DayOfWeek
      */
     public function numDaysUntil(DayOfWeek $to): int
@@ -79,7 +77,7 @@ enum DayOfWeek: int
      * For example DayOfWeek::Sunday->numDaysSince(DayOfWeek::Monday) is 6
      * DayOfWeek::Monday->numDaysUntil(DayOfWeek::Sunday) is 1
      *
-     * @param DayOfWeek $from The target DayOfWeek
+     * @param  DayOfWeek  $from  The target DayOfWeek
      * @return int The number of days until the target DayOfWeek
      */
     public function numDaysSince(DayOfWeek $from): int
