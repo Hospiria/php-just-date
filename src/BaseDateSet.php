@@ -384,10 +384,10 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Test whether the given object contains the exact same set of dates as this one
+     * Test whether the given object consists of the exact same set of dates as this one
      *
      * @param DateRangeList $other An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
-     * @return bool True if $other contains the exact same set of dates as this, false otherwise
+     * @return bool True if the set of dates in $other is exactly the same as the set of dates in this set, false otherwise
      */
     public function isSameAs(DateRangeList $other): bool
     {
@@ -415,6 +415,40 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
         if (! empty($normalised_other_ranges)) {
             // $other includes additional dates not in $this
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * Test whether this set contains all of the dates in the given DateRange
+     *
+     * @param DateRange $other DateRange to compare with
+     * @return bool True if this set contains all of the dates in $other, false otherwise
+     */
+    protected function containsRange(DateRange $other): bool
+    {
+        foreach ($this->ranges as $range) {
+            if ($range->contains($other)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Test whether this set contains all of the dates in the given object
+     *
+     * Note: returns true if $other is an empty DateSet or MutableDateSet.
+     *
+     * @param DateRangeList $other An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
+     * @return bool True if this set contains all of the dates in $other, false otherwise
+     */
+    public function contains(DateRangeList $other): bool
+    {
+        foreach ($other->getRanges() as $other_range) {
+            if (! $this->containsRange($other_range)) {
+                return false;
+            }
         }
         return true;
     }

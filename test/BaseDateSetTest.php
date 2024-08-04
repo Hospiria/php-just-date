@@ -183,4 +183,66 @@ class BaseDateSetTest extends TestCase
             }
         }
     }
+
+    public function testContains()
+    {
+        /**
+         * @var array{0: string, 1:DateRangeList|string, 2:bool}
+         */
+        $tests = [
+            ['', '', true],
+            ['', '2024-01-01', false],
+            ['', JustDate::fromYmd('2024-01-01'), false],
+            ['2024-08-04', '', true],
+            ['2024-08-04 to 2024-08-06', '', true],
+            ['2024-08-04', '2024-08-04', true],
+            ['2024-08-04', '2024-08-05', false],
+            ['2024-08-04', JustDate::fromYmd('2024-08-04'), true],
+            ['2024-08-04', DateRange::fromYmd('2024-08-04', '2024-08-04'), true],
+            ['2024-08-04, 2024-10-01', '2024-08-04', true],
+            ['2024-08-04, 2024-10-01', JustDate::fromYmd('2024-08-05'), false],
+            ['2024-08-04, 2024-10-01', JustDate::fromYmd('2024-08-04'), true],
+            ['2024-08-04, 2024-10-01', DateRange::fromYmd('2024-08-04', '2024-08-04'), true],
+            ['2024-08-01 to 2024-08-20', JustDate::fromYmd('2024-08-01'), true],
+            ['2024-08-01 to 2024-08-20', JustDate::fromYmd('2024-08-20'), true],
+            ['2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-01', '2024-08-05'), true],
+            ['2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-05', '2024-08-15'), true],
+            ['2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-15', '2024-08-20'), true],
+            ['2024-08-01 to 2024-08-20', JustDate::fromYmd('2024-08-21'), false],
+            ['2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-15', '2024-08-21'), false],
+            ['2024-08-01 to 2024-08-20', '2024-08-02 to 2024-08-07, 2024-08-14 to 2024-08-20' , true],
+            ['2024-01-01, 2024-08-01 to 2024-08-20', DateRange::fromYmd('2024-08-05', '2024-08-15'), true],
+            ['2024-01-01, 2024-08-01 to 2024-08-20', JustDate::fromYmd('2024-01-01'), true],
+            ['2024-01-01, 2024-08-01 to 2024-08-20', '2024-01-01, 2024-08-01, 2024-08-05 to 2024-08-10, 2024-08-20', true],
+            ['2024-01-01, 2024-08-01 to 2024-08-20', '2024-01-01, 2024-02-01, 2024-08-01, 2024-08-05 to 2024-08-10, 2024-08-20', false],
+        ];
+
+        foreach ($tests as $test) {
+            $set = DateSet::fromString($test[0]);
+            $mutable_set = MutableDateSet::fromString($test[0]);
+            $other = $test[1];
+            $expected = $test[2];
+            if (is_string($other)) {
+                $other_set = DateSet::fromString($other);
+                $other_mutable_set = MutableDateSet::fromString($other);
+                $this->assertSame($expected, $set->contains($other_set));
+                $this->assertSame($expected, $set->contains($other_mutable_set));
+                $this->assertSame($expected, $mutable_set->contains($other_set));
+                $this->assertSame($expected, $mutable_set->contains($other_mutable_set));
+            } else {
+                $this->assertSame($expected, $set->contains($other));
+                $this->assertSame($expected, $mutable_set->contains($other));
+            }
+        }
+
+        // A set always should contain itself
+        foreach (array_unique(array_column($tests, 0)) as $str) {
+            $set = DateSet::fromString($str);
+            $mutable_set = MutableDateSet::fromString($str);
+            $this->assertTrue($set->contains($set));
+            $this->assertTrue($set->contains($mutable_set));
+            $this->assertTrue($mutable_set->contains($set));
+            $this->assertTrue($mutable_set->contains($mutable_set));
+        }
+    }
 }

@@ -6,7 +6,7 @@
  - Added `fromStartAndDuration()`, `fromEndAndDuration()`, `currentMonth()`, `currentWeek()` and `currentYear()` static methods to DateRange
  - Added `numDaysUntil()` and `numDaysSince()` methods to DayOfWeek
  - Added `startOfWeek()` and `endOfWeek()` methods to JustDate
- - Added `isSameAs()` method to DateSet and MutableDateSet (and anything extending BaseDateSet)
+ - Added `contains()` and `isSameAs()` methods to DateSet and MutableDateSet (and anything extending BaseDateSet)
 
 
 

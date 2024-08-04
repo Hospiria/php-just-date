@@ -377,12 +377,22 @@ $a->subtract($b); // 2023-11-05 to 2023-11-07
 $b->subtract($a); // 2023-11-10 to 2023-11-12
 ```
 
-The `isSameAs($other)` method of DateSet and MutableDateSet can be used to compare with other objects to test whether they contain the exact same set of dates.  The other object does not have to be the same type, it can be a JustDate, DateRange, DateSet or MutableDateSet (or anything else implementing the DateRangeList interface).
+The `contains($other)` method of DateSet and MutableDateSet can be used to compare with other objects to test whether they contain all of the dates in the other object.  The other object does not have to be the same type, it can be a JustDate, DateRange, DateSet or MutableDateSet (or anything else implementing the DateRangeList interface).
+
+```php
+$jan_and_march = new DateSet(DateRange::fromYmd('2024-01-01',' 2024-01-31'), DateRange::fromYmd('2024-03-01', '2024-03-31'));
+$jan_and_march->contains(DateRange::fromYmd('2024-01-10', '2024-01-20')); // true
+$jan_and_march->contains(DateSet::fromString('2024-01-01, 2024-01-17, 2024-03-05')); // true
+$jan_and_march->contains(JustDate::fromYmd('2024-02-10')); // false
+```
+
+The `isSameAs($other)` method of DateSet and MutableDateSet can be used to compare with other objects to test whether they contain the _exact_ same set of dates.  Again the other object does not have to be the same type.
 
 ```php
 $set = new DateSet(JustDate::fromYmd('2024-08-01'), JustDate::fromYmd('2024-08-02'), JustDate::fromYmd('2024-08-03'));
-$set->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-03')); // true - $set contains the same 3 dates that are in the DateRange
+$set->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-03')); // true - $set contains the exact same 3 dates that are in the DateRange
 ```
+
 
 ### Iterating over a DateSet
 
