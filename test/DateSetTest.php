@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class DateSetTest extends TestCase
 {
-    public function testConstructing()
+    public function testConstructing(): void
     {
         $params = [
             [
@@ -64,7 +64,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('2021-04-10 to 2021-04-11', (string) $set);
     }
 
-    public function testAddingRanges()
+    public function testAddingRanges(): void
     {
         $set = new DateSet;
         $this->assertEquals('', (string) $set);
@@ -110,7 +110,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('2021-01-01 to 2021-05-20', (string) $set);
     }
 
-    public function testAddingDates()
+    public function testAddingDates(): void
     {
         $set = new DateSet;
         $this->assertEquals('', (string) $set);
@@ -135,7 +135,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('2021-04-01 to 2021-04-05', (string) $set);
     }
 
-    public function testAddingSets()
+    public function testAddingSets(): void
     {
         $set1 = new DateSet(DateRange::fromYmd('2021-04-01', '2021-04-05'), DateRange::fromYmd('2021-04-20', '2021-04-25'));
 
@@ -150,7 +150,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('2021-03-01 to 2021-05-06', (string) $set4);
     }
 
-    public function testSubtracting()
+    public function testSubtracting(): void
     {
         $set = new DateSet(DateRange::fromYmd('2021-02-01', '2021-05-30'));
 
@@ -203,7 +203,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('', (string) $set);
     }
 
-    public function testIntersections()
+    public function testIntersections(): void
     {
         $set0 = new DateSet;
         $set1 = new DateSet(DateRange::fromYmd('2021-02-01', '2021-05-30'));
@@ -242,7 +242,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('2021-03-01 to 2021-03-02, 2021-04-20', (string) $set);
     }
 
-    public function testIncludes()
+    public function testIncludes(): void
     {
         $set = new DateSet(
             DateRange::fromYmd('2021-04-10', '2021-04-20'),
@@ -272,7 +272,7 @@ class DateSetTest extends TestCase
         }
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $set = new DateSet;
         $this->assertTrue($set->isEmpty());
@@ -287,7 +287,7 @@ class DateSetTest extends TestCase
         $this->assertTrue($set->isEmpty());
     }
 
-    public function testSpanningRange()
+    public function testSpanningRange(): void
     {
         $set = new DateSet;
         $this->assertNull($set->getSpanningRange());
@@ -299,7 +299,7 @@ class DateSetTest extends TestCase
         $this->assertEquals('2021-04-10 to 2021-05-10', (string) $set->getSpanningRange());
     }
 
-    public function testWindowGenerator()
+    public function testWindowGenerator(): void
     {
         $tests = [
             [

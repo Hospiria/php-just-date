@@ -9,8 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 class TimeTest extends TestCase
 {
-    // Helper method of verifying the expected exception is thrown when the callback is executed
-    protected function assertThrows(string $exceptionClass, callable $callback)
+    /**
+     * Helper method for verifying the expected exception is thrown when the callback is executed
+     *
+     * @param class-string<object> $exceptionClass
+     */
+    protected function assertThrows(string $exceptionClass, callable $callback): void
     {
         $e = null;
         try {
@@ -20,13 +24,13 @@ class TimeTest extends TestCase
         $this->assertInstanceOf($exceptionClass, $e);
     }
 
-    protected function assertJustTime(string $expectedHis, $actual)
+    protected function assertJustTime(string $expectedHis, mixed $actual): void
     {
         $this->assertInstanceOf(JustTime::class, $actual);
         $this->assertSame($expectedHis, (string) $actual);
     }
 
-    public function testCreateJustTimes()
+    public function testCreateJustTimes(): void
     {
         $t = JustTime::make(2, 30, 40);
         $this->assertJustTime('02:30:40', $t);
@@ -60,7 +64,7 @@ class TimeTest extends TestCase
         $this->assertJustTime('23:59:50', $t);
     }
 
-    public function testCreateFromDateTime()
+    public function testCreateFromDateTime(): void
     {
         // Create a PHP DateTime object with the given date, time and timezone
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -79,7 +83,7 @@ class TimeTest extends TestCase
         $this->assertTrue($t2->isSameAs($t3));
     }
 
-    public function testCreateNow()
+    public function testCreateNow(): void
     {
         $t1 = JustTime::now();
         $this->assertJustTime(date('H:i:s'), $t1);
@@ -96,10 +100,11 @@ class TimeTest extends TestCase
         $this->assertJustTime($kmdNow->format('H:i:s'), $t3);
     }
 
-    public function testCreateFromTimestamp()
+    public function testCreateFromTimestamp(): void
     {
         // Create the timestamp for 2019-04-21 16:23 in UTC
         $ts = gmmktime(16, 23, 12, 4, 21, 2019);
+        assert(is_int($ts));
 
         // Create a JustTime from the timestamp
         // With no timezone defined, we should be the local system time
@@ -117,7 +122,7 @@ class TimeTest extends TestCase
         $this->assertJustTime($sydTime->format('H:i:s'), $t3);
     }
 
-    public function testCreateFromHis()
+    public function testCreateFromHis(): void
     {
         $t = JustTime::fromHis('2:3:4');
         $this->assertJustTime('02:03:04', $t);
@@ -132,7 +137,7 @@ class TimeTest extends TestCase
         $this->assertJustTime('02:30:00', $t);
     }
 
-    public function testCannotCreateFromInvalidHis()
+    public function testCannotCreateFromInvalidHis(): void
     {
         $this->assertThrows(InvalidArgumentException::class, function () {
             JustTime::fromHis('foo');
@@ -147,7 +152,7 @@ class TimeTest extends TestCase
         });
     }
 
-    public function testGetters()
+    public function testGetters(): void
     {
         $t = JustTime::make(16, 35, 17);
         $this->assertSame(16, $t->hours);
@@ -156,7 +161,7 @@ class TimeTest extends TestCase
         $this->assertSame(16 * 60 * 60 + 35 * 60 + 17, $t->since_midnight);
     }
 
-    public function testAddTime()
+    public function testAddTime(): void
     {
         $t1 = JustTime::make(12, 00, 00);
         $this->assertJustTime('12:00:00', $t1->addTime(0, 0, 0));
@@ -169,7 +174,7 @@ class TimeTest extends TestCase
         $this->assertJustTime('22:10:10', $t1->addTime(-14, 10, 10));
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $t1 = JustTime::fromHis('14:08:17');
 
@@ -178,7 +183,7 @@ class TimeTest extends TestCase
         $this->assertSame('Thu, 01 Jan 1970 14:08:17 +0000', $t1->format('r'));
     }
 
-    public function testComparisons()
+    public function testComparisons(): void
     {
         $t1 = JustTime::make(14, 8, 17);
         $t2 = JustTime::make(14, 8, 18);
@@ -197,7 +202,7 @@ class TimeTest extends TestCase
         $this->assertTrue($t1->isSameAs(JustTime::fromHis('14:08:17')));
     }
 
-    public function testEarliestAndLatest()
+    public function testEarliestAndLatest(): void
     {
         $t1 = JustTime::make(14, 8, 7);
         $this->assertJustTime('14:08:07', JustTime::earliest($t1));
@@ -214,7 +219,7 @@ class TimeTest extends TestCase
         $this->assertJustTime('14:08:08', JustTime::latest($t3, $t2, $t1));
     }
 
-    public function testRounding()
+    public function testRounding(): void
     {
         $t = JustTime::make(15, 47, 12);
 
@@ -228,7 +233,7 @@ class TimeTest extends TestCase
         $this->assertJustTime('00:00:00', $t->round(24 * 60 * 60));
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $t1 = JustTime::make(14, 8, 7);
         $s = serialize($t1);

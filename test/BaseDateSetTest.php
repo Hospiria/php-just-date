@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class BaseDateSetTest extends TestCase
 {
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $tests = [
             [
@@ -62,7 +62,7 @@ class BaseDateSetTest extends TestCase
         }
     }
 
-    public function testGenerators()
+    public function testGenerators(): void
     {
         $tests = [
             [
@@ -117,7 +117,7 @@ class BaseDateSetTest extends TestCase
         }
     }
 
-    public function testIsSameAs()
+    public function testIsSameAs(): void
     {
         $set = new DateSet(JustDate::fromYmd('2024-08-01'), JustDate::fromYmd('2024-08-02'), JustDate::fromYmd('2024-08-03'));
         $this->assertTrue($set->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-03')));
@@ -187,10 +187,10 @@ class BaseDateSetTest extends TestCase
         }
     }
 
-    public function testContains()
+    public function testContains(): void
     {
         /**
-         * @var array{0: string, 1:DateRangeList|string, 2:bool}
+         * @var list<array{0: string, 1:DateRangeList|string, 2:bool}>
          */
         $tests = [
             ['', '', true],
