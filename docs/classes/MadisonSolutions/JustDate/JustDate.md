@@ -924,7 +924,7 @@ The new JustDate object
 
 ### startOfWeek
 
-Get the date which is/was the first day of this date's week
+Get the date which is the first day of this date's week
 
 ```php
 public startOfWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\JustDate
@@ -955,7 +955,7 @@ The new JustDate object
 
 ### endOfWeek
 
-Get the date which is/will be the final day of this date's week
+Get the date which is the final day of this date's week
 
 ```php
 public endOfWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\JustDate
@@ -986,7 +986,7 @@ The new JustDate object
 
 ### startOfMonth
 
-Get the date which is the start of this date's month
+Get the date which is the first day of this date's month
 
 ```php
 public startOfMonth(): \MadisonSolutions\JustDate\JustDate
@@ -1010,7 +1010,7 @@ The new JustDate object
 
 ### endOfMonth
 
-Get the date which is the end of this date's month
+Get the date which is the final day of this date's month
 
 ```php
 public endOfMonth(): \MadisonSolutions\JustDate\JustDate

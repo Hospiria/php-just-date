@@ -510,7 +510,7 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Get the date which is/was the first day of this date's week
+     * Get the date which is the first day of this date's week
      *
      * By default weeks are assumed to 'start' on a Monday (so Sunday is the final day).
      * This can be overridden with the optional $week_starts_on parameter.
@@ -523,7 +523,7 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Get the date which is/will be the final day of this date's week
+     * Get the date which is the final day of this date's week
      *
      * By default weeks are assumed to 'start' on a Monday (so Sunday is the final day).
      * This can be overridden with the optional $week_starts_on parameter.
@@ -537,7 +537,7 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Get the date which is the start of this date's month
+     * Get the date which is the first day of this date's month
      *
      * @return JustDate The new JustDate object
      */
@@ -547,7 +547,7 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Get the date which is the end of this date's month
+     * Get the date which is the final day of this date's month
      *
      * @return JustDate The new JustDate object
      */

@@ -525,6 +525,36 @@ public eachExceptLast(bool $backwards = false): \Generator&lt;int,\MadisonSoluti
 
 ***
 
+### isSameAs
+
+Test whether a particular DateRange is the same as this one - IE has the same start date and same end date
+
+```php
+public isSameAs(\MadisonSolutions\JustDate\DateRange $range): bool
+```
+
+
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$range` | **\MadisonSolutions\JustDate\DateRange** | The DateRange to compare with |
+
+
+**Return Value:**
+
+True if the $range has the same start and end dates as this range, false otherwise
+
+
+
+***
+
 ### includes
 
 Test whether a particular date lies within this range
