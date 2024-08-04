@@ -520,6 +520,19 @@ class DateTest extends TestCase
         $this->assertFalse($r1->includes(JustDate::make(2019, 04, 27)));
     }
 
+    public function testRangeIsSameAs(): void
+    {
+        $r1 = DateRange::fromYmd('2024-08-01', '2024-08-05');
+        $this->assertTrue($r1->isSameAs($r1));
+        $this->assertTrue($r1->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-05')));
+        $this->assertFalse($r1->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-04')));
+        $this->assertFalse($r1->isSameAs(DateRange::fromYmd('2024-08-02', '2024-08-05')));
+        $r2 = DateRange::fromYmd('2024-08-04', '2024-08-04');
+        $this->assertTrue($r2->isSameAs($r2));
+        $this->assertTrue($r2->isSameAs(DateRange::fromYmd('2024-08-04', '2024-08-04')));
+        $this->assertFalse($r2->isSameAs(DateRange::fromYmd('2024-08-12', '2024-08-12')));
+    }
+
     public function testRangeIterators(): void
     {
         // Normal range
