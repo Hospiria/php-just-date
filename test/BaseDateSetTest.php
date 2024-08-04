@@ -2,6 +2,7 @@
 
 use MadisonSolutions\JustDate\BaseDateSet;
 use MadisonSolutions\JustDate\DateRange;
+use MadisonSolutions\JustDate\DateRangeList;
 use MadisonSolutions\JustDate\JustDate;
 use MadisonSolutions\JustDate\DateSet;
 use MadisonSolutions\JustDate\MutableDateSet;
@@ -109,6 +110,76 @@ class BaseDateSetTest extends TestCase
                     $ranges[] = (string) $range;
                 }
                 $this->assertEquals(array_reverse($expected_ranges), $ranges);
+            }
+        }
+    }
+
+    public function testIsSameAs()
+    {
+        $set = new DateSet(JustDate::fromYmd('2024-08-01'), JustDate::fromYmd('2024-08-02'), JustDate::fromYmd('2024-08-03'));
+        $this->assertTrue($set->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-03')));
+
+        $same = [
+            ['', new DateSet()],
+            ['', new MutableDateSet()],
+            ['2024-08-04', JustDate::fromYmd('2024-08-04')],
+            ['2024-08-04', DateRange::fromYmd('2024-08-04', '2024-08-04')],
+            ['2024-08-04 to 2024-08-10', DateRange::fromYmd('2024-08-04', '2024-08-10')],
+        ];
+
+        foreach ($same as $test) {
+            $this->assertTrue(DateSet::fromString($test[0])->isSameAs($test[1]));
+            $this->assertTrue(MutableDateSet::fromString($test[0])->isSameAs($test[1]));
+        }
+
+        $same_set = [
+            '',
+            '2024-08-04',
+            '2024-08-04 to 2024-08-10',
+            '2024-08-04 to 2024-08-10, 2024-09-01',
+            '2023-01-01, 2024-08-04 to 2024-08-10',
+            '2023-01-01, 2024-08-04 to 2024-08-10, 2024-09-01',
+            '2023-01-01 to 2023-01-31, 2024-01-01 to 2024-01-31',
+        ];
+
+        foreach ($same_set as $str) {
+            $this->assertTrue(DateSet::fromString($str)->isSameAs(DateSet::fromString($str)));
+            $this->assertTrue(DateSet::fromString($str)->isSameAs(MutableDateSet::fromString($str)));
+            $this->assertTrue(MutableDateSet::fromString($str)->isSameAs(DateSet::fromString($str)));
+            $this->assertTrue(MutableDateSet::fromString($str)->isSameAs(MutableDateSet::fromString($str)));
+        }
+
+        /**
+         * None of the sets in the first array are the same as any of the sets in the second array
+         *
+         * @var array{0:list<string>, 1:list<DateRangeList|string>}
+         */
+        $not_same = [
+            ['', '2024-08-01', '2024-08-01 to 2024-08-06', '2024-08-01, 2024-08-02'],
+            [
+                JustDate::fromYmd('2024-08-04'),
+                DateRange::fromYmd('2024-08-04', '2024-08-04'),
+                DateRange::fromYmd('2024-08-04', '2024-08-06'),
+                '2024-08-04',
+                '2024-08-04 to 2024-08-06',
+                '2024-08-01, 2024-08-04 to 2024-08-06',
+                '2024-08-01 to 2024-08-05',
+            ],
+        ];
+
+        foreach ($not_same[0] as $str) {
+            $set = DateSet::fromString($str);
+            $mutable_set = MutableDateSet::fromString($str);
+            foreach ($not_same[1] as $other) {
+                if (is_string($other)) {
+                    $this->assertFalse($set->isSameAs(DateSet::fromString($other)));
+                    $this->assertFalse($set->isSameAs(MutableDateSet::fromString($other)));
+                    $this->assertFalse($mutable_set->isSameAs(DateSet::fromString($other)));
+                    $this->assertFalse($mutable_set->isSameAs(MutableDateSet::fromString($other)));
+                } else {
+                    $this->assertFalse($set->isSameAs($other));
+                    $this->assertFalse($mutable_set->isSameAs($other));
+                }
             }
         }
     }

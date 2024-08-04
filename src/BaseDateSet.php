@@ -382,4 +382,40 @@ abstract class BaseDateSet implements DateRangeList, JsonSerializable
         }, $parts);
         return new static (...array_filter($args));
     }
+
+    /**
+     * Test whether the given object contains the exact same set of dates as this one
+     *
+     * @param DateRangeList $other An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet)
+     * @return bool True if $other contains the exact same set of dates as this, false otherwise
+     */
+    public function isSameAs(DateRangeList $other): bool
+    {
+        if ($other instanceof JustDate || $other instanceof DateRange || $other instanceof DateSet || $other instanceof MutableDateSet) {
+            // We know in theses cases the ranges are already normalised
+            $normalised_other_ranges = $other->getRanges();
+        } else {
+            // For other classes, we will need to make sure they are normalised before comparing
+            $normalised_other_ranges = BaseDateSet::normalizeRanges($other->getRanges());
+        }
+        foreach ($this->ranges as $i => $range) {
+            $other_range = $normalised_other_ranges[$i] ?? null;
+            unset($normalised_other_ranges[$i]);
+            if ($other_range instanceof DateRange) {
+                if (! $range->start->isSameAs($other_range->start)) {
+                    return false;
+                }
+                if (! $range->end->isSameAs($other_range->end)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        if (! empty($normalised_other_ranges)) {
+            // $other includes additional dates not in $this
+            return false;
+        }
+        return true;
+    }
 }

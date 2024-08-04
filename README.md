@@ -366,7 +366,7 @@ $mset->add(DateRange::fromYmd('2023-10-01', '2023-10-10'));
 (string) $mset; // '2023-10-01 to 2023-10-10, 2023-11-17'
 ```
 
-### Combining DateSets
+### Combining / Comparing DateSets
 
 ```php
 $a = new DateSet(DateRange::fromYmd('2023-11-05', '2023-11-09'));
@@ -375,6 +375,13 @@ DateSet::union($a, $b); // 2023-11-05 to 2023-11-12
 DateSet::intersection($a, $b); // 2023-11-08 to 2023-11-09
 $a->subtract($b); // 2023-11-05 to 2023-11-07
 $b->subtract($a); // 2023-11-10 to 2023-11-12
+```
+
+The `isSameAs($other)` method of DateSet and MutableDateSet can be used to compare with other objects to test whether they contain the exact same set of dates.  The other object does not have to be the same type, it can be a JustDate, DateRange, DateSet or MutableDateSet (or anything else implementing the DateRangeList interface).
+
+```php
+$set = new DateSet(JustDate::fromYmd('2024-08-01'), JustDate::fromYmd('2024-08-02'), JustDate::fromYmd('2024-08-03'));
+$set->isSameAs(DateRange::fromYmd('2024-08-01', '2024-08-03')); // true - $set contains the same 3 dates that are in the DateRange
 ```
 
 ### Iterating over a DateSet
