@@ -6,6 +6,22 @@
 ## Namespaces
 
 
+### \
+
+
+
+
+
+
+
+### \MadisonSolutions
+
+
+
+
+
+
+
 ### \MadisonSolutions\JustDate
 
 #### Classes
@@ -28,6 +44,12 @@
 | [`DateRangeList`](./classes/MadisonSolutions/JustDate/DateRangeList.md) | Interface DateRangeList|
 
 
+#### Enums
+
+| Enum | Description |
+|-------|-------------|
+| [`DayOfWeek`](./classes/MadisonSolutions/JustDate/DayOfWeek.md) | Enum DayOfWeek|
+
 
 ***
-> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments using [phpDocumentor](http://www.phpdoc.org/)

@@ -619,4 +619,4 @@ be in the format of an array with 'value' and 'range' keys.
 ***
 
 ***
-> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments using [phpDocumentor](http://www.phpdoc.org/)

@@ -424,6 +424,42 @@ The number of days from $from to $to
 
 ***
 
+### compare
+
+Compare 2 JustDate objects and return an integer to indicate which one is earlier
+
+```php
+public static compare(\MadisonSolutions\JustDate\JustDate $a, \MadisonSolutions\JustDate\JustDate $b): int
+```
+
+Returns -1, 0 or 1, depending on whether $a is respectively earlier than, the same as, or later than $b
+Can be used as the comparison function in PHP sorting functions, for example usort()
+
+If $a is earlier than $b, returns -1
+If $a and $b refer to the same date, returns zero
+If $a is later than $b, returns 1
+
+* This method is **static**.
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$a` | **\MadisonSolutions\JustDate\JustDate** | The first date |
+| `$b` | **\MadisonSolutions\JustDate\JustDate** | The second date |
+
+
+**Return Value:**
+
+Result of comparison: -1, 0 or 1
+
+
+
+***
+
 ### earliest
 
 Return the earliest of a set of dates
@@ -888,7 +924,7 @@ The new JustDate object
 
 ### startOfWeek
 
-Get the date which is/was the first day of the current week
+Get the date which is/was the first day of this date's week
 
 ```php
 public startOfWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\JustDate
@@ -919,7 +955,7 @@ The new JustDate object
 
 ### endOfWeek
 
-Get the date which is/will be the final day of the current week
+Get the date which is/will be the final day of this date's week
 
 ```php
 public endOfWeek(\MadisonSolutions\JustDate\DayOfWeek $week_starts_on = DayOfWeek::Monday): \MadisonSolutions\JustDate\JustDate
@@ -1440,4 +1476,4 @@ public jsonSerialize(): string
 ***
 
 ***
-> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments using [phpDocumentor](http://www.phpdoc.org/)

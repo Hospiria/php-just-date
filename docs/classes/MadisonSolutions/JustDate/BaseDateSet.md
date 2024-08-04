@@ -344,5 +344,65 @@ public static fromString(string $serialized): static
 
 ***
 
+### isSameAs
+
+Test whether the given object consists of the exact same set of dates as this one
+
+```php
+public isSameAs(\MadisonSolutions\JustDate\DateRangeList $other): bool
+```
+
+
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$other` | **\MadisonSolutions\JustDate\DateRangeList** | An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet) |
+
+
+**Return Value:**
+
+True if the set of dates in $other is exactly the same as the set of dates in this set, false otherwise
+
+
+
 ***
-> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)
+
+### contains
+
+Test whether this set contains all of the dates in the given object
+
+```php
+public contains(\MadisonSolutions\JustDate\DateRangeList $other): bool
+```
+
+Note: returns true if $other is an empty DateSet or MutableDateSet.
+
+
+
+
+
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `$other` | **\MadisonSolutions\JustDate\DateRangeList** | An object implementing DateRangeList to compare with (JustDate, DateRange, DateSet or MutableDateSet) |
+
+
+**Return Value:**
+
+True if this set contains all of the dates in $other, false otherwise
+
+
+
+***
+
+***
+> Automatically generated from source code comments using [phpDocumentor](http://www.phpdoc.org/)

@@ -10,7 +10,6 @@
 ## Namespaces
 
 {% for namespace in project.indexes.namespaces|sort((a,b) => a.FullyQualifiedStructuralElementName <=> b.FullyQualifiedStructuralElementName) %}
-{% if namespace.classes|length > 0 or namespace.traits|length > 0 or namespace.interfaces|length > 0 %}
 
 ### {{ namespace.FullyQualifiedStructuralElementName }}
 
@@ -33,7 +32,6 @@
 {% for trait in namespace.traits|sort((a,b) => a.FullyQualifiedStructuralElementName <=> b.FullyQualifiedStructuralElementName) %}
 | {{ macros.mdClassLink(trait) }} | {{ trait.summary|replace({'|': '&#124;'})|nl2br|replace({"\n": "", "\r": "", "\t": ""})|raw }}|
 {% endfor %}{# for trait #}
-
 {% endif %}{# if traits #}
 
 {% if namespace.interfaces|length > 0 %}
@@ -45,10 +43,19 @@
 {% for interface in namespace.interfaces|sort((a,b) => a.FullyQualifiedStructuralElementName <=> b.FullyQualifiedStructuralElementName) %}
 | {{ macros.mdClassLink(interface) }} | {{ interface.summary|replace({'|': '&#124;'})|nl2br|replace({"\n": "", "\r": "", "\t": ""})|raw }}|
 {% endfor %}{# for interace #}
-
 {% endif %}{# if interfaces #}
 
-{% endif %}{# if classes, traits, interfaces length #}
+
+{% if namespace.enums|length > 0 %}
+#### Enums
+
+| Enum | Description |
+|-------|-------------|
+{% for enum in namespace.enums|sort((a,b) => a.FullyQualifiedStructuralElementName <=> b.FullyQualifiedStructuralElementName) %}
+| {{ macros.mdClassLink(enum) }} | {{ enum.summary|replace({'|': '&#124;'})|nl2br|replace({"\n": "", "\r": "", "\t": ""})|raw }}|
+{% endfor %}{# for enum #}
+{% endif %}{# if enums.length #}
+
 {% endfor %}{# for namespace #}
 
 {% include 'config/footer.md.twig' %}

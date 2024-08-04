@@ -223,4 +223,4 @@ The number of days until the target DayOfWeek
 ***
 
 ***
-> Automatically generated from source code comments on 2024-08-03 using [phpDocumentor](http://www.phpdoc.org/)
+> Automatically generated from source code comments using [phpDocumentor](http://www.phpdoc.org/)
