@@ -496,7 +496,7 @@ class JustDate implements DateRangeList, JsonSerializable
     }
 
     /**
-     * Get the date which is/was the first day of the current week
+     * Get the date which is/was the first day of this date's week
      *
      * By default weeks are assumed to 'start' on a Monday (so Sunday is the final day).
      * This can be overridden with the optional $week_starts_on parameter.
@@ -505,12 +505,11 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function startOfWeek(DayOfWeek $week_starts_on = DayOfWeek::Monday): JustDate
     {
-        $today = JustDate::today();
-        return $today->subDays($today->day_of_week->numDaysSince($week_starts_on));
+        return $this->subDays($this->day_of_week->numDaysSince($week_starts_on));
     }
 
     /**
-     * Get the date which is/will be the final day of the current week
+     * Get the date which is/will be the final day of this date's week
      *
      * By default weeks are assumed to 'start' on a Monday (so Sunday is the final day).
      * This can be overridden with the optional $week_starts_on parameter.
@@ -519,9 +518,8 @@ class JustDate implements DateRangeList, JsonSerializable
      */
     public function endOfWeek(DayOfWeek $week_starts_on = DayOfWeek::Monday): JustDate
     {
-        $today = JustDate::today();
         $week_ends_on = $week_starts_on->addDays(6);
-        return $today->addDays($today->day_of_week->numDaysUntil($week_ends_on));
+        return $this->addDays($this->day_of_week->numDaysUntil($week_ends_on));
     }
 
     /**
