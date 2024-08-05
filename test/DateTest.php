@@ -713,16 +713,21 @@ class DateTest extends TestCase
     {
         $d1 = JustDate::make(2023, 9, 4); // Monday
         $this->assertJustDate('2023-09-04', $d1->addWorkingDays(0));
-        $this->assertJustDate('2023-09-05', $d1->addWorkingDays(1)); // Tue)
-        $this->assertJustDate('2023-09-08', $d1->addWorkingDays(4)); // Fri)
-        $this->assertJustDate('2023-09-11', $d1->addWorkingDays(5)); // Next Mon)
+        $this->assertJustDate('2023-09-05', $d1->addWorkingDays(1)); // Tue
+        $this->assertJustDate('2023-09-08', $d1->addWorkingDays(4)); // Fri
+        $this->assertJustDate('2023-09-11', $d1->addWorkingDays(5)); // Next Mon
         $this->assertJustDate('2023-09-04', $d1->addWorkingDays(-1));
+
+        // Make sure we advance to the first working day if we start on one that isn't
+        $d2 = JustDate::make(2023, 9, 2); // Saturday
+        $this->assertJustDate('2023-09-04', $d2->addWorkingDays(0)); // Mon
+        $this->assertJustDate('2023-09-05', $d2->addWorkingDays(1)); // Tue
 
         $holidays = new DateSet(JustDate::make(2023, 9, 4), JustDate::make(2023, 9, 7)); // Mon and Thur
         $this->assertJustDate('2023-09-05', $d1->addWorkingDays(0, $holidays)); // Tue
-        $this->assertJustDate('2023-09-06', $d1->addWorkingDays(1, $holidays)); // Wed)
-        $this->assertJustDate('2023-09-12', $d1->addWorkingDays(4, $holidays)); // Next Tue)
-        $this->assertJustDate('2023-09-13', $d1->addWorkingDays(5, $holidays)); // Next Wed)
+        $this->assertJustDate('2023-09-06', $d1->addWorkingDays(1, $holidays)); // Wed
+        $this->assertJustDate('2023-09-12', $d1->addWorkingDays(4, $holidays)); // Next Tue
+        $this->assertJustDate('2023-09-13', $d1->addWorkingDays(5, $holidays)); // Next Wed
         $this->assertJustDate('2023-09-05', $d1->addWorkingDays(-1, $holidays)); // Tue
     }
 

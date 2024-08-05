@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.1]
+
+### Fixed
+
+ - Incorrect return date from `addDaysPassingTest()` method when first 2 days failed test
+
+
+
 ## [2.2.0]
 
 ### Added

@@ -567,7 +567,7 @@ class JustDate implements DateRangeList, JsonSerializable
     public function addDaysPassingTest(int $num_to_add, callable $test_fn): JustDate
     {
         $curr = $this;
-        if (! $test_fn($curr)) {
+        while (! $test_fn($curr)) {
             $curr = $curr->nextDay();
         }
         while ($num_to_add > 0) {
